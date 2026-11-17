@@ -130,6 +130,7 @@ td.h{font-weight:700}.z{color:var(--line)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 
 #gate{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px}
+#gate[hidden]{display:none}
 #gate .box{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);max-width:400px;width:100%;overflow:hidden}
 #gate .top{background:var(--head);border-bottom:4px solid var(--amarelo);padding:18px;display:flex;gap:14px;align-items:center;justify-content:center}
 #gate .top img{height:38px}
@@ -540,7 +541,7 @@ $('gForm').onsubmit=async ev=>{ev.preventDefault();const email=$('gEmail').value
       if(!data.session){const r=await SB.auth.signInWithPassword({email,password});if(r.error)throw r.error;}
     }else{const {error}=await SB.auth.signInWithPassword({email,password});
       if(error){if(/invalid/i.test(error.message))throw new Error('E-mail ou senha incorretos. Se é seu primeiro acesso, clique em “Primeiro acesso? Crie sua senha”.');throw error;}}
-    await entrar();
+    gm('');await entrar();
   }catch(e){gm(e.message||'Não foi possível entrar.');}finally{$('gBtn').disabled=false;}};
 async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!session)return;
   const {data:ok}=await SB.rpc('is_allowed');
