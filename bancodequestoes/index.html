@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Banco de Questões UFU</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: cabeçalho grafite com as logos · filtros à esquerda · questões no centro · "Minha lista" à direita */
+:root{
+  --azul:#3A8CCB; --amarelo:#DDDD24; --grafite:#222322; --laranja:#EB6834; --verde:#1BAF7A; --roxo:#7B61FF; --rosa:#E0559B;
+  --bg:#F4F6FB; --card:#FFFFFF; --ink:#141A2E; --muted:#5C6380; --line:#DDE1EC; --soft:#ECEFF6; --head:#16304F;
+  --ok:#1A8A4C; --warn:#E07A1F; --bad:#D33A2C; --shadow:0 1px 2px rgba(20,26,46,.05),0 6px 20px rgba(20,26,46,.06);
+  --display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif; --body:"Public Sans",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0B1020;--card:#151C2E;--ink:#EEF0F7;--muted:#9AA1BD;--line:#262E46;--soft:#1E2740;--shadow:none;color-scheme:dark;}}
+:root[data-theme="dark"]{--bg:#0B1020;--card:#151C2E;--ink:#EEF0F7;--muted:#9AA1BD;--line:#262E46;--soft:#1E2740;--shadow:none;color-scheme:dark;}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 var(--body)}
+header{background:var(--head);padding:14px 22px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;border-bottom:4px solid var(--amarelo)}
+.logos{display:flex;align-items:center;gap:16px}
+.logos img.j{height:46px}.logos img.p{height:34px}.logos img.u{height:42px}
+.logos .sep{width:1px;height:40px;background:#55595E}
+.ttl{color:#fff;margin-left:6px}
+.ttl h1{font:700 18px/1.2 var(--display);margin:0}
+.ttl p{margin:0;color:#BFC5CA;font-size:13.5px}
+.tabs{margin-left:auto;display:flex;gap:6px}
+.tabs button{font:600 14px var(--body);border:1px solid #4A4F55;background:transparent;color:#fff;padding:7px 14px;border-radius:999px;cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--azul);border-color:var(--azul)}
+.wrap{display:grid;grid-template-columns:260px minmax(0,1fr) 300px;gap:18px;padding:18px;max-width:1500px;margin:0 auto}
+@media (max-width:1150px){.wrap{grid-template-columns:250px minmax(0,1fr)}.cart{grid-column:1/-1;position:static!important;max-height:none!important}}
+@media (max-width:760px){.wrap{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:16px;display:flex;flex-direction:column;gap:13px;align-self:start;position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto}
+@media (max-width:760px){.panel{position:static;max-height:none}}
+.panel h2{font:700 15px var(--display);margin:0}
+label.t{display:block;font:600 12px var(--display);text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:4px}
+select,input[type=search],input[type=text]{width:100%;font:15px var(--body);padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+#fDisc{border:2px solid var(--azul)}#fTop{border:2px solid var(--amarelo)}#fSub{border:2px solid var(--verde)}
+:focus-visible{outline:3px solid var(--azul);outline-offset:2px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:14px;border:1px solid var(--line);border-radius:999px;padding:4px 10px;cursor:pointer;background:var(--bg)}
+.chip input{margin:0;accent-color:var(--azul)}
+.years{display:flex;flex-direction:column;gap:2px;max-height:170px;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:var(--bg)}
+.years label{display:flex;gap:8px;align-items:center;font-size:14.5px;cursor:pointer;padding:2px 0}.years input{accent-color:var(--azul)}
+.hint{text-transform:none;letter-spacing:0;font-weight:400}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btn{font:600 14px var(--body);border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:7px 12px;border-radius:8px;cursor:pointer}
+.btn:hover{border-color:var(--azul)}
+.btn.pri{background:var(--azul);border-color:var(--azul);color:#fff}
+.btn.word{background:#2B579A;border-color:#2B579A}
+.btn.pri:disabled{opacity:.5;cursor:not-allowed}
+.btn.sel{background:var(--grafite);color:#fff;border-color:var(--grafite)}
+main{min-width:0;display:flex;flex-direction:column;gap:14px}
+.count{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.count b{font:800 26px var(--display);font-variant-numeric:tabular-nums}
+.count span{color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
+.card.on{outline:3px solid var(--azul)}
+.head{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:11px 14px;border-bottom:1px solid var(--line)}
+.src{font:700 14px var(--display)}
+.pill{font-size:12.5px;font-weight:700;padding:2px 9px;border-radius:999px;background:var(--soft);white-space:nowrap}
+.lvF{background:var(--ok);color:#fff}.lvM{background:var(--warn);color:#fff}.lvD{background:var(--bad);color:#fff}
+.k1{background:#F4F4C4;color:#55550A}.k2{background:#F6E3CF;color:#7A4510}.k3{background:#F6D5D1;color:#7B1E1E}
+.path{padding:8px 14px 0;font-weight:600}.path span{color:var(--muted);font-weight:400}
+.img{padding:12px 14px;background:#fff;border-radius:0}
+.img img{display:block;width:100%;min-height:60px;max-width:760px;height:auto;margin:0 auto}
+.foot{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:10px 14px;border-top:1px solid var(--line)}
+.gab{font:700 15px var(--display);color:var(--ok)}
+.more{align-self:center}
+.empty{padding:30px;text-align:center;color:var(--muted);background:var(--card);border-radius:12px;border:1px dashed var(--line)}
+.list{display:flex;flex-direction:column;gap:6px;max-height:340px;overflow:auto}
+.li{display:flex;align-items:center;gap:8px;font-size:14px;border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:var(--bg)}
+.li b{font:700 13px var(--display);min-width:22px;text-align:center;background:var(--grafite);color:#fff;border-radius:6px;padding:1px 4px}
+.li span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.li button{border:0;background:none;color:var(--muted);cursor:pointer;font-size:16px;line-height:1;padding:2px 4px}
+.li button:hover{color:var(--ink)}
+.note{font-size:13px;color:var(--muted);margin:0}
+.msg{font-size:14px;margin:0}
+.chart{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px 22px;margin-bottom:16px;box-shadow:var(--shadow)}
+.chart h3{font:700 19px var(--display);margin:0 0 4px;display:flex;align-items:center;gap:10px}.chart h3 .hi{width:12px;height:26px;border-radius:6px}.hi.a{background:linear-gradient(#3A8CCB,#DDDD24)}.hi.b{background:linear-gradient(#EB6834,#7B61FF)}
+.bars{display:flex;flex-direction:column;gap:7px;margin-top:12px}
+.bar{display:grid;grid-template-columns:minmax(120px,240px) 1fr 92px;gap:10px;align-items:center;font-size:14.5px}
+.bl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bt{height:20px;background:var(--soft);border-radius:5px;overflow:hidden}
+.bf{display:block;height:100%;background:var(--azul);border-radius:5px}
+.bar:first-child .bf{background:var(--grafite)}
+.bv{font-variant-numeric:tabular-nums;text-align:right}.bv small{color:var(--muted)}
+@media (max-width:560px){.bar{grid-template-columns:1fr 70px}.bt{grid-column:1/-1;order:3}}
+.an .cart{display:none!important}
+body.an .wrap{grid-template-columns:260px minmax(0,1fr)}
+@media (max-width:760px){body.an .wrap{grid-template-columns:1fr}}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin-bottom:14px}
+.kpi{border-radius:18px;padding:16px 18px;display:grid;grid-template-columns:64px 1fr;gap:14px;align-items:center;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);min-width:0}
+.kpi>div{min-width:0;display:flex;flex-direction:column}
+.kpi span{font:600 12px var(--body);text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}
+.kpi b{font:800 27px/1.15 var(--display);font-variant-numeric:tabular-nums}
+.kpi small{font-size:13.5px;color:var(--muted);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.k-a{background:linear-gradient(135deg,#3A8CCB,#16304F);border:0;color:#fff}.k-a span,.k-a small{color:#D6E6F5}
+.ring{width:64px;height:64px}.ring .rv{font:800 15px var(--display);fill:var(--ink)}
+.k-a .ring .rv{fill:#fff}
+.of{font:600 14px var(--body);color:var(--muted);font-style:normal}
+.kpi b.nm{font-size:20px;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ico.disc{background:linear-gradient(135deg,#DDDD24,#C9A227);color:#141A2E;font:800 20px var(--display)}.ico.dash{background:var(--soft);color:var(--muted);font:800 22px var(--display)}
+.ico{width:56px;height:56px;border-radius:16px;display:grid;place-items:center;font-size:24px;background:rgba(255,255,255,.16)}
+.anbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.dwrap{display:flex;flex-wrap:wrap;gap:22px;align-items:center;margin-top:10px}
+.dwrap .donut{flex:0 0 220px;width:220px;height:220px;display:block}
+.dwrap .legend{flex:1 1 260px;min-width:0}
+@media (max-width:560px){.dwrap{justify-content:center}}
+.donut .dn{font:800 26px var(--display);fill:var(--ink)}.donut .dm{font:700 11px var(--body);fill:var(--ink)}.donut .dl{font:600 8.5px var(--body);letter-spacing:.8px;fill:var(--muted)}
+.legend{display:flex;flex-direction:column;gap:6px}
+.lg span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lg{display:grid;grid-template-columns:14px minmax(0,1fr) auto 34px;gap:9px;align-items:center;font-size:14.5px}
+.lg i{width:14px;height:14px;border-radius:4px}.lg b{font-variant-numeric:tabular-nums}.lg small{color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.bf{display:flex!important;align-items:center;justify-content:flex-end;padding-right:7px;font:700 12px var(--display);white-space:nowrap}
+.bt{height:26px!important;border-radius:999px!important}.bf{border-radius:999px!important}
+.bar{grid-template-columns:minmax(120px,250px) 1fr 92px!important}
+.bv{color:var(--muted);font-size:13.5px}
+.theme{display:inline-flex;gap:2px;padding:3px;border:1px solid #3B5878;background:#0E2238;border-radius:999px;cursor:pointer;margin-right:6px}
+.theme span{width:28px;height:26px;display:grid;place-items:center;border-radius:999px;color:#9FB3CC;font-size:15px}
+:root:not([data-theme="dark"]) .theme .sun,:root[data-theme="dark"] .theme .moon{background:#fff;color:#16304F}
+.tw{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:center}
+th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--card)}
+thead th{font:600 12px var(--display);color:var(--muted);text-transform:uppercase}
+td.h{font-weight:700}.z{color:var(--line)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+#gate{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px}
+#gate .box{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);max-width:400px;width:100%;overflow:hidden}
+#gate .top{background:var(--head);border-bottom:4px solid var(--amarelo);padding:18px;display:flex;gap:14px;align-items:center;justify-content:center}
+#gate .top img{height:38px}
+#gate form{padding:20px 22px 22px;display:flex;flex-direction:column;gap:12px}
+#gate h2{margin:0;font:800 22px var(--display);color:var(--ink)}
+#gate p{margin:0;color:var(--muted);font-size:14px;line-height:1.45}
+#gate input{font:500 15px var(--body);padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink)}
+#gate .btn{padding:10px 12px;font-size:15px}
+#gate .lnk{background:none;border:0;color:var(--azul);font:600 14px var(--body);cursor:pointer;padding:2px}
+#gMsg{min-height:20px;font-size:14px;color:var(--bad)}#gMsg.ok{color:var(--ok)}
+.tabs .sair{border-color:#4A4F55}
+#adm{position:fixed;inset:0;z-index:40;background:rgba(5,8,18,.55);display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;overflow:auto}
+#adm[hidden]{display:none}
+#adm .box{background:var(--card);color:var(--ink);border-radius:16px;max-width:720px;width:100%;padding:20px;display:flex;flex-direction:column;gap:12px;box-shadow:0 10px 40px rgba(0,0,0,.35)}
+#adm h2{margin:0;font:800 21px var(--display)}
+#adm .add{display:grid;grid-template-columns:1fr 1fr auto;gap:8px}
+#adm .add input,#adm textarea{font:500 14px var(--body);padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+#adm table{width:100%;border-collapse:collapse;font-size:14px}
+#adm td,#adm th{padding:7px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+#adm th{color:var(--muted);font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.03em}
+#adm .tag{font-size:12px;padding:2px 8px;border-radius:99px;background:var(--soft);color:var(--muted);white-space:nowrap}
+#adm .tag.on{background:rgba(27,175,122,.15);color:var(--ok)}
+#adm .x{font:600 12.5px var(--body);border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:7px;padding:4px 8px;cursor:pointer;margin-left:4px}
+#adm .x.del{color:var(--bad)}
+@media (max-width:600px){#adm .add{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="gate"><div class="box"><div class="top"><img src="logo/jazz_claro.png" alt="Jazz, Professor de Matemática"><img src="logo/prepara_transp.png" alt="Prepara UFU"></div>
+<form id="gForm" autocomplete="on"><h2 id="gTit">Banco de Questões UFU</h2><p id="gTxt">Acesso exclusivo para alunos liberados pelo Prof. Jazz. Entre com seu e-mail e senha.</p>
+<input id="gEmail" type="email" placeholder="seu e-mail" autocomplete="email" required>
+<input id="gPass" type="password" placeholder="senha (mínimo 6 caracteres)" autocomplete="current-password" minlength="6" required>
+<input id="gPass2" type="password" placeholder="repita a senha" autocomplete="new-password" minlength="6" hidden>
+<button class="btn pri" id="gBtn" type="submit">Entrar</button>
+<div id="gMsg" role="status"></div>
+<button class="lnk" id="gMode" type="button">Primeiro acesso? Crie sua senha</button></form></div></div>
+<div id="adm" hidden><div class="box"><div style="display:flex;align-items:center;gap:10px"><h2>Alunos liberados</h2><span class="tag" id="admN"></span><button class="btn" id="admClose" style="margin-left:auto">Fechar</button></div>
+<p class="note" style="margin:0;color:var(--muted);font-size:14px">Libere o e-mail do aluno aqui. No primeiro acesso, ele clica em “Primeiro acesso? Crie sua senha”. Se ele esquecer a senha, clique em “Zerar senha” e ele cria outra.</p>
+<form class="add" id="admAdd"><input id="admEmail" type="email" placeholder="e-mail do aluno" required><input id="admNome" type="text" placeholder="nome (opcional)"><button class="btn pri" type="submit">Liberar</button></form>
+<details><summary style="cursor:pointer;font-size:14px;color:var(--muted)">Liberar vários de uma vez</summary><div style="display:flex;flex-direction:column;gap:8px;margin-top:8px"><textarea id="admLote" rows="5" placeholder="um e-mail por linha (pode ser: e-mail; nome)"></textarea><button class="btn" id="admLoteBtn" type="button">Liberar todos</button></div></details>
+<p class="msg" id="admMsg" role="status" style="margin:0"></p>
+<input id="admBusca" type="search" placeholder="procurar aluno" style="font:500 14px var(--body);padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)">
+<div style="overflow:auto"><table><thead><tr><th>Aluno</th><th>Situação</th><th></th></tr></thead><tbody id="admList"></tbody></table></div></div></div>
+<header>
+  <div class="logos"><img class="j" src="logo/jazz_claro.png" alt="Jazz, Professor de Matemática"><span class="sep"></span><img class="p" src="logo/prepara_transp.png" alt="Prepara UFU"><span class="sep"></span><img class="u" src="logo/ufu_branco.png" alt="Universidade Federal de Uberlândia"></div>
+  <div class="ttl"><h1>Banco de Questões UFU</h1><p>Provas objetivas 2015–2026 · gabarito oficial</p></div>
+  <nav class="tabs" aria-label="Visões"><button class="theme" id="theme" aria-label="Alternar modo diurno e noturno" title="Modo diurno / noturno"><span class="sun">☀</span><span class="moon">☾</span></button><button id="admBtn" hidden>Alunos</button><button class="sair" id="sairBtn" title="Sair">Sair</button><button id="tabQ" aria-pressed="true">Questões</button><button id="tabI" aria-pressed="false">Análise de Incidência</button></nav>
+</header>
+<div class="wrap">
+  <aside class="panel" aria-label="Filtros">
+    <h2>Filtros</h2>
+    <div><label class="t" for="fBusca">Busca</label><input id="fBusca" type="search" placeholder="palavra do enunciado ou tópico"></div>
+    <div><label class="t" for="fDisc">Disciplina</label><select id="fDisc"></select></div>
+    <div><label class="t" for="fTop">Tópico</label><select id="fTop"></select></div>
+    <div><label class="t" for="fSub">Subtópico</label><select id="fSub"></select></div>
+    <div><label class="t">Ano <span class="hint">(nenhum marcado = todos)</span></label><div class="years" id="fAno"></div></div>
+    <div><label class="t">Dificuldade</label><div class="chips" id="fNivel"></div></div>
+    <label class="chip"><input type="checkbox" id="fAnul" checked> Incluir anuladas</label>
+    <button class="btn" id="reset">Limpar filtros</button>
+  </aside>
+  <main>
+    <div class="count" id="count" aria-live="polite"></div>
+    <section id="viewQ" style="display:flex;flex-direction:column;gap:14px"></section>
+    <section id="viewI" hidden></section>
+  </main>
+  <aside class="panel cart" aria-label="Minha lista">
+    <h2>Minha lista</h2>
+    <p class="note" id="cartInfo">Clique em “Adicionar à lista” nas questões. Elas saem numeradas 1, 2, 3… na ordem em que você escolher.</p>
+    <div class="list" id="cartList"></div>
+    <div><label class="t" for="pdfName">Nome da lista</label><input id="pdfName" type="text" value="Lista de exercícios UFU"></div>
+    <label class="chip"><input type="checkbox" id="pdfGab" checked> Gabarito no final</label>
+    <label class="chip"><input type="checkbox" id="pdfSrc" checked> Mostrar a prova de origem</label>
+    <div class="row2"><button class="btn pri" id="pdfBtn" disabled>Baixar PDF</button><button class="btn pri word" id="docBtn" disabled>Baixar Word</button></div>
+    <button class="btn" id="cartClear">Esvaziar lista</button>
+    <p class="msg" id="pdfMsg" role="status"></p>
+  </aside>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+let B=[],shown=20,cart=[];
+(function(){let m=null;try{m=localStorage.getItem('bqufu-tema');}catch(e){}
+  const set=t=>{document.documentElement.setAttribute('data-theme',t);try{localStorage.setItem('bqufu-tema',t);}catch(e){}};
+  window.__setTheme=set;const cur=m||'dark';
+  document.addEventListener('DOMContentLoaded',()=>{set(cur);document.getElementById('theme').onclick=()=>set(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');});})();const $=id=>document.getElementById(id);
+const LV={F:'Fácil',M:'Médio',D:'Difícil'},K={1:'Complementar 2027',2:'Fora 2027 · caiu recente',3:'Fora 2027 · sem queda recente'};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const norm=s=>s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+const uniq=a=>[...new Set(a)].sort((x,y)=>String(x).localeCompare(String(y),'pt'));
+const CAD={'Cursos Gerais':'Cursos Gerais','Medicina':'Medicina','1º dia':'1º dia','2º dia':'2º dia'};
+const label=o=>`UFU ${o.a}${o.c?' · '+o.c:''} · Q${o.q}`;
+function opts(sel,vals,all){const cur=sel.value;sel.innerHTML=(all?`<option value="">${all}</option>`:'')+vals.map(v=>`<option>${esc(v)}</option>`).join('');if(vals.map(String).includes(cur))sel.value=cur;}
+function cascade(){const d=$('fDisc').value,b=d?B.filter(o=>o.d===d):B;opts($('fTop'),uniq(b.map(o=>o.t)),'Todos');const t=$('fTop').value;opts($('fSub'),uniq(b.filter(o=>!t||o.t===t).map(o=>o.s)),'Todos');}
+function filtered(){
+  const q=norm($('fBusca').value.trim()),d=$('fDisc').value,t=$('fTop').value,s=$('fSub').value,ys=[...document.querySelectorAll('#fAno input:checked')].map(i=>+i.value),an=$('fAnul').checked,
+  lv=[...document.querySelectorAll('#fNivel input:checked')].map(i=>i.value);
+  return B.filter(o=>(!d||o.d===d)&&(!t||o.t===t)&&(!s||o.s===s)&&(!ys.length||ys.includes(o.a))&&(an||o.g!=='N')&&lv.includes(o.n)&&(!q||o._s.includes(q)));
+}
+function card(o){const on=cart.includes(o.i);
+  return `<article class="card${on?' on':''}" data-i="${o.i}">
+  <div class="head"><span class="src">${esc(label(o))}</span><span class="pill">${esc(o.d)}</span><span class="pill lv${o.n}">${LV[o.n]}</span>${o.g==='N'?'<span class="pill">Anulada</span>':''}</div>
+  <div class="path">${esc(o.t)} <span>› ${esc(o.s)}</span></div>
+  <div class="img"><img data-src="${o.i}" alt="Questão ${o.q} da UFU ${o.a}, ${esc(o.d)}: ${esc(o.s)}"></div>
+  <div class="foot"><button class="btn" data-a="gab">Ver gabarito</button><span class="gab" hidden></span><span style="flex:1"></span><button class="btn ${on?'sel':''}" data-a="add">${on?'Na lista ✓':'Adicionar à lista'}</button></div></article>`;}
+function renderQ(L){const v=$('viewQ');
+  if(!L.length){v.innerHTML='<div class="empty">Nenhuma questão com esses filtros. Limpe a busca ou amplie os anos.</div>';return;}
+  v.innerHTML=L.slice(0,shown).map(card).join('')+(L.length>shown?`<button class="btn pri more" id="more">Mostrar mais ${Math.min(20,L.length-shown)} (faltam ${L.length-shown})</button>`:'');
+  const m=$('more');if(m)m.onclick=()=>{shown+=20;render(false);};
+  v.querySelectorAll('img[data-src]').forEach(async im=>{const o=B.find(x=>x.i===im.dataset.src);try{im.src=await imgURL(o);}catch(e){im.alt='Não foi possível carregar a imagem desta questão.';}});}
+const bundles={};
+function bundle(k){return bundles[k]||(bundles[k]=fetch('qb/'+k+'.json').then(r=>{if(!r.ok)throw 0;return r.json();}).catch(e=>{delete bundles[k];throw e;}));}
+let SIG={},SIGEXP=0;
+async function signAll(){const paths=B.map(o=>'q/'+o.i+'.jpg');const m={};
+  for(let i=0;i<paths.length;i+=400){const {data,error}=await SB.storage.from('banco').createSignedUrls(paths.slice(i,i+400),21600);if(error)throw error;data.forEach(d=>{if(d.signedUrl)m[d.path]=d.signedUrl;});}
+  SIG=m;SIGEXP=Date.now()+21000*1000;}
+let signing=null;
+async function imgURL(o){if(Date.now()>SIGEXP){signing=signing||signAll().finally(()=>{signing=null;});await signing;}const u=SIG['q/'+o.i+'.jpg'];if(!u)throw new Error('img');return u;}
+const PAL=['#3A8CCB','#DDDD24','#EB6834','#1BAF7A','#7B61FF','#E0559B','#1F5F8F','#C9A227','#2BB3C0','#8A93A6'];
+const palText=c=>['#DDDD24','#C9A227','#2BB3C0','#8A93A6'].includes(c)?'#141A2E':'#FFFFFF';
+const lighten=(c,f=.45)=>{const[r,g,b]=[1,3,5].map(i=>parseInt(c.slice(i,i+2),16));return `rgb(${[r,g,b].map(v=>Math.round(v+(255-v)*f)).join(',')})`;};
+let lastAnalysis=null;
+function analysis(L){
+  const tot=L.length,cnt=k=>{const c={};L.forEach(o=>c[o[k]]=(c[o[k]]||0)+1);return Object.entries(c).sort((a,b)=>b[1]-a[1]);};
+  const d=$('fDisc').value,t=$('fTop').value,anos=[...document.querySelectorAll('#fAno input:checked')].map(i=>i.value).sort();
+  const ctx={tot,d,t,anos:anos.length?anos.join(', '):'2015 a 2026',niveis:[...document.querySelectorAll('#fNivel input:checked')].map(i=>LV[i.value]).join(', ')};
+  const charts=[];
+  if(!d)charts.push({title:'Questões por disciplina',kind:'bars',rows:cnt('d')});
+  else if(!t){charts.push({title:'Tópicos mais cobrados',kind:'donut',rows:cnt('t')});charts.push({title:'Subtópicos mais cobrados',kind:'bars',rows:cnt('s').slice(0,15)});}
+  else charts.push({title:'Subtópicos mais cobrados em '+t,kind:'bars',rows:cnt('s').slice(0,20)});
+  return {ctx,charts,L};
+}
+function donutSVG(rows,tot){
+  let a0=-Math.PI/2,R=88,r=54,cx=100,cy=100,out='';
+  const top=rows.slice(0,9),rest=rows.slice(9).reduce((s,[,n])=>s+n,0),R2=rest?[...top,['Outros',rest]]:top;
+  R2.forEach(([k,n],i)=>{const f=n/tot,a1=a0+f*2*Math.PI,big=f>.5?1:0,c=PAL[i%PAL.length];
+    if(f>=0.9999){out+=`<circle cx="${cx}" cy="${cy}" r="${(R+r)/2}" fill="none" stroke="${c}" stroke-width="${R-r}"/>`;}
+    else{const p=(rr,a)=>`${cx+rr*Math.cos(a)},${cy+rr*Math.sin(a)}`;
+      out+=`<path d="M${p(R,a0)} A${R},${R} 0 ${big} 1 ${p(R,a1)} L${p(r,a1)} A${r},${r} 0 ${big} 0 ${p(r,a0)} Z" fill="${c}" stroke="var(--card)" stroke-width="1.5"><title>${esc(k)}: ${(f*100).toFixed(1)}%</title></path>`;}
+    a0=a1;});
+  const L0=R2[0],nm=L0[0].length>16?L0[0].slice(0,15)+'…':L0[0];
+  const defs='<defs>'+R2.map((_,i)=>`<linearGradient id="g${i}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${lighten(PAL[i%PAL.length],.25)}"/><stop offset="1" stop-color="${PAL[i%PAL.length]}"/></linearGradient>`).join('')+'</defs>';
+  out=out.replace(/fill="(#[0-9A-F]{6})"/gi,(m,c)=>{const i=PAL.indexOf(c.toUpperCase());return i<0?m:`fill="url(#g${i})"`;});
+  return {svg:`<svg viewBox="0 0 200 200" class="donut" role="img" aria-label="Gráfico de rosca">${defs}${out}<text x="100" y="94" text-anchor="middle" class="dn">${(L0[1]/tot*100).toFixed(1).replace('.',',')}%</text><text x="100" y="111" text-anchor="middle" class="dm">${esc(nm)}</text><text x="100" y="125" text-anchor="middle" class="dl">MAIOR INCIDÊNCIA</text></svg>`,rows:R2};
+}
+const pct=(n,t)=>(n/t*100).toFixed(1).replace('.',',')+'%';
+function kpiData(L,ctx){
+  const top=k=>{const c={};L.forEach(o=>c[o[k]]=(c[o[k]]||0)+1);return Object.entries(c).sort((a,b)=>b[1]-a[1])[0];};
+  const hint='escolha uma disciplina';
+  if(!ctx.d)return {t:{l:'Tópico mais cobrado',hint},s:{l:'Subtópico mais cobrado',hint}};
+  const t=ctx.t?[ctx.t,L.length]:top('t'),s=top('s');
+  return {t:{l:ctx.t?'Tópico escolhido':'Tópico mais cobrado',v:t[0],n:t[1],f:t[1]/L.length},s:{l:'Subtópico mais cobrado',v:s[0],n:s[1],f:s[1]/L.length}};
+}
+function renderI(L){
+  if(!L.length){$('viewI').innerHTML='<div class="empty">Nenhuma questão com esses filtros.</div>';return;}
+  const A=analysis(L);lastAnalysis=A;const {ctx}=A;
+  const ring=(f,c,lab)=>{const r=26,C=2*Math.PI*r;return `<svg class="ring" viewBox="0 0 64 64"><circle cx="32" cy="32" r="${r}" fill="none" stroke="var(--soft)" stroke-width="7"/><circle cx="32" cy="32" r="${r}" fill="none" stroke="${c}" stroke-width="7" stroke-linecap="round" stroke-dasharray="${C*f} ${C}" transform="rotate(-90 32 32)"/><text x="32" y="37" text-anchor="middle" class="rv">${lab}</text></svg>`;};
+  const K=kpiData(L,ctx);
+  const card=(k,c)=>k.v?`<div class="kpi">${ring(k.f,c,Math.round(k.f*100)+'%')}<div><span>${k.l}</span><b class="nm" title="${esc(k.v)}">${esc(k.v)}</b><small>${pct(k.n,ctx.tot)} das questões · ${k.n} quest${k.n>1?'ões':'ão'}</small></div></div>`
+    :`<div class="kpi"><span class="ico dash">—</span><div><span>${k.l}</span><b class="nm">—</b><small>${k.hint}</small></div></div>`;
+  let h=`<div class="kpis"><div class="kpi k-a"><span class="ico">📚</span><div><span>Questões analisadas</span><b>${ctx.tot}</b><small>${esc(ctx.anos)}</small></div></div>
+  <div class="kpi"><span class="ico disc">${ctx.d?esc(ctx.d.slice(0,2).toUpperCase()):'—'}</span><div><span>Disciplina</span><b class="nm">${ctx.d?esc(ctx.d):'—'}</b><small>${ctx.d?'filtro escolhido':'escolha uma disciplina no filtro'}</small></div></div>
+  ${card(K.t,'#3A8CCB')}${card(K.s,'#DDDD24')}</div>
+  <div class="anbar"><p class="note">Os gráficos seguem os filtros da esquerda. ${ctx.d?'':'Escolha uma disciplina para ver tópicos e subtópicos.'}</p><span class="anact"><span class="msg" id="anMsg" role="status"></span><button class="btn pri" id="anPdf">Baixar análise em PDF</button></span></div>`;
+  A.charts.forEach(c=>{
+    if(c.kind==='donut'){const D=donutSVG(c.rows,ctx.tot);
+      h+=`<section class="chart"><h3><i class="hi a"></i>${esc(c.title)}</h3><div class="dwrap">${D.svg}<div class="legend">${D.rows.map(([k,n],i)=>`<div class="lg"><i style="background:${PAL[i%PAL.length]}"></i><span>${esc(k)}</span><b>${pct(n,ctx.tot)}</b><small>${n}</small></div>`).join('')}</div></div></section>`;}
+    else{const mx=c.rows[0][1];
+      h+=`<section class="chart"><h3><i class="hi b"></i>${esc(c.title)}</h3><div class="bars">${c.rows.map(([k,n],i)=>{const col=PAL[i%PAL.length];
+        return `<div class="bar"><span class="bl" title="${esc(k)}">${esc(k)}</span><span class="bt"><span class="bf" style="width:${Math.max(n/mx*100,8)}%;background:linear-gradient(90deg,${lighten(col,.35)},${col});color:${palText(col)}">${pct(n,ctx.tot)}</span></span><span class="bv">${n} quest${n>1?'ões':'ão'}</span></div>`}).join('')}</div></section>`;}
+  });
+  $('viewI').innerHTML=h;
+  $('anPdf').onclick=()=>savePdf(analysisPdf,'Análise de incidência UFU'+(ctx.d?' - '+ctx.d:'')+(ctx.t?' - '+ctx.t:''),$('anPdf'));
+}
+
+const hex=c=>[parseInt(c.slice(1,3),16),parseInt(c.slice(3,5),16),parseInt(c.slice(5,7),16)];
+async function svgToPng(svg,px){const blob=new Blob([svg],{type:'image/svg+xml'}),u=URL.createObjectURL(blob);
+  try{const im=await loadImg(u);const c=document.createElement('canvas');c.width=c.height=px;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,px,px);x.drawImage(im,0,0,px,px);return c.toDataURL('image/png');}finally{URL.revokeObjectURL(u);delete imgCache[u];}}
+async function analysisPdf(defName){
+  const A=lastAnalysis,{ctx}=A,L0an=A.L;const F=await pdfFrame(defName),{doc,M,CW,BOT}=F;
+  doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(94,102,112);
+  const info=`Questões objetivas da UFU · ${ctx.d||'todas as disciplinas'}${ctx.t?' · '+ctx.t:''} · anos: ${ctx.anos} · dificuldade: ${ctx.niveis}`;
+  const il=doc.splitTextToSize(info,CW);doc.text(il,F.W/2,F.y-2,{align:'center'});F.y+=il.length*4+4;
+  // KPIs
+  const KD=kpiData(L0an,ctx);const K=[['QUESTÕES',String(ctx.tot),'#222322'],['DISCIPLINA',ctx.d||'—','#3A8CCB']];
+  K.push([KD.t.l.toUpperCase(),KD.t.v?pct(KD.t.n,ctx.tot):'—','#1F5F8F',KD.t.v]);K.push(['SUBTÓPICO MAIS COBRADO',KD.s.v?pct(KD.s.n,ctx.tot):'—','#DDDD24',KD.s.v]);
+  const kw=(CW-(K.length-1)*4)/K.length;
+  K.forEach(([l,v,c,sub],i)=>{const x=M+i*(kw+4),dark=c!=='#DDDD24';doc.setFillColor(...hex(c));doc.roundedRect(x,F.y,kw,20,2.5,2.5,'F');
+    doc.setTextColor(...(dark?[255,255,255]:[34,35,34]));doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.text(l,x+4,F.y+5.5);
+    doc.setFontSize(v.length>12?11:15);doc.text(doc.splitTextToSize(v,kw-8)[0],x+4,F.y+13);if(sub){doc.setFont('helvetica','normal');doc.setFontSize(7.5);doc.text(doc.splitTextToSize(sub,kw-8)[0],x+4,F.y+17.5);}});
+  F.y+=27;
+  for(const c of A.charts){
+    const need=c.kind==='donut'?Math.max(70,Math.min(c.rows.length,10)*6.5+16):c.rows.length*7.5+16;
+    if(F.y+Math.min(need,90)>BOT)F.newPage();
+    doc.setFont('helvetica','bold');doc.setFontSize(12.5);doc.setTextColor(34,35,34);doc.text(c.title,M,F.y+4);
+    doc.setFillColor(221,221,36);doc.rect(M,F.y+6,18,1,'F');F.y+=11;
+    if(c.kind==='donut'){
+      const D=donutSVG(c.rows,ctx.tot);const svg=D.svg.replace('<svg ','<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" ').replaceAll('var(--card)','#ffffff').replace('class="dn"','font-family="Helvetica" font-weight="800" font-size="26" fill="#141A2E"').replace('class="dm"','font-family="Helvetica" font-weight="700" font-size="11" fill="#141A2E"').replace('class="dl"','font-family="Helvetica" font-weight="600" font-size="8.5" letter-spacing="0.8" fill="#5C6380"');
+      const png=await svgToPng(svg,600);doc.addImage(png,'PNG',M,F.y,58,58);
+      let ly=F.y+4;D.rows.forEach(([k,n],i)=>{doc.setFillColor(...hex(PAL[i%PAL.length]));doc.roundedRect(M+66,ly-3.2,4,4,.8,.8,'F');
+        doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(34,35,34);doc.text(doc.splitTextToSize(k,78)[0],M+73,ly);
+        doc.setFont('helvetica','bold');doc.text(pct(n,ctx.tot),M+CW-14,ly,{align:'right'});doc.setFont('helvetica','normal');doc.setTextColor(94,102,112);doc.text(String(n),M+CW,ly,{align:'right'});ly+=6.2;});
+      F.y=Math.max(F.y+62,ly+2);
+    }else{
+      const mx=c.rows[0][1],lw=62,bw=CW-lw-22;
+      c.rows.forEach(([k,n],i)=>{if(F.y+7>BOT)F.newPage();const col=PAL[i%PAL.length];
+        doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(34,35,34);doc.text(doc.splitTextToSize(k,lw-2)[0],M,F.y+4);
+        doc.setFillColor(234,242,249);doc.roundedRect(M+lw,F.y,bw,5.6,1.2,1.2,'F');
+        const w=Math.max(bw*n/mx,14);doc.setFillColor(...hex(col));doc.roundedRect(M+lw,F.y,w,5.6,1.2,1.2,'F');
+        doc.setFont('helvetica','bold');doc.setFontSize(8);doc.setTextColor(...(palText(col)==='#FFFFFF'?[255,255,255]:[34,35,34]));doc.text(pct(n,ctx.tot),M+lw+w-1.5,F.y+4,{align:'right'});
+        doc.setFont('helvetica','normal');doc.setTextColor(94,102,112);doc.text(n+(n>1?' questões':' questão'),M+CW,F.y+4,{align:'right'});F.y+=7.5;});
+      F.y+=4;
+    }
+  }
+  return {blob:doc.output('blob'),name:defName};
+}
+function render(reset=true){if(reset)shown=20;const L=filtered();$('count').innerHTML=`<b>${L.length}</b><span>questões encontradas</span>`;$('viewI').hidden?renderQ(L):renderI(L);}
+function renderCart(){
+  $('cartList').innerHTML=cart.map((id,n)=>{const o=B.find(x=>x.i===id);return `<div class="li"><b>${n+1}</b><span title="${esc(label(o)+' · '+o.s)}">${esc(o.d)} · ${esc(o.s)}</span><button aria-label="Subir" data-m="up" data-i="${id}">↑</button><button aria-label="Remover" data-m="rm" data-i="${id}">×</button></div>`}).join('');
+  $('cartInfo').textContent=cart.length?`${cart.length} ${cart.length>1?'questões selecionadas':'questão selecionada'}.`:'Clique em “Adicionar à lista” nas questões. Elas saem numeradas 1, 2, 3… na ordem em que você escolher.';
+  $('pdfBtn').disabled=!cart.length;$('docBtn').disabled=!cart.length;
+}
+$('cartList').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const i=cart.indexOf(b.dataset.i);
+  if(b.dataset.m==='rm')cart.splice(i,1);if(b.dataset.m==='up'&&i>0)[cart[i-1],cart[i]]=[cart[i],cart[i-1]];renderCart();render(false);});
+$('cartClear').onclick=()=>{cart=[];renderCart();render(false);};
+$('viewQ').addEventListener('click',e=>{const b=e.target.closest('button[data-a]');if(!b)return;const c=b.closest('.card'),o=B.find(x=>x.i===c.dataset.i);
+  if(b.dataset.a==='gab'){const g=c.querySelector('.gab'),show=g.hidden;g.hidden=!show;g.textContent=o.g==='N'?'Questão anulada':'Gabarito: '+o.g;b.textContent=show?'Ocultar gabarito':'Ver gabarito';}
+  if(b.dataset.a==='add'){const i=cart.indexOf(o.i);i<0?cart.push(o.i):cart.splice(i,1);const on=cart.includes(o.i);c.classList.toggle('on',on);b.classList.toggle('sel',on);b.textContent=on?'Na lista ✓':'Adicionar à lista';renderCart();}
+});
+function tab(i){document.body.classList.toggle('an',!!i);$('tabQ').setAttribute('aria-pressed',!i);$('tabI').setAttribute('aria-pressed',i);$('viewQ').style.display=i?'none':'flex';$('viewI').hidden=!i;render();}
+$('tabQ').onclick=()=>tab(false);$('tabI').onclick=()=>tab(true);
+
+/* ---------- PDF ---------- */
+let dl=null;
+const imgCache={};
+function loadImg(src){return imgCache[src]||(imgCache[src]=new Promise((res,rej)=>{const im=new Image();if(/^https?:/.test(src))im.crossOrigin='anonymous';im.onload=()=>res(im);im.onerror=rej;im.src=src;}));}
+function toJpeg(im,sy=0,sh=im.naturalHeight){const c=document.createElement('canvas');c.width=im.naturalWidth;c.height=sh;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,sy,c.width,sh,0,0,c.width,sh);return c.toDataURL('image/jpeg',0.9);}
+function toPng(im){const c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;c.getContext('2d').drawImage(im,0,0);return c.toDataURL('image/png');}
+async function pdfFrame(title){
+  const {jsPDF}=window.jspdf;const doc=new jsPDF({unit:'mm',format:'a4'});
+  const W=210,H=297,M=14,CW=W-2*M,TOP=28,BOT=H-16;
+  const jz=await loadImg('logo/jazz.png'),uf=await loadImg('logo/ufu.png');
+  const jzD=toPng(jz),ufD=toPng(uf);
+  const footer=()=>{doc.setDrawColor(58,140,203);doc.setLineWidth(.4);doc.line(M,H-12,W-M,H-12);doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setTextColor(34,35,34);
+    doc.text('PREPARA UFU',M,H-7.5);doc.setFont('helvetica','normal');doc.text(' | Professor Jazz',M+doc.getTextWidth('PREPARA UFU'),H-7.5);doc.text(String(doc.getNumberOfPages()),W-M,H-7.5,{align:'right'});};
+  const header=()=>{const jh=10,jw=jh*jz.naturalWidth/jz.naturalHeight,uh=11;
+    doc.addImage(jzD,'PNG',M,9,jw,jh);doc.addImage(ufD,'PNG',W-M-uh,8.5,uh,uh);
+    doc.setDrawColor(221,221,36);doc.setLineWidth(.8);doc.line(M,22,W-M,22);};
+  header();footer();
+  try{if(!window.__abFont){const buf=await (await fetch('fonts/ArchivoBlack.ttf')).arrayBuffer();let bin='';const u=new Uint8Array(buf);for(let i=0;i<u.length;i+=8192)bin+=String.fromCharCode.apply(null,u.subarray(i,i+8192));window.__abFont=btoa(bin);}
+    doc.addFileToVFS('ArchivoBlack.ttf',window.__abFont);doc.addFont('ArchivoBlack.ttf','ArchivoBlack','normal');doc.setFont('ArchivoBlack','normal');}catch(e){doc.setFont('helvetica','bold');}
+  doc.setFontSize(19);doc.setTextColor(20,26,46);
+  const tl=doc.splitTextToSize(title,CW);doc.text(tl,W/2,33,{align:'center'});
+  const F={doc,W,H,M,CW,TOP,BOT,y:33+(tl.length-1)*7.5+8};
+  F.newPage=()=>{doc.addPage();header();footer();F.y=TOP;};
+  return F;
+}
+async function makePdf(){
+  const name=($('pdfName').value.trim()||'Lista de exercícios UFU');
+  const F=await pdfFrame(name),{doc,W,H,M,CW,TOP,BOT}=F;let y=F.y;
+  const newPage=()=>{F.newPage();y=TOP;};
+  for(let n=0;n<cart.length;n++){
+    $('pdfMsg').textContent=`Montando questão ${n+1} de ${cart.length}…`;
+    const o=B.find(x=>x.i===cart[n]),im=await loadImg(await imgURL(o));
+    const sc=CW/im.naturalWidth,hmm=im.naturalHeight*sc,lab=8;
+    if(y+lab+Math.min(hmm,60)>BOT||(hmm+lab<=BOT-TOP&&y+lab+hmm>BOT))newPage();
+    doc.setFillColor(34,35,34);doc.roundedRect(M,y,24,6.2,1.2,1.2,'F');doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(255,255,255);
+    doc.text('QUESTÃO '+String(n+1).padStart(2,'0'),M+12,y+4.4,{align:'center'});
+    if($('pdfSrc').checked){doc.setFont('helvetica','normal');doc.setFontSize(8.5);doc.setTextColor(94,102,112);doc.text('('+label(o).replace(/ · Q\d+$/,'')+')',M+27,y+4.4);}
+    y+=lab;
+    let sy=0;
+    while(sy<im.naturalHeight){
+      const room=(BOT-y)/sc,take=Math.min(im.naturalHeight-sy,Math.floor(room));
+      doc.addImage(toJpeg(im,sy,take),'JPEG',M,y,CW,take*sc);y+=take*sc;sy+=take;
+      if(sy<im.naturalHeight)newPage();
+    }
+    y+=6;
+  }
+  if($('pdfGab').checked){
+    newPage();doc.setFont('helvetica','bold');doc.setFontSize(13);doc.setTextColor(34,35,34);doc.text('GABARITO',M,y+2);y+=6;doc.setFillColor(221,221,36);doc.rect(M,y,CW,1,'F');y+=8;
+    const cols=5,cw=CW/cols;doc.setFontSize(11);
+    cart.forEach((id,n)=>{const o=B.find(x=>x.i===id),c=n%cols,r=Math.floor(n/cols);if(c===0&&y+r*8>BOT)newPage();
+      const yy=y+r*8;doc.setFont('helvetica','bold');doc.text(String(n+1).padStart(2,'0')+'  ',M+c*cw,yy);doc.setFont('helvetica','normal');doc.text(o.g==='N'?'Anulada':o.g,M+c*cw+9,yy);});
+  }
+  return {blob:doc.output('blob'),name};
+}
+async function savePdf(maker,defName,btn){
+  btn.disabled=true;const msg=(btn.id==='pdfBtn'||btn.id==='docBtn')?$('pdfMsg'):$('anMsg');if(msg)msg.textContent='Gerando o PDF…';
+  try{const {blob,name,ext}=await maker(defName);const fn=name.replace(/[\\/:*?"<>|]+/g,' ').trim()+'.'+(ext||'pdf');
+    if(dl){await dl.save({filename:fn,data:blob});}
+    else{const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=fn;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);}
+    if(msg)msg.textContent='Arquivo pronto: “'+fn+'”.';}
+  catch(e){if(msg)msg.textContent=e&&e.code==='declined'?'Download cancelado.':'Não foi possível gerar o PDF ('+((e&&(e.message||e.code))||'erro')+'). Tente de novo.';}
+  btn.disabled=(btn.id==='pdfBtn'||btn.id==='docBtn')?!cart.length:false;
+}
+$('pdfBtn').onclick=()=>savePdf(makePdf,'',$('pdfBtn'));
+/* Monta o .docx da lista a partir do modelo (cabeçalho/rodapé) e dos fragmentos de cada questão.
+   buildDocx(JSZip, modeloArrayBuffer, titulo, questoes, opcoes) -> Promise<Blob|Uint8Array>
+   questao: {frag: {x, img, m} | null, label: '(UFU 2026)', gab: 'A'} */
+function buildDocx(JSZip, tplBuf, titulo, questoes, op) {
+  op = op || {};
+  const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const A = 'xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"';
+  let rid = 100, pid = 100;
+  const media = [];
+  function dataToBytes(uri) {
+    const b64 = uri.slice(uri.indexOf(',') + 1), bin = atob(b64), u = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+    return { bytes: u, ext: uri.startsWith('data:image/png') ? 'png' : 'jpeg' };
+  }
+  function drawing(uri, cx, cy) {
+    const { bytes, ext } = dataToBytes(uri), id = 'rId' + (rid++), n = pid++, fn = `q${n}.${ext}`;
+    media.push({ id, fn, bytes });
+    return `<w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="${cx}" cy="${cy}"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:docPr id="${n}" name="Figura ${n}"/><wp:cNvGraphicFramePr><a:graphicFrameLocks ${A} noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic ${A}><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="${n}" name="${fn}"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="${id}"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r>`;
+  }
+  const R = (t, rpr) => `<w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/>${rpr || ''}</w:rPr><w:t xml:space="preserve">${esc(t)}</w:t></w:r>`;
+  let body = `<w:p><w:pPr><w:spacing w:before="120" w:after="240"/><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Arial Black" w:hAnsi="Arial Black" w:cs="Arial Black"/><w:color w:val="141A2E"/><w:sz w:val="34"/><w:szCs w:val="34"/></w:rPr><w:t xml:space="preserve">${esc(titulo)}</w:t></w:r></w:p>`;
+  questoes.forEach((q, i) => {
+    body += `<w:p><w:pPr><w:keepNext/><w:spacing w:before="200" w:after="120"/></w:pPr>${R(' QUESTÃO ' + String(i + 1).padStart(2, '0') + ' ', '<w:b/><w:color w:val="FFFFFF"/><w:sz w:val="20"/><w:szCs w:val="20"/><w:shd w:val="clear" w:color="auto" w:fill="222322"/>')}${op.src === false ? '' : R('   ' + q.label, '<w:color w:val="5E6670"/><w:sz w:val="16"/><w:szCs w:val="16"/>')}</w:p>`;
+    const fr = q.frag;
+    if (fr && fr.x && !fr.m) {
+      body += fr.x.replace(/\{\{IMG:([^:}]+):(\d+):(\d+)\}\}/g, (_, k, cx, cy) => fr.img[k] ? drawing(fr.img[k], cx, cy) : '');
+    } else if (fr && fr.img && fr.img.full) {
+      const [uri, cx, cy] = fr.img.full;
+      body += `<w:p><w:pPr><w:keepLines/><w:spacing w:after="120"/><w:jc w:val="center"/></w:pPr>${drawing(uri, cx, cy)}</w:p>`;
+    } else if (q.fallback) {
+      body += `<w:p><w:pPr><w:keepLines/><w:spacing w:after="120"/><w:jc w:val="center"/></w:pPr>${drawing(q.fallback[0], q.fallback[1], q.fallback[2])}</w:p>`;
+    }
+  });
+  if (op.gab !== false) {
+    body += `<w:p><w:pPr><w:pageBreakBefore/><w:pBdr><w:bottom w:val="single" w:sz="12" w:space="4" w:color="DDDD24"/></w:pBdr><w:spacing w:after="160"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Arial Black" w:hAnsi="Arial Black" w:cs="Arial Black"/><w:color w:val="141A2E"/><w:sz w:val="26"/><w:szCs w:val="26"/></w:rPr><w:t>GABARITO</w:t></w:r></w:p>`;
+    const cw = 1927, nb = '<w:tcBorders><w:top w:val="nil"/><w:left w:val="nil"/><w:bottom w:val="nil"/><w:right w:val="nil"/></w:tcBorders>';
+    let rows = '';
+    for (let r = 0; r < Math.ceil(questoes.length / 5); r++) {
+      rows += '<w:tr>';
+      for (let c = 0; c < 5; c++) {
+        const n = r * 5 + c, q = questoes[n];
+        const txt = q ? R(String(n + 1).padStart(2, '0') + '   ', '<w:b/>') + R(q.gab === 'N' ? 'Anulada' : q.gab) : '';
+        rows += `<w:tc><w:tcPr><w:tcW w:w="${cw}" w:type="dxa"/>${nb}</w:tcPr><w:p><w:pPr><w:spacing w:after="80"/></w:pPr>${txt}</w:p></w:tc>`;
+      }
+      rows += '</w:tr>';
+    }
+    body += `<w:tbl><w:tblPr><w:tblW w:w="${cw * 5}" w:type="dxa"/><w:tblLayout w:type="fixed"/></w:tblPr><w:tblGrid>${('<w:gridCol w:w="' + cw + '"/>').repeat(5)}</w:tblGrid>${rows}</w:tbl><w:p/>`;
+  }
+  return JSZip.loadAsync(tplBuf).then(async zip => {
+    let doc = await zip.file('word/document.xml').async('string');
+    doc = doc.replace(/<w:p>(?:(?!<w:p>).)*?\{\{BODY\}\}.*?<\/w:p>/s, body);
+    if (!doc.includes('xmlns:m=')) doc = doc.replace('<w:document ', '<w:document xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" ');
+    zip.file('word/document.xml', doc);
+    let rels = await zip.file('word/_rels/document.xml.rels').async('string');
+    rels = rels.replace('</Relationships>', media.map(m => `<Relationship Id="${m.id}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/${m.fn}"/>`).join('') + '</Relationships>');
+    zip.file('word/_rels/document.xml.rels', rels);
+    media.forEach(m => zip.file('word/media/' + m.fn, m.bytes));
+    return zip.generateAsync({ type: op.type || 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', compression: 'DEFLATE' });
+  });
+}
+
+
+const docxBundles={};
+function docxBundle(k){return docxBundles[k]||(docxBundles[k]=sbJSON('docx/'+k+'.json').catch(e=>{delete docxBundles[k];throw e;}));}
+async function makeDocx(){
+  const name=($('pdfName').value.trim()||'Lista de exercícios UFU');
+  const tpl=Uint8Array.from(atob((await sbJSON('modelo.json')).docx),c=>c.charCodeAt(0));
+  const qs=[];
+  for(let n=0;n<cart.length;n++){$('pdfMsg').textContent=`Montando questão ${n+1} de ${cart.length}…`;
+    const o=B.find(x=>x.i===cart[n]);let frag=null;try{frag=(await docxBundle(o.b))[o.i];}catch(e){}
+    let fallback=null;if(!frag){const im=await loadImg(await imgURL(o));const c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;c.getContext('2d').drawImage(im,0,0);
+      const w=Math.min(im.naturalWidth*72/100,481.9);fallback=[c.toDataURL('image/jpeg',.9),Math.round(w*12700),Math.round(w*im.naturalHeight/im.naturalWidth*12700)];}
+    qs.push({frag,fallback,label:'('+label(o).replace(/ · Q\d+$/,'')+')',gab:o.g});}
+  const blob=await buildDocx(JSZip,tpl,name,qs,{src:$('pdfSrc').checked,gab:$('pdfGab').checked});
+  return {blob,name,ext:'docx'};
+}
+$('docBtn').onclick=()=>savePdf(makeDocx,'',$('docBtn'));
+(async()=>{try{dl=window.claude&&window.claude.use?await window.claude.use('downloads'):null;}catch(e){dl=null;}
+  renderCart();})();
+
+function iniciar(){return sbJSON('banco.json').then(d=>{
+  B=d.map(o=>({...o,_s:norm(o.x+' '+o.t+' '+o.s+' '+o.d)}));
+  B.sort((a,b)=>b.a-a.a||a.p.localeCompare(b.p)||a.q-b.q||a.d.localeCompare(b.d));
+  opts($('fDisc'),uniq(B.map(o=>o.d)),'Todas');
+  const ys=uniq(B.map(o=>o.a)).reverse();$('fAno').innerHTML=ys.map(y=>`<label><input type="checkbox" value="${y}"> ${y}</label>`).join('');$('fAno').addEventListener('change',()=>render());
+  $('fNivel').innerHTML=['F','M','D'].map(k=>`<label class="chip"><input type="checkbox" value="${k}" checked> ${LV[k]}</label>`).join('');
+  cascade();
+  ['fBusca','fSub','fAnul'].forEach(id=>$(id).addEventListener('input',()=>render()));
+  $('fNivel').addEventListener('change',()=>render());
+  $('fDisc').addEventListener('input',()=>{$('fTop').value='';cascade();render();});
+  $('fTop').addEventListener('input',()=>{cascade();render();});
+  $('reset').onclick=()=>{['fBusca','fDisc'].forEach(i=>$(i).value='');document.querySelectorAll('#fAno input').forEach(i=>i.checked=false);$('fAnul').checked=true;document.querySelectorAll('#fNivel input').forEach(i=>i.checked=true);cascade();render();};
+  render();renderCart();
+}).catch(()=>{$('viewQ').innerHTML='<div class="empty">Não foi possível carregar o banco. Recarregue a página.</div>';});}
+/* ===== Acesso restrito (Supabase) ===== */
+const SB=supabase.createClient('https://ygdlbhoqyqjsqoyyfizk.supabase.co','sb_publishable_jB2I59Ruw4MaMT63KLWtSA_O-DMf63b');
+const ADMIN='jesrrael.santos@gmail.com';
+async function sbJSON(p){const {data,error}=await SB.storage.from('banco').download(p);if(error)throw error;return JSON.parse(await data.text());}
+let novo=false,iniciado=false;
+const gm=(t,ok)=>{$('gMsg').textContent=t;$('gMsg').className=ok?'ok':'';};
+function modo(n){novo=n;$('gPass2').hidden=!n;$('gPass2').required=n;$('gBtn').textContent=n?'Criar senha e entrar':'Entrar';
+  $('gMode').textContent=n?'Já tenho senha — entrar':'Primeiro acesso? Crie sua senha';
+  $('gTxt').textContent=n?'Use o e-mail que o Prof. Jazz liberou e escolha uma senha.':'Acesso exclusivo para alunos liberados pelo Prof. Jazz. Entre com seu e-mail e senha.';
+  $('gPass').autocomplete=n?'new-password':'current-password';gm('');}
+$('gMode').onclick=()=>modo(!novo);
+$('gForm').onsubmit=async ev=>{ev.preventDefault();const email=$('gEmail').value.trim().toLowerCase(),password=$('gPass').value;$('gBtn').disabled=true;gm('Aguarde…',true);
+  try{
+    if(novo){if(password!==$('gPass2').value)throw new Error('As senhas não conferem.');
+      const {data:ok}=await SB.rpc('email_permitido',{e:email});if(!ok)throw new Error('Este e-mail ainda não foi liberado pelo Prof. Jazz.');
+      const {data,error}=await SB.auth.signUp({email,password});
+      if(error){if(/registered|exists/i.test(error.message))throw new Error('Esse e-mail já tem senha. Clique em “Já tenho senha — entrar”.');throw error;}
+      if(!data.session){const r=await SB.auth.signInWithPassword({email,password});if(r.error)throw r.error;}
+    }else{const {error}=await SB.auth.signInWithPassword({email,password});
+      if(error){if(/invalid/i.test(error.message))throw new Error('E-mail ou senha incorretos. Se é seu primeiro acesso, clique em “Primeiro acesso? Crie sua senha”.');throw error;}}
+    await entrar();
+  }catch(e){gm(e.message||'Não foi possível entrar.');}finally{$('gBtn').disabled=false;}};
+async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!session)return;
+  const {data:ok}=await SB.rpc('is_allowed');
+  if(!ok){await SB.auth.signOut();$('gate').hidden=false;gm('Seu acesso não está liberado. Fale com o Prof. Jazz.');return;}
+  $('gate').hidden=true;$('admBtn').hidden=(session.user.email||'').toLowerCase()!==ADMIN;
+  if(!iniciado){iniciado=true;$('viewQ').innerHTML='<div class="empty">Carregando o banco de questões…</div>';await iniciar();}}
+$('sairBtn').onclick=async()=>{await SB.auth.signOut();location.reload();};
+/* painel do professor */
+let AL=[];const am=t=>$('admMsg').textContent=t;
+const fdt=d=>d?new Date(d).toLocaleDateString('pt-BR'):'';
+async function admLoad(){const {data,error}=await SB.rpc('admin_lista');if(error){am(error.message);return;}AL=data||[];admRender();}
+function admRender(){const q=norm($('admBusca').value||'');const L=AL.filter(a=>!q||norm(a.email+' '+(a.nome||'')).includes(q));
+  $('admN').textContent=AL.length+' liberado(s)';
+  $('admList').innerHTML=L.map(a=>`<tr><td><b>${esc(a.nome||'')}</b>${a.nome?'<br>':''}<span style="color:var(--muted)">${esc(a.email)}</span></td><td>${a.cadastrado?`<span class="tag on">já criou senha</span>${a.ultimo_acesso?`<br><span style="font-size:12px;color:var(--muted)">último acesso ${fdt(a.ultimo_acesso)}</span>`:''}`:'<span class="tag">ainda não entrou</span>'}</td><td style="text-align:right;white-space:nowrap">${a.cadastrado?`<button class="x" data-z="${esc(a.email)}">Zerar senha</button>`:''}${a.email===ADMIN?'':`<button class="x del" data-r="${esc(a.email)}">Remover</button>`}</td></tr>`).join('')||'<tr><td colspan="3" style="color:var(--muted)">Nenhum aluno.</td></tr>';}
+async function liberar(lista){const rows=lista.map(([e,n])=>({email:e.trim().toLowerCase(),nome:(n||'').trim()||null})).filter(r=>/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(r.email));
+  if(!rows.length){am('Nenhum e-mail válido.');return;}
+  const {error}=await SB.from('allowed_emails').upsert(rows,{onConflict:'email'});am(error?error.message:rows.length+' e-mail(s) liberado(s).');await admLoad();}
+$('admBtn').onclick=()=>{$('adm').hidden=false;am('');admLoad();};
+$('admClose').onclick=()=>{$('adm').hidden=true;};
+$('admBusca').oninput=admRender;
+$('admAdd').onsubmit=async ev=>{ev.preventDefault();await liberar([[$('admEmail').value,$('admNome').value]]);$('admEmail').value='';$('admNome').value='';};
+$('admLoteBtn').onclick=async()=>{await liberar($('admLote').value.split(/\n+/).filter(l=>l.trim()).map(l=>l.split(/[;,\t]/)));$('admLote').value='';};
+$('admList').onclick=async ev=>{const z=ev.target.dataset.z,r=ev.target.dataset.r;
+  if(z&&confirm('Zerar a senha de '+z+'? O aluno vai criar uma nova em “Primeiro acesso”.')){const {error}=await SB.rpc('admin_zerar_senha',{e:z});am(error?error.message:'Senha zerada: '+z);await admLoad();}
+  if(r&&confirm('Remover o acesso de '+r+'?')){await SB.rpc('admin_zerar_senha',{e:r});const {error}=await SB.from('allowed_emails').delete().eq('email',r);am(error?error.message:'Acesso removido: '+r);await admLoad();}};
+entrar();
+</script>
+</body>
+</html>
