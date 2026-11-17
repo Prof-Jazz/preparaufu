@@ -29,6 +29,19 @@ header{background:var(--head);padding:14px 22px;display:flex;align-items:center;
 .tabs{margin-left:auto;display:flex;gap:6px}
 .tabs button{font:600 14px var(--body);border:1px solid #4A4F55;background:transparent;color:#fff;padding:7px 14px;border-radius:999px;cursor:pointer}
 .tabs button[aria-pressed="true"]{background:var(--azul);border-color:var(--azul)}
+@media (max-width:760px){
+  header{padding:12px 14px;gap:10px}
+  .logos{gap:10px;max-width:100%}
+  .logos img.j{height:32px}.logos img.p{height:24px}.logos img.u{height:29px}.logos .sep{height:28px}
+  .ttl{margin-left:0;flex:1 1 100%}
+  .ttl h1{font-size:17px}.ttl p{font-size:12.5px}
+  .tabs{margin-left:0;flex:1 1 100%;flex-wrap:wrap;gap:6px}
+  .tabs button{padding:6px 11px;font-size:13px}
+  header{position:relative}
+  .tabs .theme{position:absolute;top:13px;right:12px;margin:0}
+}
+@media (max-width:380px){.logos img.j{height:28px}.logos img.p{height:20px}.logos img.u{height:25px}.tabs button{padding:6px 9px;font-size:12.5px}}
+@media (max-width:760px){html,body{overflow-x:clip}}
 .wrap{display:grid;grid-template-columns:260px minmax(0,1fr) 300px;gap:18px;padding:18px;max-width:1500px;margin:0 auto}
 @media (max-width:1150px){.wrap{grid-template-columns:250px minmax(0,1fr)}.cart{grid-column:1/-1;position:static!important;max-height:none!important}}
 @media (max-width:760px){.wrap{grid-template-columns:1fr}}
