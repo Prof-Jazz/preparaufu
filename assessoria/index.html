@@ -187,6 +187,10 @@ input[type=time]{max-width:160px}input[type=number]{max-width:160px}
 .vz{margin:0;color:var(--muted);font-size:12.5px}
 @media (max-width:760px){.cd{min-height:0}.ci{flex-direction:row;justify-content:space-between;align-items:center;gap:10px}}
 @media print{.cw{grid-template-columns:repeat(7,1fr)}.ci{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+.faq h3{margin-bottom:2px}.faq details{border-top:1px solid var(--line);padding:10px 2px}.faq details:first-of-type{border-top:0}
+.faq summary{cursor:pointer;font-weight:600;font-size:15px;list-style:none;display:flex;gap:8px}.faq summary::-webkit-details-marker{display:none}
+.faq summary::before{content:"+";color:var(--azul);font-weight:800;width:14px;flex:none}.faq details[open] summary::before{content:"–"}
+.faq p{margin:8px 0 2px 22px;color:var(--muted);line-height:1.55}
 /* login */
 #gate{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px}
 #gate[hidden]{display:none}
@@ -229,7 +233,7 @@ input[type=time]{max-width:160px}input[type=number]{max-width:160px}
 <header>
   <a class="logos" href="/" title="Início da plataforma PREPARA UFU" style="text-decoration:none"><img class="j" src="../bancodequestoes/logo/jazz_claro.png" alt="Jazz, Professor de Matemática"><span class="sep"></span><img class="p" src="../bancodequestoes/logo/prepara_transp.png" alt="Prepara UFU"></a>
   <div class="ttl"><h1>Assessoria ENEM</h1><p>Perfil de estudos e pré-cronograma</p></div>
-  <nav class="tabs"><button class="theme" id="theme" aria-label="Alternar modo diurno e noturno" title="Modo diurno / noturno"><span class="sun">☀</span><span class="moon">☾</span></button><a href="../bancodequestoes/">Banco de Questões</a><button id="tabGeral" hidden>Visão geral</button><button id="tabResp" hidden>Alunos</button><button id="tabExemplo" hidden>Ver como aluno</button><button class="on" id="tabForm" hidden>Meu perfil de estudos</button><button id="tabCrono" hidden>Meu pré-cronograma</button><button id="sair">Sair</button></nav>
+  <nav class="tabs"><button class="theme" id="theme" aria-label="Alternar modo diurno e noturno" title="Modo diurno / noturno"><span class="sun">☀</span><span class="moon">☾</span></button><a href="../bancodequestoes/">Banco de Questões</a><button id="tabGeral" hidden>Visão geral</button><button id="tabResp" hidden>Alunos</button><button id="tabExemplo" hidden>Ver como aluno</button><button class="on" id="tabForm" hidden>Meu perfil de estudos</button><button id="tabCrono" hidden>Meu pré-cronograma</button><button id="tabFaq" hidden>Dúvidas</button><button id="sair">Sair</button></nav>
 </header>
 <div id="exBar" hidden>Modo aluno exemplo — é assim que o aluno vê. Nada aqui entra nas estatísticas da turma. <button type="button" id="exSair">Sair do modo exemplo</button></div>
 <main id="app"></main>
@@ -398,7 +402,7 @@ function fmt(f,v){
   if(f.type==='scale')return AREAS.map(a=>a+': '+(v[a]?DIFN[v[a]-1]:'—')).join('\n');
   return Array.isArray(v)?v.join(', '):String(v);}
 let RESP=[],LIB=[],EXR=null,LST=[];
-function abas(on){$('app').classList.toggle('largo',on!=='tabForm');['tabGeral','tabResp','tabForm','tabCrono'].forEach(t=>$(t).classList.toggle('on',t===on));}
+function abas(on){$('app').classList.toggle('largo',!['tabForm','tabFaq'].includes(on));['tabGeral','tabResp','tabForm','tabCrono','tabFaq'].forEach(t=>$(t).classList.toggle('on',t===on));}
 async function carregar(){
   const [a,b]=await Promise.all([SB.from('checkup').select('*').order('atualizado_em',{ascending:false}),SB.rpc('admin_lista')]);
   if(a.error)throw a.error;RESP=(a.data||[]).filter(r=>r.email!==ADMIN&&r.email!==EXEMPLO);EXR=(a.data||[]).find(r=>r.email===EXEMPLO)||null;LIB=(b.data||[]).filter(x=>x.assessoria&&x.email!==ADMIN);}
@@ -656,6 +660,35 @@ async function exemploAcoes(){
   box.querySelector('[data-x=fill]').onclick=()=>{preencher(EXEMPLO_RESP);visiveis();};
   box.querySelector('[data-x=zero]').onclick=async()=>{if(!confirm('Apagar o perfil e o cronograma do aluno exemplo para começar do zero?'))return;
     await SB.from('cronograma').delete().eq('email',EXEMPLO);await SB.from('checkup').delete().eq('email',EXEMPLO);$('tabCrono').hidden=true;telaForm();};}
+const FAQ=[
+ ['Primeiros passos',[
+  ['O que é o perfil de estudos?','É o seu raio-x: a sua rotina, os seus compromissos, quantas horas você estuda em cada dia, as suas dificuldades e o seu curso. Com essas respostas o site monta o seu pré-cronograma, e o Prof. Jazz usa tudo isso no seu encontro de mentoria.'],
+  ['O que é o pré-cronograma?','É a sua semana de estudos já organizada: em cada dia aparecem os seus compromissos (com horário) e, embaixo, as matérias que você vai estudar, na ordem e com a duração de cada uma. É um ponto de partida: ele será totalmente validado no seu encontro com o mentor.'],
+  ['As matérias têm horário marcado?','Não. Só os compromissos (escola, cursinho, academia, psicólogo, PREPARA UFU…) aparecem com horário. As matérias aparecem só com a duração: você escolhe o melhor momento do dia para estudar, seguindo a ordem sugerida.'],
+  ['Por que umas matérias aparecem mais vezes que outras?','O cronograma dá mais espaço para as matérias que você marcou como difíceis e para as que pesam mais no seu curso. Matemática, Física e Química sempre aparecem mais vezes. Redação entra uma vez por semana, a revisão entra quase todos os dias e o domingo é para simulado, provas antigas da UFU e matéria atrasada.'],
+  ['As aulas do PREPARA UFU contam como tempo de estudo?','Não. As aulas ao vivo (segunda e quinta, 19h–20h30) aparecem como compromisso e não entram nas suas horas de estudo: o seu tempo de estudo é além delas.']]],
+ ['Mudar a rotina e as horas',[
+  ['Como mudo a quantidade de horas que estudo por dia?','Abra "Meu perfil de estudos", vá até "Quantas horas você estuda em cada dia da semana?", escolha as novas horas de cada dia e clique em "Atualizar perfil de estudos". Se você ainda não tinha mexido no cronograma, ele se monta de novo com as novas horas. Se já tinha mexido, os blocos que passarem do novo total vão sozinhos para dias com espaço. Para montar tudo de novo, use "Montar de novo pelo perfil de estudos".'],
+  ['Mudou um compromisso (academia, escola, cursinho, trabalho). O que faço?','Em "Meu perfil de estudos", na parte "Seus compromissos fixos", altere a linha do compromisso (dias e horário), exclua com o ✕ ou adicione um novo em "+ Adicionar compromisso". Depois clique em "Atualizar perfil de estudos". O compromisso aparece atualizado no seu cronograma.'],
+  ['Como coloco o cursinho?','Coloque só o horário das aulas do cursinho. O tempo em que você fica lá estudando sozinho é tempo de estudo: conte nas horas de cada dia.'],
+  ['Mudei de curso ou de dificuldade em alguma matéria. Como atualizo?','Altere no perfil (curso e grau de dificuldade por matéria), clique em "Atualizar perfil de estudos" e, no cronograma, clique em "Montar de novo pelo perfil de estudos" para redistribuir as matérias.']]],
+ ['Mexer no cronograma',[
+  ['Como mudo um bloco de dia ou de lugar?','No computador, clique e arraste o bloco da matéria para outro dia ou para cima/baixo no mesmo dia, para mudar a ordem. No celular, toque no bloco, escolha o novo dia e clique em "Salvar".'],
+  ['Como mudo a duração de um bloco?','Clique (ou toque) no bloco, escolha a nova duração e clique em "Salvar".'],
+  ['Como troco a matéria de um bloco?','Clique no bloco, escolha outra matéria em "Matéria / atividade" e clique em "Salvar".'],
+  ['Como acrescento um bloco?','Clique em "+ Adicionar bloco", escolha a matéria (ou "Outro" para escrever o nome, como "Lista de exercícios"), o dia e a duração, e clique em "Adicionar".'],
+  ['Como excluo um bloco?','Clique no bloco e depois em "Excluir bloco".'],
+  ['Posso mudar os compromissos direto no cronograma?','Não. Compromissos vêm do seu perfil de estudos: para mudar, altere o perfil (veja "Mudou um compromisso").'],
+  ['Como refaço o cronograma do zero?','Clique em "Montar de novo pelo perfil de estudos". Atenção: isso apaga todas as mudanças que você fez e monta tudo de novo a partir do seu perfil.'],
+  ['As minhas mudanças ficam salvas?','Sim, salvam sozinhas: aparece "✓ Salvo às…" ao lado dos botões. O Prof. Jazz vê o seu cronograma e também pode ajustá-lo no seu encontro.'],
+  ['Apareceu "A quantidade de horas que você estuda é insuficiente". E agora?','Significa que as horas que você marcou não comportam todas as matérias de que você precisa. As que ficaram de fora aparecem no aviso. Você pode aumentar as horas no perfil ou conversar com o mentor no seu encontro.'],
+  ['Como imprimo ou salvo em PDF?','Clique em "Imprimir / PDF" e, na janela de impressão, escolha a impressora ou "Salvar como PDF".']]],
+ ['Acesso',[
+  ['Esqueci a minha senha. O que faço?','Fale com o Prof. Jazz: ele zera a sua senha e você cria uma nova em "Primeiro acesso? Crie sua senha", com o mesmo e-mail.'],
+  ['A senha é a mesma do Banco de Questões?','Sim. É a mesma conta: você entra no Banco de Questões e na área da Assessoria com o mesmo e-mail e a mesma senha.']]]];
+function telaFaq(){abas('tabFaq');
+  $('app').innerHTML=`<div class="intro"><h2>Dúvidas</h2><p>Perguntas e respostas sobre o perfil de estudos e o pré-cronograma. Não achou a sua dúvida? Fale com o Prof. Jazz.</p></div>
+  ${FAQ.map(([t,L])=>`<section class="sec faq"><h3>${esc(t)}</h3>${L.map(([q,a])=>`<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join('')}</section>`).join('')}`;}
 async function telaCrono(){abas('tabCrono');
   const {data}=await SB.from('checkup').select('respostas').eq('email',ALVO).maybeSingle();
   if(!data){$('app').innerHTML='<div class="aviso"><h2>Preencha o seu perfil de estudos primeiro</h2><p>O seu pré-cronograma é montado a partir das suas respostas.</p></div>';return;}
@@ -686,7 +719,7 @@ async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!se
   $('gate').hidden=true;
   if(!ok){$('app').innerHTML=`<div class="aviso"><h2>Área exclusiva da Assessoria PREPARA UFU</h2><p>Aqui os alunos da Assessoria preenchem o perfil de estudos e recebem um pré-cronograma personalizado, montado a partir da rotina, das dificuldades e do curso de cada um, e ajustado nos encontros com o Prof. Jazz.</p><p>O seu acesso hoje é ao Banco de Questões. Quer fazer parte da Assessoria? Fale com o Prof. Jazz. Se você já é aluno da Assessoria e está vendo esta mensagem, avise o Prof. Jazz para liberar o seu e-mail.</p><a href="../bancodequestoes/">Ir para o Banco de Questões</a></div>`;return;}
   $('tabForm').hidden=false;$('tabResp').hidden=!IS_ADMIN;$('tabGeral').hidden=!IS_ADMIN;
-  ALVO=EMAIL;$('tabForm').onclick=telaForm;$('tabResp').onclick=telaResp;$('tabGeral').onclick=telaGeral;$('tabCrono').onclick=telaCrono;
+  ALVO=EMAIL;$('tabForm').onclick=telaForm;$('tabResp').onclick=telaResp;$('tabGeral').onclick=telaGeral;$('tabCrono').onclick=telaCrono;$('tabFaq').onclick=telaFaq;$('tabFaq').hidden=false;
   $('tabExemplo').hidden=!IS_ADMIN;$('tabExemplo').onclick=()=>modoExemplo(true);$('exSair').onclick=()=>modoExemplo(false);
   if(!IS_ADMIN){const {data:ex}=await SB.from('checkup').select('email').eq('email',EMAIL).maybeSingle();$('tabCrono').hidden=!ex;}
   if(IS_ADMIN){$('tabForm').textContent='Ver formulário';telaGeral();}else telaForm();}
