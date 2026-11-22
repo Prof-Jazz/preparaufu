@@ -536,11 +536,30 @@ function gerar(p){
       .sort((a,b)=>b.dist-a.dist||b.resto-a.resto||dI(a.d)-dI(b.d))[0];
     if(!c){falta.push(x.n);return;}
     out.dias[c.d].push({tipo:x.k==='RED'?'red':'estudo',k:x.k,g:x.g,dur:x.dur,label:x.n});usado[c.d]+=x.dur;x.dias.push(c.d);x.feito++;});
+  // garantia: toda matéria aparece pelo menos uma vez — tira uma repetição de quem aparece mais
+  const todas=[...plano,red];const trocas=[];
+  const cabeEm=(x,d,livre)=>!out.dias[d].some(b=>b.k===x.k)&&!(x.g==='EX'&&exDia(d)>=2)&&livre>=x.dur;
+  todas.filter(x=>x.feito===0).forEach(x=>{
+    let d=DS.slice(0,6).find(d=>cabeEm(x,d,cap[d]-usado[d]));
+    if(d){out.dias[d].push({tipo:x.k==='RED'?'red':'estudo',k:x.k,g:x.g,dur:x.dur,label:x.n});usado[d]+=x.dur;x.feito=1;x.dias.push(d);return;}
+    const doadores=todas.filter(y=>y.feito>=2).sort((a,b)=>b.feito-a.feito||(a.g==='EX')-(b.g==='EX'));
+    for(const y of doadores){
+      for(const dd of y.dias.slice().reverse()){
+        const i=out.dias[dd].findIndex(b=>b.k===y.k);if(i<0)continue;const bl=out.dias[dd][i];
+        out.dias[dd].splice(i,1);usado[dd]-=bl.dur;
+        let dur=x.dur;if(cap[dd]-usado[dd]<dur&&dur===90&&cap[dd]-usado[dd]>=60)dur=60;
+        if(cabeEm({...x,dur},dd,cap[dd]-usado[dd])){out.dias[dd].push({tipo:x.k==='RED'?'red':'estudo',k:x.k,g:x.g,dur,label:x.n});usado[dd]+=dur;
+          y.feito--;y.dias.splice(y.dias.indexOf(dd),1);x.feito=1;x.dias.push(dd);trocas.push([y.n,y.feito+1,y.feito,x.n]);d=dd;break;}
+        out.dias[dd].splice(i,0,bl);usado[dd]+=bl.dur;}
+      if(d)break;}
+    if(!d)out.avisos.push(`Não coube ${x.n} nem uma vez na semana. Toda matéria precisa aparecer pelo menos uma vez: aumente as suas horas de estudo no perfil ou fale com o seu mentor.`);});
+  trocas.forEach(([y,de,para,x])=>out.avisos.push(`Precisamos diminuir ${y} (de ${de} para ${para} vezes na semana), porque faltou tempo para ${x}. Toda matéria precisa aparecer pelo menos uma vez.`));
+  {const ok=new Set(todas.filter(x=>x.feito>=x.v).map(x=>x.n));const f2=falta.filter(n=>!ok.has(n));falta.splice(0,falta.length,...f2);}
   // domingo: simulado / provas antigas / matéria atrasada
   if(cap.Dom>=60)out.dias.Dom.push({tipo:'sim',k:'SIM',dur:Math.min(240,cap.Dom),label:SIMLBL});
   else out.avisos.push('Você não marcou horas de estudo no domingo. O domingo é o dia das provas antigas e dos simulados: converse sobre isso com o seu mentor.');
   if(falta.length){const c={};falta.forEach(n=>c[n]=(c[n]||0)+1);
-    out.avisos.unshift('A quantidade de horas que você estuda é insuficiente para a quantidade de conteúdos que você precisa estudar. Ficaram de fora desta semana: '+Object.entries(c).map(([n,k])=>k>1?`${n} (${k}×)`:n).join(', ')+'. Vamos rever o seu tempo de estudo no encontro com o mentor.');}
+    out.avisos.unshift('A quantidade de horas que você estuda é insuficiente para a quantidade de conteúdos que você precisa estudar: algumas matérias apareceriam mais vezes se você tivesse mais tempo ('+Object.keys(c).join(', ')+'). Vamos rever o seu tempo de estudo no encontro com o mentor.');}
   let id=1;out.B=DS.flatMap(d=>ordenaDia(out.dias[d]).map((b,i)=>({id:id++,d,ord:i,tipo:b.tipo,k:b.k,g:b.g,dur:b.dur,label:b.label})));
   out.curso=pc;return out;}
 function corBloco(b){if(b.tipo==='estudo'||b.tipo==='red')return `background:${CORD[b.k]||CORD.OUT};color:#fff`;return '';}
@@ -554,7 +573,7 @@ function migra(B){ // cronogramas salvos no formato antigo (com horário)
 function reorganizar(B,p){ // se as horas de um dia diminuíram, leva os blocos que sobram para dias com espaço
   const HD=horasDia(p),cap={};DS.forEach(d=>cap[d]=Math.round((HD[d]||0)*60));
   const tot=d=>B.filter(b=>b.d===d).reduce((s,b)=>s+b.dur,0);let mov=0;const rem=[];
-  DS.forEach(d=>{while(tot(d)>cap[d]){const L=B.filter(b=>b.d===d).sort((a,b)=>b.ord-a.ord);const b=L.find(x=>x.tipo!=='rev')||L[0];if(!b)break;
+  DS.forEach(d=>{while(tot(d)>cap[d]){const L=B.filter(b=>b.d===d).sort((a,b)=>b.ord-a.ord);const cnt=k=>B.filter(o=>o.k===k).length;const b=L.filter(x=>x.tipo!=='rev').sort((a,c)=>cnt(c.k)-cnt(a.k))[0]||L[0];if(!b)break;
     const alvo=DS.filter(e=>e!==d&&(b.tipo==='sim'?e==='Dom':e!=='Dom')&&tot(e)+b.dur<=cap[e]&&!(b.tipo==='estudo'&&B.some(o=>o.d===e&&o.k===b.k))).sort((x,y)=>(cap[y]-tot(y))-(cap[x]-tot(x)))[0];
     if(alvo){b.d=alvo;b.ord=99;mov++;}else{B.splice(B.indexOf(b),1);rem.push(b.label.split(' — ')[0]);}}});
   DS.forEach(d=>B.filter(b=>b.d===d).sort((a,b)=>a.ord-b.ord).forEach((b,i)=>b.ord=i));
@@ -594,7 +613,7 @@ function desenhar(st){
   const resumo=`<table class="cr"><tr><th>Disciplina</th><th>Vezes na semana</th><th>Horas</th></tr>${ordem.map(x=>`<tr><td><i style="${sw(x)}"></i>${esc(x.n)}</td><td>${x.v}</td><td>${hfmt(x.min/60)}</td></tr>`).join('')}<tr class="tt"><td>Total de estudo na semana</td><td></td><td>${hfmt(tot/60)}</td></tr></table><p class="pend" style="margin:6px 0 0">As aulas ao vivo do PREPARA UFU não contam como tempo de estudo: as suas horas de estudo são além delas.</p>`;
   const quem=st.info&&st.info.atualizado_por?(st.info.atualizado_por===ADMIN?(st.email===EXEMPLO?'você':'Prof. Jazz'):(st.info.atualizado_por===st.email?(st.quem==='prof'?'o aluno':'você'):st.info.atualizado_por)):'';
   st.el.innerHTML=`<div class="cbanner">Este é um <b>pré-cronograma</b> para que você comece a estudar. Ele será totalmente validado no seu encontro com o seu mentor.</div>
-   ${st.avisos.map(a=>`<div class="caviso">${esc(a)}</div>`).join('')}
+   ${st.avisos.map(a=>`<div class="caviso">${esc(a)}</div>`).join('')}${(()=>{const L=opcoesMateria(st.p).filter(([k])=>GRUPO[k]&&!B.some(b=>b.k===k)).map(o=>o[1]);return L.length?`<div class="caviso">Atenção: ${esc(L.join(', '))} não aparece${L.length>1?'m':''} no cronograma. Toda matéria precisa aparecer pelo menos uma vez na semana.</div>`:'';})()}
    <div class="ctb"><button class="btn pri" data-a="add">+ Adicionar bloco</button><button class="btn" data-a="refazer">Montar de novo pelo perfil de estudos</button><button class="btn" data-a="print">Imprimir / PDF</button><span class="cst">${st.info&&st.info.atualizado_em?`Última alteração: ${new Date(st.info.atualizado_em).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}${quem?' por '+esc(quem):''}`:'Ainda não alterado'}</span></div>
    <p class="pend chint">Cada dia mostra os seus compromissos, com horário, e embaixo o que estudar, na ordem e com a duração de cada matéria. <span class="sodesk">Arraste um bloco para outro dia ou para mudar a ordem; clique nele para alterar ou excluir.</span><span class="somob">Toque num bloco para mudar o dia, a duração ou excluir.</span></p>
    <div class="cw">${DS.map(col).join('')}</div>
@@ -629,8 +648,10 @@ function editar(st,b){const novo=!b;const ops=opcoesMateria(st.p);
   f.k.onchange=()=>{dlg.querySelector('.outro').hidden=f.k.value!=='OUT';const m={MAT:90,FIS:90,QUI:90,BIO:90,RED:90,REV:30,SIM:240}[f.k.value]||60;f.dur.value=String(m);};
   const fecha=()=>dlg.remove();dlg.onclick=ev=>{if(ev.target===dlg)fecha();};
   dlg.querySelector('[data-x=cancel]').onclick=fecha;
-  const del=dlg.querySelector('[data-x=del]');if(del)del.onclick=()=>{if(!confirm('Excluir este bloco?'))return;st.B=st.B.filter(x=>x!==b);fecha();desenhar(st);salvar(st);};
+  const unica=()=>b&&(GRUPO[b.k])&&st.B.filter(x=>x.k===b.k).length===1;
+  const del=dlg.querySelector('[data-x=del]');if(del)del.onclick=()=>{if(unica()){f.querySelector('.cerr').textContent=`Esta é a única vez que ${b.label} aparece na semana. Toda matéria precisa aparecer pelo menos uma vez: em vez de excluir, mude o dia ou a duração.`;return;}if(!confirm('Excluir este bloco?'))return;st.B=st.B.filter(x=>x!==b);fecha();desenhar(st);salvar(st);};
   f.onsubmit=ev=>{ev.preventDefault();const k=f.k.value,nome=(ops.find(o=>o[0]===k)||[])[1];
+    if(b&&k!==b.k&&unica()){f.querySelector('.cerr').textContent=`Esta é a única vez que ${b.label} aparece na semana. Para estudar outra matéria aqui, adicione um bloco novo em vez de trocar este.`;return;}
     if(k==='OUT'&&!f.nome.value.trim()){f.querySelector('.cerr').textContent='Escreva o nome da atividade.';return;}
     const d=f.d.value,mudouDia=!b||b.d!==d;
     const nb={id:b?b.id:Math.max(0,...st.B.map(x=>+x.id||0))+1,d,dur:+f.dur.value,
