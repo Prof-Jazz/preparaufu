@@ -112,6 +112,30 @@ input[type=time]{max-width:160px}input[type=number]{max-width:160px}
 .leg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--muted);margin-top:8px}
 .leg i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-2px}
 .leg i.sono{background:rgba(120,130,160,.4)}.leg i.livre{border:2px dashed var(--verde)}
+.cbanner{background:rgba(221,221,36,.14);border:1px solid var(--amarelo);border-radius:12px;padding:12px 14px;font-size:15px}
+.caviso{background:rgba(235,104,52,.12);border:1px solid var(--laranja);border-radius:12px;padding:10px 14px;font-size:14.5px;margin-top:8px}
+.cgw{overflow-x:auto;margin-top:12px}
+.cg{display:grid;grid-template-columns:40px repeat(7,minmax(96px,1fr));gap:0 4px;min-width:760px}
+.cgh{text-align:center;font:700 13px var(--display);padding:6px 0;color:var(--muted)}
+.cgt{position:relative}.cgt span{position:absolute;right:5px;transform:translateY(-50%);font-size:11px;color:var(--muted)}
+.cgc{position:relative;border-radius:8px;background-color:var(--bg);background-image:linear-gradient(to bottom,var(--line) 1px,transparent 1px)}
+.cb{position:absolute;left:2px;right:2px;border-radius:7px;padding:3px 6px;overflow:hidden;font-size:12px;line-height:1.2;display:flex;flex-direction:column;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.cb b{font-weight:700;font-size:12.5px}.cb span{opacity:.92;font-size:11.5px}
+.cb.fixo,.cli.fixo{background:repeating-linear-gradient(45deg,var(--soft) 0 6px,var(--card) 6px 12px);color:var(--muted);box-shadow:none;border:1px solid var(--line)}
+.cb.prepara,.cli.prepara{background:#16304F;color:#fff;border:2px solid var(--amarelo)}
+.cb.sim,.cli.sim{background:#212529;color:#fff;border:2px solid var(--amarelo)}
+.cb.rev,.cli.rev{background:var(--card);color:var(--ink);border:2px solid #868E96}
+.clw{display:none}
+@media (max-width:760px){.cgw{display:none}.clw{display:flex;flex-direction:column;gap:10px;margin-top:12px}}
+.cl h5{margin:0 0 6px;font:700 15px var(--display)}
+.cli{display:flex;gap:10px;align-items:center;border-radius:9px;padding:8px 10px;margin-bottom:5px;font-size:14px}
+.cli span{font-variant-numeric:tabular-nums;font-size:13px;min-width:92px}
+.cleg i.fx{background:repeating-linear-gradient(45deg,var(--soft) 0 4px,var(--card) 4px 8px);border:1px solid var(--line)}
+.cleg{margin-top:10px}
+.cr{border-collapse:collapse;width:100%;font-size:14px}.cr th,.cr td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left}
+.cr th{color:var(--muted);font-weight:600;font-size:12.5px}.cr td i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:8px;vertical-align:-1px}
+.cr .tt td{font-weight:700}.falt{color:var(--laranja);font-size:12.5px}
+@media print{header,.tabs,.intro,.btn{display:none!important}body{background:#fff;color:#000}.sec{border:0;box-shadow:none}.cgw{overflow:visible}.cb{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 /* login */
 #gate{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px}
 #gate[hidden]{display:none}
@@ -154,7 +178,7 @@ input[type=time]{max-width:160px}input[type=number]{max-width:160px}
 <header>
   <div class="logos"><img class="j" src="../bancodequestoes/logo/jazz_claro.png" alt="Jazz, Professor de Matemática"><span class="sep"></span><img class="p" src="../bancodequestoes/logo/prepara_transp.png" alt="Prepara UFU"></div>
   <div class="ttl"><h1>Assessoria ENEM</h1><p>Check-up do aluno para montar o seu cronograma de estudos</p></div>
-  <nav class="tabs"><button class="theme" id="theme" aria-label="Alternar modo diurno e noturno" title="Modo diurno / noturno"><span class="sun">☀</span><span class="moon">☾</span></button><a href="../bancodequestoes/">Banco de Questões</a><button id="tabGeral" hidden>Visão geral</button><button id="tabResp" hidden>Alunos</button><button class="on" id="tabForm" hidden>Meu check-up</button><button id="sair">Sair</button></nav>
+  <nav class="tabs"><button class="theme" id="theme" aria-label="Alternar modo diurno e noturno" title="Modo diurno / noturno"><span class="sun">☀</span><span class="moon">☾</span></button><a href="../bancodequestoes/">Banco de Questões</a><button id="tabGeral" hidden>Visão geral</button><button id="tabResp" hidden>Alunos</button><button class="on" id="tabForm" hidden>Meu check-up</button><button id="tabCrono" hidden>Meu pré-cronograma</button><button id="sair">Sair</button></nav>
 </header>
 <main id="app"></main>
 
@@ -188,6 +212,7 @@ const S=[
   {k:'curso',l:'Curso que você quer fazer',type:'text',req:1},
   {k:'universidades',l:'Universidades em que pretende entrar',type:'checks',opts:['UFU','UFTM','UFMG','UFG','USP / Unicamp','Outras']},
   {k:'provas',l:'Quais provas você vai fazer?',type:'checks',opts:['ENEM','Vestibular UFU','Outros vestibulares'],req:1},
+  {k:'lingua',l:'Língua estrangeira que você vai fazer na UFU',type:'radio',opts:['Inglês','Espanhol','Ainda não sei'],req:1},
   {k:'ufu_exp',l:'Qual a sua experiência com a prova da UFU?',type:'radio',opts:['Não conheço a prova','Conheço, mas nunca fiz','Já fiz'],req:1},
   {k:'ufu_vezes',l:'Quantas vezes você já fez a prova da UFU?',type:'radio',opts:['1 vez','2 vezes','3 vezes','4 vezes ou mais'],req:1,show:r=>r.ufu_exp==='Já fiz'},
   {k:'enem_antes',l:'Já fez o ENEM antes?',type:'radio',opts:['Sim','Não'],req:1},
@@ -198,7 +223,7 @@ const S=[
   {k:'dorme',l:'Que horas você costuma dormir? (dias de semana)',type:'time',req:1},
   {k:'sono_fds',l:'E no fim de semana?',type:'radio',opts:['Mesmo horário da semana','Durmo e acordo mais tarde','Varia muito']},
   {k:'trabalha',l:'Você trabalha ou faz estágio?',type:'radio',opts:['Sim','Não'],req:1},
-  {k:'cursinho',l:'Você faz cursinho?',type:'radio',opts:['Sim, presencial','Sim, online','Presencial e online','Não faço cursinho'],req:1},
+  {k:'cursinho',l:'Você faz cursinho?',type:'radio',opts:['Sim, presencial','Sim, online','Presencial e online','Não faço cursinho'],req:1,h:'Se faz, coloque os dias e horários das aulas (inclusive as online ao vivo) na lista de compromissos fixos, logo abaixo.'},
   {k:'cursinho_nome',l:'Qual cursinho?',type:'text',show:r=>r.cursinho&&r.cursinho!=='Não faço cursinho'},
   {k:'atividade',l:'Você pratica atividade física?',type:'radio',opts:['Sim','Não'],req:1},
   {k:'atividade_qual',l:'Qual atividade?',type:'checks',opts:['Academia','Corrida / caminhada','Futebol','Natação','Luta','Dança','Outra'],show:r=>r.atividade==='Sim'},
@@ -302,7 +327,7 @@ async function telaForm(){
     const {error}=await SB.from('checkup').upsert({email:EMAIL,respostas:r,atualizado_em:agora},{onConflict:'email'});
     $('enviar').disabled=false;
     if(error){m.className='err';m.textContent='Não foi possível enviar: '+error.message;return;}
-    m.className='ok';m.textContent='✓ Check-up enviado! Obrigado. O Prof. Jazz vai usar essas respostas para montar o seu cronograma.';$('enviar').textContent='Atualizar check-up';};
+    m.className='ok';m.innerHTML='✓ Check-up enviado! <button type="button" class="btn pri" id="verCrono" style="margin-left:8px">Ver meu pré-cronograma</button>';$('tabCrono').hidden=false;$('verCrono').onclick=telaCrono;$('enviar').textContent='Atualizar check-up';};
 }
 
 /* ===== Área do professor ===== */
@@ -318,7 +343,7 @@ function fmt(f,v){
   if(f.type==='scale')return AREAS.map(a=>a.replace(/ \(.*\)/,'')+': '+(v[a]??'—')).join('\n');
   return Array.isArray(v)?v.join(', '):String(v);}
 let RESP=[],LIB=[];
-function abas(on){['tabGeral','tabResp','tabForm'].forEach(t=>$(t).classList.toggle('on',t===on));}
+function abas(on){['tabGeral','tabResp','tabForm','tabCrono'].forEach(t=>$(t).classList.toggle('on',t===on));}
 async function carregar(){
   const [a,b]=await Promise.all([SB.from('checkup').select('*').order('atualizado_em',{ascending:false}),SB.rpc('admin_lista')]);
   if(a.error)throw a.error;RESP=(a.data||[]).filter(r=>r.email!==ADMIN);LIB=(b.data||[]).filter(x=>x.assessoria&&x.email!==ADMIN);}
@@ -374,6 +399,7 @@ function ficha(r){const p=r.respostas;
   const t=(v,l)=>`<div class="kp"><b>${esc(v||'—')}</b><span>${esc(l)}</span></div>`;
   return `<div class="kps">${t(p.horas_semana,'estuda hoje (seg–sex)')}${t(p.horas_possiveis,'consegue estudar')}${t((p.horas_sab||'—')+' / '+(p.horas_dom||'—'),'sábado / domingo')}${t(sono,`de sono (${p.dorme||'?'} → ${p.acorda||'?'})`)}${t(p.cursinho,'cursinho')}${t(p.aulas_mat,'aulas de Matemática')}${t(p.local_principal,'onde estuda')}${t(p.anki,'Anki')}${t(p.ufu_exp+(p.ufu_vezes?' · '+p.ufu_vezes:''),'prova da UFU')}</div>
   <h4>Semana do aluno</h4>${agenda(p)}
+  <h4>Pré-cronograma gerado</h4>${renderCrono(p,'prof')}
   <h4>Nível por área</h4>${AREAS.map(a=>{const v=(p.nivel||{})[a]||0;return `<div class="br"><span class="bl">${esc(a.replace(/ \(.*\)/,''))}</span><span class="bt"><i style="width:${v*20}%;background:${v<=2?'var(--laranja)':v===3?'var(--amarelo)':'var(--verde)'}"></i></span><b>${v||'—'}</b><small></small></div>`;}).join('')}
   ${S.map(s=>{const it=s.f.filter(f=>!['nivel','disp'].includes(f.k)).map(f=>{const v=fmt(f,p[f.k]);return v?`<dt>${esc(f.l)}</dt><dd>${esc(v)}</dd>`:'';}).join('');return it?`<h4>${esc(s.t)}</h4><dl>${it}</dl>`:'';}).join('')}`;}
 function lista(){const q=($('busca').value||'').toLowerCase();
@@ -387,6 +413,117 @@ function csv(){const cols=[['email','E-mail'],['atualizado_em','Enviado em'],...
   const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
   const linhas=[cols.map(c=>q(c[1])).join(';')].concat(RESP.map(r=>cols.map(([k])=>{if(k==='email')return q(r.email);if(k==='atualizado_em')return q(new Date(r.atualizado_em).toLocaleString('pt-BR'));const f=CAMPOS.find(x=>x.k===k);return q(fmt(f,r.respostas[k]).replace(/\n/g,' | '));}).join(';')));
   const b=new Blob(['﻿'+linhas.join('\r\n')],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='checkup-assessoria.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);}
+
+/* ===== Pré-cronograma ===== */
+const DISC=[ // chave, nome, grupo, minutos por bloco, vezes base na semana
+ ['MAT','Matemática','EX',90,2],['FIS','Física','EX',90,1],['QUI','Química','EX',90,1],['BIO','Biologia','BIO',90,1],
+ ['LP','Língua Portuguesa','LIN',60,2],['LIT','Literatura','LIN',60,1],['LE','Língua Estrangeira','LIN',60,1],
+ ['HIS','História','HUM',60,1],['GEO','Geografia','HUM',60,1],['FIL','Filosofia','HUM',60,1],['SOC','Sociologia','HUM',60,1]];
+const CORD={MAT:'#D9480F',FIS:'#1864AB',QUI:'#5F3DC4',BIO:'#2B8A3E',LP:'#C92A2A',LIT:'#A61E4D',LE:'#0B7285',HIS:'#7F4F24',GEO:'#5C7A0A',FIL:'#495057',SOC:'#8C6500',RED:'#C2255C'};
+const DIF2K={'Matemática':'MAT','Física':'FIS','Química':'QUI','Biologia':'BIO','Português':'LP','Literatura':'LIT','Inglês':'LE','Espanhol':'LE','História':'HIS','Geografia':'GEO','Filosofia':'FIL','Sociologia':'SOC'};
+const sem=s=>(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+function pesoCurso(curso){const c=sem(curso);
+  if(/medic|enferm|odont|biomed|farmac|nutri|fisiot|veterin|biolog|zootec|agronom|biotec|saude|fonoaud|educacao fisica/.test(c))return {k:['BIO','QUI'],g:'saúde'};
+  if(/engenh|comput|sistemas|matemat|fisica|quimica|estatist|arquitet|geolog|automac|eletr|mecatr/.test(c))return {k:/quimic/.test(c)?['MAT','QUI']:['MAT','FIS'],g:'exatas'};
+  if(/letras|traduc|linguist/.test(c))return {k:['LP','LIT','LE'],g:'letras'};
+  if(/direito|historia|geograf|filosof|sociol|ciencias sociais|relacoes intern|jornal|comunicac|pedagog|servico social|psicolog|teatro|musica|artes|cinema|design|publicid/.test(c))return {k:['LP','HIS'],g:'humanas'};
+  if(/administ|economi|contab|gestao|financ|logist/.test(c))return {k:['MAT','LP'],g:'gestão'};
+  return {k:[],g:''};}
+const REVMIN={'Até 15 min':15,'15 a 30 min':30,'30 min a 1 h':45,'Mais de 1 h':60};
+const hm=m=>String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
+function subtrai(L,a,b){const o=[];L.forEach(([x,y])=>{if(b<=x||a>=y)o.push([x,y]);else{if(a>x)o.push([x,a]);if(b<y)o.push([b,y]);}});return o.filter(([x,y])=>y-x>=15);}
+function gerar(p){
+  const W=tmin(p.acorda)??420,SL=tmin(p.dorme)??1380;
+  const iniDia=W+30,fimDia=Math.min(SL<=W+120?1440:SL,1440)-30;
+  const marc=p.disp||[],usaMarc=marc.length>0;
+  const fixosDia=d=>(p.fixos||[]).filter(x=>(x.dias||[]).includes(d)).map(x=>{const a=tmin(x.ini),b=tmin(x.fim);return a==null||b==null?null:{ini:a,fim:b>a?b:1440,label:x.tipo+(x.desc?' — '+x.desc:'')};}).filter(Boolean);
+  const out={dias:{},avisos:[],resumo:[],extra:[]};
+  DS.forEach(d=>out.dias[d]=[]);
+  // blocos fixos exibidos
+  DS.forEach(d=>{fixosDia(d).forEach(f=>out.dias[d].push({tipo:'fixo',ini:f.ini,fim:f.fim,label:f.label}));
+    if(d==='Seg'||d==='Qui')out.dias[d].push({tipo:'prepara',ini:1140,fim:1230,label:'PREPARA UFU — aula ao vivo com o Prof. Jazz'});});
+  // tempo livre por dia (seg a sáb)
+  const cap={},livre={};
+  const hp=Math.max(hnum(p.horas_possiveis),1)*60,hs=Math.max(hnum(p.horas_sab),hnum(p.horas_possiveis))*60;
+  DS.slice(0,6).forEach((d,i)=>{
+    let L=usaMarc?TURNOS.map((t,j)=>marc.includes(DIAS[i]+'|'+t)?[[360,720,1080][j],[720,1080,1440][j]]:null).filter(Boolean):[[0,1440]];
+    L=L.map(([a,b])=>[Math.max(a,iniDia),Math.min(b,fimDia)]).filter(([a,b])=>b>a);
+    L.sort((x,y)=>x[0]-y[0]);const M=[];L.forEach(x=>{const l=M[M.length-1];if(l&&x[0]<=l[1])l[1]=Math.max(l[1],x[1]);else M.push([...x]);});L=M;
+    const F=fixosDia(d);F.forEach(f=>L=subtrai(L,f.ini-15,f.fim+15));
+    if(d==='Seg'||d==='Qui')L=subtrai(L,1125,1245);
+    const almocoBloq=F.find(f=>f.ini<780&&f.fim>720);const alm=almocoBloq&&almocoBloq.fim<=870?[almocoBloq.fim+15,almocoBloq.fim+75]:[720,780];
+    L=subtrai(L,alm[0],alm[1]);L=subtrai(L,1110,1140);
+    livre[d]=L.map(([a,b])=>({a,b,prev:(d==='Seg'||d==='Qui')&&a===1245?'EX':null}));cap[d]=d==='Sáb'?hs:hp;});
+  const usado={};DS.forEach(d=>usado[d]=0);
+  function coloca(d,dur,grupo,relax){if(usado[d]+dur>cap[d])return null;
+    for(const iv of livre[d]){if(iv.b-iv.a<dur)continue;
+      if(!relax&&iv.prev&&iv.prev===grupo&&grupo!=='REV')continue;
+      if(relax&&iv.prev==='EX'&&grupo==='EX')continue;
+      const s=iv.a;iv.a=s+dur+10;iv.prev=grupo;usado[d]+=dur;return [s,s+dur];}
+    return null;}
+  // revisão diária (seg a sáb)
+  const ankiOn=(p.anki||'').startsWith('Sim');
+  const outros=(p.revisao||[]).filter(x=>!['Videoaulas','Não tenho método de revisão'].includes(x));
+  const revNome='Revisão'+(ankiOn?' — Anki':'')+(outros.length?(ankiOn?' + ':' — ')+outros.join(', ').toLowerCase():'');
+  const revDur=ankiOn?(REVMIN[p.anki_min]||30):30;
+  DS.slice(0,6).forEach(d=>{const r=coloca(d,revDur,'REV');if(r)out.dias[d].push({tipo:'rev',ini:r[0],fim:r[1],label:revNome});});
+  // quantas vezes cada disciplina
+  const dif=new Set((p.dificuldades||[]).map(x=>DIF2K[x]).filter(Boolean));const pc=pesoCurso(p.curso);
+  const LEnome=p.lingua||'Língua Estrangeira';
+  const plano=DISC.map(([k,n,g,dur,base])=>{let v=base,why=[];if(dif.has(k)){v++;why.push('dificuldade');}if(pc.k.includes(k)){v++;why.push('peso para '+(p.curso||'o seu curso'));}
+    return {k,n:k==='LE'?LEnome:n,g,dur,v,why,feito:0,dias:[]};});
+  plano.sort((a,b)=>b.v-a.v||(b.g==='EX'||b.g==='BIO')-(a.g==='EX'||a.g==='BIO'));
+  const red={k:'RED',n:'Redação',g:'LIN',dur:90,v:1,why:(p.dificuldades||[]).includes('Redação')?['dificuldade']:[],feito:0,dias:[]};
+  const fila=[];const maxV=Math.max(...plano.map(x=>x.v));
+  for(let r=1;r<=maxV;r++){plano.filter(x=>x.v>=r).forEach(x=>fila.push(x));if(r===1)fila.splice(Math.min(3,fila.length),0,red);}
+  const dIdx=d=>DS.indexOf(d);
+  const exNoDia=d=>out.dias[d].filter(b=>b.g==='EX'||b.tipo==='prepara').length;
+  const falta=[];
+  fila.forEach(x=>{let melhor=null;
+    for(const relax of [false,true]){
+      const cands=DS.slice(0,6).filter(d=>!x.dias.includes(d)&&!(x.g==='EX'&&exNoDia(d)>=2)).map(d=>{
+        const dist=x.dias.length?Math.min(...x.dias.map(e=>Math.abs(dIdx(e)-dIdx(d)))):6;
+        return {d,dist,resto:cap[d]-usado[d]};}).sort((a,b)=>b.dist-a.dist||b.resto-a.resto||dIdx(a.d)-dIdx(b.d));
+      for(const c of cands){const r=coloca(c.d,x.dur,x.g,relax);if(r){melhor={d:c.d,r};break;}}
+      if(melhor)break;}
+    if(melhor){x.dias.push(melhor.d);x.feito++;out.dias[melhor.d].push({tipo:x.k==='RED'?'red':'estudo',k:x.k,g:x.g,ini:melhor.r[0],fim:melhor.r[1],label:x.n});}
+    else falta.push(x.n);});
+  // domingo: só de manhã
+  let dom=[[Math.max(W+30,420),720]];fixosDia('Dom').forEach(f=>dom=subtrai(dom,f.ini-15,f.fim+15));
+  const dm=dom.sort((a,b)=>(b[1]-b[0])-(a[1]-a[0]))[0];
+  if(dm&&dm[1]-dm[0]>=90)out.dias['Dom'].push({tipo:'sim',ini:dm[0],fim:Math.min(dm[1],dm[0]+240),label:'Simulado · provas antigas da UFU · matéria atrasada'});
+  else out.avisos.push('Seus compromissos de domingo de manhã não deixam espaço para o simulado/provas antigas. Vamos ajustar isso no encontro com o mentor.');
+  if(falta.length){const c={};falta.forEach(n=>c[n]=(c[n]||0)+1);
+    out.avisos.unshift('A quantidade de horas que você estuda hoje é insuficiente para a quantidade de conteúdos que você precisa estudar. Ficaram de fora desta semana: '+Object.entries(c).map(([n,k])=>k>1?`${n} (${k}×)`:n).join(', ')+'. Vamos rever o seu tempo de estudo no encontro com o mentor.');}
+  if(!usaMarc)out.avisos.push('Você não marcou os períodos livres para estudar; usamos todo o horário em que você está acordado e sem compromissos.');
+  out.resumo=[...plano,red].map(x=>({n:x.n,k:x.k,v:x.feito,pedido:x.v,min:x.feito*x.dur,why:x.why}));
+  out.revMin=DS.slice(0,6).reduce((s,d)=>s+out.dias[d].filter(b=>b.tipo==='rev').reduce((a,b)=>a+b.fim-b.ini,0),0);
+  out.curso=pc;return out;}
+function corBloco(b){if(b.tipo==='estudo'||b.tipo==='red')return `background:${CORD[b.k]};color:#fff`;return '';}
+function renderCrono(p,quem){const c=gerar(p);
+  const todos=DS.flatMap(d=>c.dias[d]);if(!todos.length)return '<p class="pend">Sem dados suficientes para montar o cronograma.</p>';
+  const H0=Math.max(0,Math.floor(Math.min(...todos.map(b=>b.ini))/60)),H1=Math.min(24,Math.ceil(Math.max(...todos.map(b=>b.fim))/60));
+  const px=46,top=m=>(m/60-H0)*px,alt=(H1-H0)*px;
+  const bl=b=>`<div class="cb ${b.tipo}" style="top:${top(b.ini)}px;height:${Math.max(top(b.fim)-top(b.ini)-2,18)}px;${corBloco(b)}" title="${esc(b.label)} · ${hm(b.ini)}–${hm(b.fim)}"><b>${esc(b.label)}</b><span>${hm(b.ini)}–${hm(b.fim)}</span></div>`;
+  const grade=`<div class="cg" style="--n:${H1-H0}"><div></div>${DS.map(d=>`<div class="cgh">${DIAS[DS.indexOf(d)]}</div>`).join('')}
+    <div class="cgt" style="height:${alt}px">${Array.from({length:H1-H0+1},(_,i)=>`<span style="top:${i*px}px">${String(H0+i).padStart(2,'0')}h</span>`).join('')}</div>
+    ${DS.map(d=>`<div class="cgc" style="height:${alt}px;background-size:100% ${px}px">${c.dias[d].map(bl).join('')}</div>`).join('')}</div>`;
+  const listaM=DS.map(d=>{const B=c.dias[d].slice().sort((a,b)=>a.ini-b.ini);return `<div class="cl"><h5>${DIAS[DS.indexOf(d)]}</h5>${B.length?B.map(b=>`<div class="cli ${b.tipo}" style="${corBloco(b)}"><span>${hm(b.ini)}–${hm(b.fim)}</span><b>${esc(b.label)}</b></div>`).join(''):'<p class="pend">Livre</p>'}</div>`;}).join('');
+  const tot=c.resumo.reduce((s,x)=>s+x.min,0)+c.revMin+DS.flatMap(d=>c.dias[d]).filter(b=>b.tipo==='sim').reduce((s,b)=>s+b.fim-b.ini,0);
+  const resumo=`<table class="cr"><tr><th>Disciplina</th><th>Vezes na semana</th><th>Horas</th><th>Por quê</th></tr>${c.resumo.map(x=>`<tr><td><i style="background:${CORD[x.k]}"></i>${esc(x.n)}</td><td>${x.v}${x.v<x.pedido?` <span class="falt">de ${x.pedido}</span>`:''}</td><td>${hfmt(x.min/60)}</td><td>${esc(x.why.join(' · '))}</td></tr>`).join('')}
+    <tr><td><i style="background:#fff;border:2px solid #868E96"></i>Revisão</td><td>${DS.slice(0,6).filter(d=>c.dias[d].some(b=>b.tipo==='rev')).length}</td><td>${hfmt(c.revMin/60)}</td><td></td></tr>
+    <tr class="tt"><td>Total de estudo na semana</td><td></td><td>${hfmt(tot/60)}</td><td></td></tr></table>`;
+  return `<div class="cbanner">Este é um <b>pré-cronograma</b> para que você comece a estudar. Ele será totalmente validado no seu encontro com o seu mentor.</div>
+   ${c.avisos.map(a=>`<div class="caviso">${esc(a)}</div>`).join('')}
+   <div class="cgw">${grade}</div><div class="clw">${listaM}</div>
+   <div class="leg cleg"><span><i style="background:#16304F;border:2px solid var(--amarelo)"></i>PREPARA UFU (ao vivo)</span><span><i class="fx"></i>compromisso fixo</span><span><i style="background:#212529;border:2px solid var(--amarelo)"></i>simulado de domingo</span><span><i style="border:2px solid #868E96"></i>revisão</span></div>
+   <h4>Resumo da semana</h4>${resumo}
+   <p class="pend" style="margin-top:8px">${quem==='prof'&&c.curso.g?`Ênfase de curso aplicada: ${esc(c.curso.g)} (${c.curso.k.map(k=>DISC.find(x=>x[0]===k)[1]).join(', ')}). `:''}Exatas e Biologia em blocos de 1h30; Humanas e Linguagens em blocos de 1h; Redação 1h30 uma vez por semana; intervalos de 10 min entre blocos; almoço e jantar preservados.</p>
+   <button class="btn" onclick="window.print()" style="margin-top:10px">Imprimir / salvar em PDF</button>`;}
+async function telaCrono(){abas('tabCrono');
+  const {data}=await SB.from('checkup').select('respostas').eq('email',EMAIL).maybeSingle();
+  if(!data){$('app').innerHTML='<div class="aviso"><h2>Responda o check-up primeiro</h2><p>O seu pré-cronograma é montado a partir das suas respostas.</p></div>';return;}
+  $('app').innerHTML=`<div class="intro"><h2>Meu pré-cronograma</h2><p>Montado a partir do seu check-up. Se a sua rotina mudar, atualize o check-up e o cronograma se ajusta.</p></div><div class="sec">${renderCrono(data.respostas,'aluno')}</div>`;}
 
 /* ===== Login (mesma conta do Banco de Questões) ===== */
 let novo=false;
@@ -412,7 +549,8 @@ async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!se
   $('gate').hidden=true;
   if(!ok){$('app').innerHTML=`<div class="aviso"><h2>Área exclusiva da Assessoria ENEM</h2><p>O seu e-mail tem acesso ao Banco de Questões, mas não está cadastrado na Assessoria. Se você é aluno da Assessoria, fale com o Prof. Jazz.</p><a href="../bancodequestoes/">Ir para o Banco de Questões</a></div>`;return;}
   $('tabForm').hidden=false;$('tabResp').hidden=!IS_ADMIN;$('tabGeral').hidden=!IS_ADMIN;
-  $('tabForm').onclick=telaForm;$('tabResp').onclick=telaResp;$('tabGeral').onclick=telaGeral;
+  $('tabForm').onclick=telaForm;$('tabResp').onclick=telaResp;$('tabGeral').onclick=telaGeral;$('tabCrono').onclick=telaCrono;
+  if(!IS_ADMIN){const {data:ex}=await SB.from('checkup').select('email').eq('email',EMAIL).maybeSingle();$('tabCrono').hidden=!ex;}
   if(IS_ADMIN){$('tabForm').textContent='Ver formulário';telaGeral();}else telaForm();}
 $('sair').onclick=async()=>{await SB.auth.signOut();location.reload();};
 entrar();
