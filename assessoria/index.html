@@ -105,8 +105,10 @@ input[type=time]{max-width:160px}input[type=number]{max-width:160px}
 .ag{display:grid;grid-template-columns:38px repeat(7,minmax(70px,1fr));gap:0 3px;overflow-x:auto;font-size:11.5px;margin-top:4px}
 .agh{text-align:center;font-weight:700;padding:4px 0;color:var(--muted)}
 .agt{position:relative}.agt span{position:absolute;right:4px;transform:translateY(-50%);color:var(--muted);font-size:10.5px}
-.agc{position:relative;background:repeating-linear-gradient(to bottom,var(--soft) 0 1px,transparent 1px 30px);border-radius:6px;background-color:var(--bg)}
-.ev{position:absolute;left:2px;right:2px;border-radius:5px;overflow:hidden;padding:2px 4px;line-height:1.2}
+.agc{position:relative;background:repeating-linear-gradient(to bottom,var(--soft) 0 1px,transparent 1px 40px);border-radius:6px;background-color:var(--bg)}
+.ev{position:absolute;left:2px;right:2px;border-radius:6px;overflow:hidden;padding:5px 7px;line-height:1.2;box-sizing:border-box}
+.ev.fx1{display:flex;flex-direction:column;gap:1px}.ev.fx1 b{font-size:11.5px}.ev .hr{font-size:10.5px;opacity:.95}
+.ev.f2{padding:3px 6px;line-height:1.12}.ev.f2 b{font-size:10.5px}.ev.f3{display:block}.ev.f3 b{margin-right:3px}.ev.f4{padding:2px 5px}.ev.f4 b,.ev.f4 .hr{font-size:9.5px}
 .ev.sono{background:repeating-linear-gradient(45deg,rgba(120,130,160,.28) 0 6px,rgba(120,130,160,.12) 6px 12px);color:var(--muted);left:0;right:0;border-radius:0;font-size:10.5px}
 .ev.livre{border:2px dashed var(--verde);background:rgba(27,175,122,.08);left:0;right:0}
 .ev.fx1{color:#fff;font-size:11px;box-shadow:0 1px 3px rgba(0,0,0,.25);z-index:2}
@@ -120,9 +122,14 @@ input[type=time]{max-width:160px}input[type=number]{max-width:160px}
 .cgh{text-align:center;font:700 13px var(--display);padding:6px 0;color:var(--muted)}
 .cgt{position:relative}.cgt span{position:absolute;right:5px;transform:translateY(-50%);font-size:11px;color:var(--muted)}
 .cgc{position:relative;border-radius:8px;background-color:var(--bg);background-image:linear-gradient(to bottom,var(--line) 1px,transparent 1px)}
-.cb{position:absolute;left:2px;right:2px;border-radius:7px;padding:3px 6px;overflow:hidden;font-size:12px;line-height:1.2;display:flex;flex-direction:column;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.cb{position:absolute;left:3px;right:3px;border-radius:8px;padding:6px 9px;overflow:hidden;font-size:12px;line-height:1.22;display:flex;flex-direction:column;gap:1px;box-shadow:0 1px 2px rgba(0,0,0,.2);box-sizing:border-box}
 .cb b{font-weight:700;font-size:12.5px}
-.cb.curto{display:block;white-space:nowrap;text-overflow:ellipsis;padding:2px 6px;font-size:11.5px}.cb.curto b,.cb.curto span{font-size:11.5px}.cb span{opacity:.92;font-size:11.5px}
+.cb .ds,.ev .ds{font-style:normal;font-size:11.5px;opacity:.85}.cb .hr{font-size:11.5px;opacity:.95;font-variant-numeric:tabular-nums}
+.cb.f1 .ds,.ev.f1 .ds{display:none}
+.cb.f2{padding:4px 8px;line-height:1.15}.cb.f2 b{font-size:11.5px}.cb.f2 .hr{font-size:11px}
+.cb.f3{display:block}.cb.f3 b{margin-right:4px}.cb.f3 .hr{white-space:nowrap}
+.cb.f4{padding:3px 6px}.cb.f4 b,.cb.f4 .hr{font-size:10.5px}
+
 .cb.fixo,.cli.fixo{background:repeating-linear-gradient(45deg,var(--soft) 0 6px,var(--card) 6px 12px);color:var(--muted);box-shadow:none;border:1px solid var(--line)}
 .cb.prepara,.cli.prepara{background:#16304F;color:#fff;border:2px solid var(--amarelo)}
 .cb.sim,.cli.sim{background:#212529;color:#fff;border:2px solid var(--amarelo)}
@@ -407,13 +414,13 @@ async function telaResp(){abas('tabResp');
   try{await carregar();}catch(e){$('lista').innerHTML='<p class="pend">Erro: '+esc(e.message)+'</p>';return;}
   $('busca').oninput=lista;$('csv').onclick=csv;lista();}
 function agenda(p){
-  const H0=5,H1=24,px=30,top=m=>((m/60-H0)*px);const alt=(H1-H0)*px;
+  const H0=5,H1=24,px=40,top=m=>((m/60-H0)*px);const alt=(H1-H0)*px;
   const ac=tmin(p.acorda),dm=tmin(p.dorme);
   const sono=[];if(ac!=null&&dm!=null){if(dm>ac){sono.push([dm,1440]);sono.push([0,ac]);}else sono.push([dm,ac]);}
   const blocos=d=>{let h='';
     sono.forEach(([a,b])=>{const A=Math.max(a,H0*60),B=Math.min(b,H1*60);if(B>A)h+=`<div class="ev sono" style="top:${top(A)}px;height:${top(B)-top(A)}px">${B-A>=60?'dormindo':''}</div>`;});
     (p.fixos||[]).filter(x=>x.dias.includes(d)).forEach(x=>{let A=tmin(x.ini),B=tmin(x.fim);if(A==null||B==null)return;if(B<=A)B=1440;A=Math.max(A,H0*60);B=Math.min(B,H1*60);if(B<=A)return;
-      h+=`<div class="ev fx1" style="top:${top(A)}px;height:${Math.max(top(B)-top(A),14)}px;background:${COR[x.tipo]||'#8A93A6'}" title="${esc(x.tipo+(x.desc?' — '+x.desc:'')+' · '+x.ini+'–'+x.fim)}"><b>${esc(x.tipo)}</b>${x.desc?' '+esc(x.desc):''}<br>${x.ini}–${x.fim}</div>`;});
+      h+=`<div class="ev fx1" style="top:${top(A)}px;height:${Math.max(top(B)-top(A),14)}px;background:${COR[x.tipo]||'#8A93A6'}" title="${esc(x.tipo+(x.desc?' — '+x.desc:'')+' · '+x.ini+'–'+x.fim)}">${rotulo(x.tipo+(x.desc?' — '+x.desc:''),x.ini+'–'+x.fim)}</div>`;});
     return h;};
   const horas=Array.from({length:H1-H0+1},(_,i)=>`<span style="top:${i*px}px">${String(H0+i).padStart(2,'0')}h</span>`).join('');
   return `<div class="ag"><div class="agh"></div>${DS.map(d=>`<div class="agh">${d}</div>`).join('')}<div class="agt" style="height:${alt}px">${horas}</div>${DS.map(d=>`<div class="agc" style="height:${alt}px">${blocos(d)}</div>`).join('')}</div>
@@ -432,7 +439,7 @@ function lista(){const q=($('busca').value||'').toLowerCase();
   $('lista').innerHTML=(LST.map((r,i)=>{const p=r.respostas;
     return `<details class="alu" data-i="${i}"><summary>${r.email===EXEMPLO?'<span class="tag" style="background:var(--amarelo);color:#16304F;font-weight:700">ALUNO EXEMPLO</span>':''}<b>${esc(p.nome||r.email)}</b><span class="m">${esc(p.curso||'')}${p.whats?' · '+esc(p.whats):''}</span><span class="d">enviado ${new Date(r.atualizado_em).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}</span></summary><div class="corpo"></div></details>`;}).join('')||'<p class="pend">Nenhum perfil de estudos enviado ainda.</p>')
    +(pend.length&&!q?`<div class="intro"><p><b>Ainda não enviaram (${pend.length}):</b> ${pend.map(x=>esc(x.nome||x.email)).join(' · ')}</p></div>`:'');
-  $('lista').querySelectorAll('details.alu').forEach(d=>d.addEventListener('toggle',()=>{const c=d.querySelector('.corpo');if(d.open&&!c.innerHTML){const r=LST[+d.dataset.i];c.innerHTML=ficha(r);montarCrono(c.querySelector('.cronoBox'),r.respostas,r.email,'prof');}}));}
+  $('lista').querySelectorAll('details.alu').forEach(d=>d.addEventListener('toggle',()=>{const c=d.querySelector('.corpo');if(d.open&&!c.innerHTML){const r=LST[+d.dataset.i];c.innerHTML=ficha(r);requestAnimationFrame(()=>encaixa(c));montarCrono(c.querySelector('.cronoBox'),r.respostas,r.email,'prof');}}));}
 function csv(){const cols=[['email','E-mail'],['atualizado_em','Enviado em'],...CAMPOS.map(f=>[f.k,f.l])];
   const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
   const linhas=[cols.map(c=>q(c[1])).join(';')].concat(RESP.map(r=>cols.map(([k])=>{if(k==='email')return q(r.email);if(k==='atualizado_em')return q(new Date(r.atualizado_em).toLocaleString('pt-BR'));const f=CAMPOS.find(x=>x.k===k);return q(fmt(f,r.respostas[k]).replace(/\n/g,' | '));}).join(';')));
@@ -596,12 +603,19 @@ function salvar(st){const s=st.el.querySelector('.cst');if(s){s.textContent='Sal
     if(error){s.textContent='Não foi possível salvar: '+error.message;s.className='cst err';}
     else{st.info={atualizado_em:agora,atualizado_por:EMAIL};s.textContent='✓ Salvo às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});s.className='cst ok';}},350);}
 const sobrepoe=(a,b)=>a.d===b.d&&a.ini<b.fim&&b.ini<a.fim;
+const CURTO={'Língua Portuguesa':'Português','Língua Estrangeira':'Língua estr.','Academia / esporte':'Academia','Trabalho / estágio':'Trabalho','Psicólogo / terapia':'Psicólogo','Consulta médica':'Consulta','Curso de idioma':'Idioma','Música / arte':'Música','Aula particular':'Aula part.','PREPARA UFU':'PREPARA UFU','Simulado · provas antigas da UFU · matéria atrasada':'Simulado e provas antigas'};
+function rotulo(label,hr){const [nm,...r]=String(label).split(' — ');const ds=r.join(' — ');
+  return `<b class="nm" data-curto="${esc(CURTO[nm]||'')}">${esc(nm)}</b>${ds?`<i class="ds">${esc(ds)}</i>`:''}<span class="hr">${esc(hr)}</span>`;}
+function encaixa(root){root.querySelectorAll('.cb,.ev.fx1').forEach(e=>{
+  const cabe=()=>e.clientHeight===0||(e.scrollHeight<=e.clientHeight+1&&e.scrollWidth<=e.clientWidth+1);
+  for(const k of ['f1','f2','curto','f3','f4']){if(cabe())return;
+    if(k==='curto'){const n=e.querySelector('.nm');if(n&&n.dataset.curto)n.textContent=n.dataset.curto;}else e.classList.add(k);}});}
 function desenhar(st){
   const B=st.B,F=st.fix,todos=[...B,...F];
-  const H0=Math.min(6,...todos.map(b=>Math.floor(b.ini/60))),H1=24,px=46,top=m=>(m/60-H0)*px,alt=(H1-H0)*px;st.geo={H0,px};
+  const H0=Math.min(6,...todos.map(b=>Math.floor(b.ini/60))),H1=24,px=68,top=m=>(m/60-H0)*px,alt=(H1-H0)*px;st.geo={H0,px};
   const conf=new Set(B.filter(b=>todos.some(o=>o!==b&&sobrepoe(o,b))).map(b=>b.id));
-  const bl=b=>{const mv=b.id!=null,c=mv&&conf.has(b.id)?' conf':'',cur=b.fim-b.ini<50;
-    return `<div class="cb ${b.tipo}${mv?' mov':''}${c}${cur?' curto':''}" ${mv?`data-id="${b.id}"`:''} style="top:${top(b.ini)}px;height:${Math.max(top(b.fim)-top(b.ini)-2,18)}px;${corBloco(b)}" title="${esc(b.label)} · ${hm(b.ini)}–${hm(b.fim)}">${cur?`<span>${hm(b.ini)}–${hm(b.fim)}</span> <b>${esc(b.label.split(' — ')[0])}</b>`:`<b>${esc(b.label)}</b><span>${hm(b.ini)}–${hm(b.fim)}</span>`}</div>`;};
+  const bl=b=>{const mv=b.id!=null,c=mv&&conf.has(b.id)?' conf':'';
+    return `<div class="cb ${b.tipo}${mv?' mov':''}${c}" ${mv?`data-id="${b.id}"`:''} style="top:${top(b.ini)}px;height:${Math.max(top(b.fim)-top(b.ini)-3,20)}px;${corBloco(b)}" title="${esc(b.label)} · ${hm(b.ini)}–${hm(b.fim)}">${rotulo(b.label,hm(b.ini)+'–'+hm(b.fim))}</div>`;};
   const grade=`<div class="cg"><div></div>${DS.map(d=>`<div class="cgh">${DIAS[DS.indexOf(d)]}</div>`).join('')}
     <div class="cgt" style="height:${alt}px">${Array.from({length:H1-H0+1},(_,i)=>`<span style="top:${i*px}px">${String(H0+i).padStart(2,'0')}h</span>`).join('')}</div>
     ${DS.map(d=>`<div class="cgc" data-d="${d}" style="height:${alt}px;background-size:100% ${px}px">${todos.filter(b=>b.d===d).map(bl).join('')}</div>`).join('')}</div>`;
@@ -609,7 +623,7 @@ function desenhar(st){
   const R={};B.forEach(b=>{const k=b.tipo==='rev'?'REV':b.tipo==='sim'?'SIM':(b.k==='OUT'?'OUT:'+b.label:b.k);(R[k]=R[k]||{n:b.tipo==='rev'?'Revisão':b.tipo==='sim'?'Simulado / provas antigas':b.label,k:b.k,v:0,min:0,tipo:b.tipo});R[k].v++;R[k].min+=b.fim-b.ini;});
   const ordem=Object.values(R).sort((a,b)=>b.min-a.min);const tot=ordem.reduce((s,x)=>s+x.min,0);
   const sw=x=>x.tipo==='rev'?'background:#fff;border:2px solid #868E96':x.tipo==='sim'?'background:#212529;border:2px solid var(--amarelo)':`background:${CORD[x.k]||CORD.OUT}`;
-  const resumo=`<table class="cr"><tr><th>Disciplina</th><th>Blocos na semana</th><th>Horas</th></tr>${ordem.map(x=>`<tr><td><i style="${sw(x)}"></i>${esc(x.n)}</td><td>${x.v}</td><td>${hfmt(x.min/60)}</td></tr>`).join('')}<tr class="tt"><td>Total de estudo na semana</td><td></td><td>${hfmt(tot/60)}</td></tr></table>`;
+  const resumo=`<table class="cr"><tr><th>Disciplina</th><th>Blocos na semana</th><th>Horas</th></tr>${ordem.map(x=>`<tr><td><i style="${sw(x)}"></i>${esc(x.n)}</td><td>${x.v}</td><td>${hfmt(x.min/60)}</td></tr>`).join('')}<tr class="tt"><td>Total de estudo na semana</td><td></td><td>${hfmt(tot/60)}</td></tr></table><p class="pend" style="margin:6px 0 0">As aulas ao vivo do PREPARA UFU (segunda e quinta, 19h–20h30) não contam como tempo de estudo: as suas horas de estudo são além delas.</p>`;
   const quem=st.info&&st.info.atualizado_por?(st.info.atualizado_por===ADMIN?(st.email===EXEMPLO?'você':'Prof. Jazz'):(st.info.atualizado_por===st.email?(st.quem==='prof'?'o aluno':'você'):st.info.atualizado_por)):'';
   st.el.innerHTML=`<div class="cbanner">Este é um <b>pré-cronograma</b> para que você comece a estudar. Ele será totalmente validado no seu encontro com o seu mentor.</div>
    ${st.avisos.map(a=>`<div class="caviso">${esc(a)}</div>`).join('')}
@@ -620,6 +634,7 @@ function desenhar(st){
    <div class="leg cleg"><span><i style="background:#16304F;border:2px solid var(--amarelo)"></i>PREPARA UFU (ao vivo, seg e qui 19h–20h30)</span><span><i class="fx"></i>compromisso fixo</span><span><i style="background:#212529;border:2px solid var(--amarelo)"></i>simulado de domingo</span><span><i style="border:2px solid #868E96"></i>revisão</span></div>
    <h4>Resumo da semana</h4>${resumo}
    ${st.quem==='prof'&&st.curso.g?`<p class="pend" style="margin-top:8px">Ênfase de curso aplicada na montagem: ${esc(st.curso.g)} (${st.curso.k.map(k=>DISC.find(x=>x[0]===k)[1]).join(', ')}). Exatas e Biologia em blocos de 1h30; Humanas e Linguagens em 1h; Redação 1h30 por semana.</p>`:''}`;
+  requestAnimationFrame(()=>encaixa(st.el));
   st.el.querySelector('[data-a=add]').onclick=()=>editar(st,null);
   st.el.querySelector('[data-a=print]').onclick=()=>window.print();
   st.el.querySelector('[data-a=refazer]').onclick=()=>{if(!confirm('Isso apaga todas as mudanças feitas e monta o cronograma de novo a partir do perfil de estudos. Continuar?'))return;const g=gerar(st.p);st.B=paraBlocos(g);st.avisos=g.avisos;desenhar(st);salvar(st);};
