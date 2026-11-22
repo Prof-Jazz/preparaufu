@@ -78,6 +78,17 @@ input[type=time]{max-width:160px}input[type=number]{max-width:160px}
 .aviso{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px;text-align:center}
 .aviso h2{font:800 22px var(--display);margin:0 0 8px}.aviso p{color:var(--muted);margin:0 0 16px}
 .aviso a{color:#fff;background:var(--azul);padding:10px 18px;border-radius:9px;text-decoration:none;font-weight:600}
+.fx{display:flex;flex-direction:column;gap:10px}
+.fxl{border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.fxt{display:grid;grid-template-columns:200px 1fr 34px;gap:8px}
+.fxt select,.fxt input,.fxh input{background:var(--card)}
+.fx-del{border:1px solid var(--line);background:var(--card);color:var(--bad);border-radius:8px;cursor:pointer;font-size:15px}
+.fxd{display:flex;flex-wrap:wrap;gap:6px}
+.fxd label{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:13.5px;cursor:pointer;background:var(--card)}
+.fxd label:has(input:checked){border-color:var(--azul);background:rgba(58,140,203,.16)}
+.fxh{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted)}
+.fxh input{max-width:130px}
+@media (max-width:560px){.fxt{grid-template-columns:1fr 34px}.fxt .fx-desc{grid-column:1/-1;grid-row:2}}
 /* login */
 #gate{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px}
 #gate[hidden]{display:none}
@@ -148,7 +159,6 @@ const S=[
   {k:'cidade',l:'Cidade onde mora',type:'text'},
   {k:'situacao',l:'Situação escolar',type:'radio',opts:['Estou no 2º ano do Ensino Médio','Estou no 3º ano do Ensino Médio','Já concluí o Ensino Médio'],req:1},
   {k:'escola_turno',l:'Em que turno você vai à escola?',type:'radio',opts:['Manhã','Tarde','Integral','Noite','Não frequento escola'],req:1},
-  {k:'escola_horario',l:'Horário da escola (entrada e saída)',type:'text',ph:'ex.: 7h às 12h20; terças até 13h10',show:r=>r.escola_turno&&r.escola_turno!=='Não frequento escola'},
  ]},
  {t:'Seu objetivo',f:[
   {k:'curso',l:'Curso que você quer fazer',type:'text',req:1},
@@ -163,16 +173,19 @@ const S=[
   {k:'dorme',l:'Que horas você costuma dormir? (dias de semana)',type:'time',req:1},
   {k:'sono_fds',l:'No fim de semana o seu horário de sono muda? Como?',type:'text',ph:'ex.: acordo às 9h e durmo à 1h'},
   {k:'trabalha',l:'Você trabalha ou faz estágio?',type:'radio',opts:SIMNAO,req:1},
-  {k:'trabalho_horario',l:'Dias e horários do trabalho/estágio',type:'textarea',show:r=>r.trabalha==='Sim'},
   {k:'cursinho',l:'Você faz cursinho presencial?',type:'radio',opts:SIMNAO,req:1},
-  {k:'cursinho_horario',l:'Qual cursinho, em que dias e horários?',type:'textarea',show:r=>r.cursinho==='Sim'},
+  {k:'cursinho_nome',l:'Qual cursinho?',type:'text',show:r=>r.cursinho==='Sim'},
   {k:'atividade',l:'Você pratica atividade física?',type:'radio',opts:SIMNAO,req:1},
   {k:'atividade_qual',l:'Qual atividade?',type:'text',ph:'ex.: academia, futebol, natação',show:r=>r.atividade==='Sim'},
   {k:'atividade_fixo',l:'Tem horário fixo?',type:'radio',opts:['Sim, dias e horários fixos','Não, faço quando dá'],show:r=>r.atividade==='Sim'},
-  {k:'atividade_horario',l:'Em que dias e horários?',type:'textarea',ph:'ex.: seg, qua e sex das 18h às 19h',show:r=>r.atividade==='Sim'&&r.atividade_fixo==='Sim, dias e horários fixos'},
-  {k:'outras',l:'Outros compromissos fixos na semana',type:'textarea',h:'Curso de inglês, música, igreja, aula particular, transporte demorado… Coloque dias e horários.'},
+ ]},
+ {t:'Seus compromissos fixos',f:[
+  {k:'fixos',l:'Coloque aqui TUDO o que você tem em dia e horário fixo na semana',type:'fixos',req:1,h:'Escola, cursinho, trabalho, academia/esporte, consulta médica, fisioterapia, psicólogo, mentoria, aula particular, idioma, música, igreja, deslocamento demorado… Um compromisso por linha. Se o horário muda de um dia para outro, crie uma linha para cada horário.'},
+  {k:'fixos_ok',l:'Confirmo que coloquei todos os meus compromissos fixos',type:'checks',opts:['Sim, está tudo aí'],req:1},
+  {k:'variaveis',l:'Tem compromissos que se repetem, mas sem dia certo?',type:'textarea',ph:'ex.: plantão no trabalho a cada 15 dias; consulta uma vez por mês'},
  ]},
  {t:'Seu tempo de estudo',f:[
+  {k:'aulas_mat',l:'Como você vai assistir às aulas do Curso de Matemática?',type:'radio',opts:['Ao vivo','Gravadas','Parte ao vivo, parte gravadas','Ainda não sei'],req:1},
   {k:'horas_semana',l:'Quantas horas por dia você estuda hoje, fora da escola/cursinho? (segunda a sexta)',type:'select',opts:HORAS,req:1},
   {k:'horas_sab',l:'E no sábado?',type:'select',opts:['Não estudo',...HORAS],req:1},
   {k:'horas_dom',l:'E no domingo?',type:'select',opts:['Não estudo',...HORAS],req:1},
@@ -206,16 +219,28 @@ function campo(f){
   else if(f.type==='select')inner=`<select id="${id}" name="${f.k}"><option value="">Escolha…</option>${f.opts.map(o=>`<option>${esc(o)}</option>`).join('')}</select>`;
   else if(f.type==='radio'||f.type==='checks')inner=`<div class="opts" role="${f.type==='radio'?'radiogroup':'group'}">${f.opts.map(o=>`<label><input type="${f.type==='radio'?'radio':'checkbox'}" name="${f.k}" value="${esc(o)}"> ${esc(o)}</label>`).join('')}</div>`;
   else if(f.type==='grid')inner=`<div style="overflow-x:auto"><table class="grid"><tr><th></th>${TURNOS.map(t=>`<th>${t}</th>`).join('')}</tr>${DIAS.map(d=>`<tr><td>${d}</td>${TURNOS.map(t=>`<td><input type="checkbox" name="disp" value="${d}|${t}" aria-label="${d} — ${t}"></td>`).join('')}</tr>`).join('')}</table></div>`;
+  else if(f.type==='fixos')inner=`<div class="fx" id="fx"></div><button type="button" class="btn" id="fxAdd" style="align-self:flex-start">+ Adicionar compromisso</button>`;
   else if(f.type==='scale')inner=`<div class="scale"><span></span>${[1,2,3,4,5].map(n=>`<span class="hd">${n}</span>`).join('')}${AREAS.map((a,i)=>`<span>${esc(a)}</span>${[1,2,3,4,5].map(n=>`<label><input type="radio" name="nivel_${i}" value="${n}" aria-label="${esc(a)}: ${n}"></label>`).join('')}`).join('')}</div>`;
   const lab=['radio','checks','grid','scale'].includes(f.type)?`<div class="q">${esc(f.l)}${rq}</div>`:`<label class="q" for="${id}">${esc(f.l)}${rq}</label>`;
   return `<div class="f" data-k="${f.k}">${lab}${h}${inner}</div>`;
 }
 const CAMPOS=S.flatMap(s=>s.f);
+const TIPOS=['Escola','Cursinho','Trabalho / estágio','Academia / esporte','Consulta médica','Fisioterapia','Psicólogo / terapia','Mentoria','Aula particular','Curso de idioma','Música / arte','Igreja','Deslocamento','Outro'];
+const DS=['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
+function fxLinha(v={}){const d=document.createElement('div');d.className='fxl';
+  d.innerHTML=`<div class="fxt"><select class="fx-tipo" aria-label="Tipo de compromisso"><option value="">Tipo…</option>${TIPOS.map(t=>`<option${v.tipo===t?' selected':''}>${t}</option>`).join('')}</select><input type="text" class="fx-desc" placeholder="Detalhe (ex.: Colégio X, natação, Dra. Ana)" value="${esc(v.desc||'')}"><button type="button" class="fx-del" aria-label="Remover compromisso" title="Remover">✕</button></div>
+  <div class="fxd">${DS.map(x=>`<label><input type="checkbox" value="${x}"${(v.dias||[]).includes(x)?' checked':''}> ${x}</label>`).join('')}</div>
+  <div class="fxh"><span>das</span><input type="time" class="fx-ini" value="${esc(v.ini||'')}" aria-label="Início"><span>às</span><input type="time" class="fx-fim" value="${esc(v.fim||'')}" aria-label="Fim"></div>`;
+  d.querySelector('.fx-del').onclick=()=>{d.remove();if(!$('fx').children.length)fxLinha();};
+  $('fx').appendChild(d);}
+function fxLer(){return [...document.querySelectorAll('.fxl')].map(d=>({tipo:d.querySelector('.fx-tipo').value,desc:d.querySelector('.fx-desc').value.trim(),dias:[...d.querySelectorAll('.fxd input:checked')].map(i=>i.value),ini:d.querySelector('.fx-ini').value,fim:d.querySelector('.fx-fim').value})).filter(x=>x.tipo||x.desc||x.dias.length||x.ini);}
+function fxIncompleto(L){return L.find(x=>!x.tipo||!x.dias.length||!x.ini||!x.fim);}
 function ler(){const fm=$('ck'),r={};
   CAMPOS.forEach(f=>{
     if(f.type==='checks')r[f.k]=[...fm.querySelectorAll(`input[name="${f.k}"]:checked`)].map(i=>i.value);
     else if(f.type==='radio'){const c=fm.querySelector(`input[name="${f.k}"]:checked`);r[f.k]=c?c.value:'';}
     else if(f.type==='grid')r.disp=[...fm.querySelectorAll('input[name="disp"]:checked')].map(i=>i.value);
+    else if(f.type==='fixos')r.fixos=fxLer();
     else if(f.type==='scale'){r.nivel={};AREAS.forEach((a,i)=>{const c=fm.querySelector(`input[name="nivel_${i}"]:checked`);r.nivel[a]=c?+c.value:null;});}
     else r[f.k]=(fm.querySelector(`[name="${f.k}"]`).value||'').trim();});
   return r;}
@@ -223,6 +248,7 @@ function preencher(r){const fm=$('ck');
   CAMPOS.forEach(f=>{const v=r[f.k];if(v==null)return;
     if(f.type==='checks'||f.type==='grid')fm.querySelectorAll(`input[name="${f.k}"]`).forEach(i=>i.checked=(v||[]).includes(i.value));
     else if(f.type==='radio')fm.querySelectorAll(`input[name="${f.k}"]`).forEach(i=>i.checked=i.value===v);
+    else if(f.type==='fixos'){$('fx').innerHTML='';(v.length?v:[{}]).forEach(fxLinha);}
     else if(f.type==='scale')AREAS.forEach((a,i)=>fm.querySelectorAll(`input[name="nivel_${i}"]`).forEach(x=>x.checked=+x.value===(v||{})[a]));
     else fm.querySelector(`[name="${f.k}"]`).value=v;});}
 function visiveis(){const r=ler();CAMPOS.forEach(f=>{if(f.show){const el=document.querySelector(`.f[data-k="${f.k}"]`);el.hidden=!f.show(r);}});}
@@ -234,6 +260,7 @@ async function telaForm(){
   $('app').innerHTML=`<div class="intro" id="intro"><h2>Check-up do aluno</h2><p>Responda com sinceridade: com essas respostas o Prof. Jazz monta o seu cronograma de estudos e a sua revisão. Leva uns 10 minutos. Você pode voltar aqui e alterar depois.</p></div>
   <form id="ck" novalidate>${S.map((s,i)=>`<section class="sec"><h3><span class="n">${i+1}</span>${esc(s.t)}</h3>${s.f.map(campo).join('')}</section>`).join('<div style="height:16px"></div>')}
   <div class="send"><button class="btn pri" id="enviar" type="submit">Enviar check-up</button><span id="msg" role="status"></span></div></form>`;
+  ['Escola',''].forEach((t,i)=>fxLinha(i?{}:{tipo:t}));$('fxAdd').onclick=()=>fxLinha();
   const fm=$('ck');fm.addEventListener('input',visiveis);fm.addEventListener('change',visiveis);
   const {data}=await SB.from('checkup').select('respostas,atualizado_em').eq('email',EMAIL).maybeSingle();
   if(data){preencher(data.respostas);$('intro').classList.add('done');$('intro').insertAdjacentHTML('beforeend',`<p style="margin-top:8px;color:var(--ok);font-weight:600">✓ Check-up enviado em ${new Date(data.atualizado_em).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}. Se algo mudou, altere e envie de novo.</p>`);$('enviar').textContent='Atualizar check-up';}
@@ -241,6 +268,8 @@ async function telaForm(){
   fm.onsubmit=async ev=>{ev.preventDefault();const r=ler(),f=faltando(r),m=$('msg');
     if(f.length){m.className='err';m.textContent='Falta responder: '+f.map(x=>x.l.replace(/\?.*$/,'?')).slice(0,3).join(' · ')+(f.length>3?` (e mais ${f.length-3})`:'');
       document.querySelector(`.f[data-k="${f[0].k}"]`).scrollIntoView({behavior:'smooth',block:'center'});return;}
+    const inc=fxIncompleto(r.fixos||[]);
+    if(inc){m.className='err';m.textContent='Complete cada compromisso fixo: tipo, dias e horário de início e fim (ou remova a linha vazia com ✕).';document.querySelector('.f[data-k="fixos"]').scrollIntoView({behavior:'smooth',block:'center'});return;}
     $('enviar').disabled=true;m.className='';m.textContent='Enviando…';
     const agora=new Date().toISOString();
     const {error}=await SB.from('checkup').upsert({email:EMAIL,respostas:r,atualizado_em:agora},{onConflict:'email'});
@@ -253,6 +282,7 @@ async function telaForm(){
 function fmt(f,v){
   if(v==null||v===''||(Array.isArray(v)&&!v.length))return '';
   if(f.type==='grid'){return DIAS.map(d=>{const t=TURNOS.filter(t=>v.includes(d+'|'+t));return t.length?d+': '+t.join(', '):'';}).filter(Boolean).join('\n');}
+  if(f.type==='fixos')return v.map(x=>`${x.tipo}${x.desc?' ('+x.desc+')':''}: ${x.dias.join(', ')} · ${x.ini||'?'}–${x.fim||'?'}`).join('\n');
   if(f.type==='scale')return AREAS.map(a=>a.replace(/ \(.*\)/,'')+': '+(v[a]??'—')).join('\n');
   return Array.isArray(v)?v.join(', '):String(v);}
 let RESP=[],LIB=[];
