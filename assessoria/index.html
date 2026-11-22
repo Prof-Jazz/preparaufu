@@ -118,7 +118,7 @@ input[type=time]{max-width:160px}input[type=number]{max-width:160px}
 .cbanner{background:rgba(221,221,36,.14);border:1px solid var(--amarelo);border-radius:12px;padding:12px 14px;font-size:15px}
 .caviso{background:rgba(235,104,52,.12);border:1px solid var(--laranja);border-radius:12px;padding:10px 14px;font-size:14.5px;margin-top:8px}
 .cgw{overflow-x:auto;margin-top:12px}
-.cg{display:grid;grid-template-columns:40px repeat(7,minmax(96px,1fr));gap:0 4px;min-width:760px}
+.cg{display:grid;grid-template-columns:40px repeat(7,minmax(118px,1fr));gap:0 4px;min-width:900px}
 .cgh{text-align:center;font:700 13px var(--display);padding:6px 0;color:var(--muted)}
 .cgt{position:relative}.cgt span{position:absolute;right:5px;transform:translateY(-50%);font-size:11px;color:var(--muted)}
 .cgc{position:relative;border-radius:8px;background-color:var(--bg);background-image:linear-gradient(to bottom,var(--line) 1px,transparent 1px)}
@@ -271,7 +271,7 @@ const S=[
   {k:'horas_semana',l:'Quantas horas por dia você estuda hoje, fora da escola/cursinho? (segunda a sexta)',type:'select',opts:HORAS,req:1},
   {k:'horas_sab',l:'E no sábado?',type:'select',opts:['Não estudo',...HORAS],req:1},
   {k:'horas_dom',l:'E no domingo?',type:'select',opts:['Não estudo',...HORAS],req:1},
-  {k:'horas_possiveis',l:'Quantas horas por dia você consegue estudar de verdade, se se organizar? (segunda a sexta)',type:'select',opts:HORAS,req:1},
+  {k:'horas_possiveis',l:'Quantas horas por dia você VAI estudar a partir de agora, seguindo o cronograma? (segunda a sexta)',h:'É com esse número que o seu pré-cronograma é montado.',type:'select',opts:HORAS,req:1},
   {k:'disp',l:'Marque os períodos em que você está livre para estudar',type:'grid',h:'Marque só o que dá para cumprir toda semana.'},
   {k:'melhor_periodo',l:'Em que período você rende mais?',type:'checks',opts:['Manhã','Tarde','Noite','Madrugada'],req:1},
   {k:'local_principal',l:'Onde você estuda na maior parte do tempo?',type:'radio',opts:LOCAIS,req:1},
@@ -398,7 +398,7 @@ async function telaGeral(){abas('tabGeral');$('app').innerHTML='<p class="pend">
   const heat=DIAS.map(d=>`<tr><td>${d.slice(0,3)}</td>${TURNOS.map(t=>{const n=RESP.filter(r=>(r.respostas.disp||[]).includes(d+'|'+t)).length,p=n/N;return `<td style="background:rgba(58,140,203,${(.08+p*.85).toFixed(2)})" title="${n} de ${N}">${Math.round(p*100)}%</td>`;}).join('')}</tr>`).join('');
   const D=k=>{const x=dist(k,N);return card(x.f.l.replace(/\s*\(.*?\)\s*/g,' ').trim(),x.html,x.base!==N?`base: ${x.base} aluno(s)`:'');};
   $('app').innerHTML=`<div class="intro"><h2>Visão geral da turma</h2><p>${N} de ${T} alunos da Assessoria enviaram o perfil de estudos${T>N?` · faltam ${T-N}`:''}. Percentuais sobre quem respondeu.</p></div>
-  <div class="kps">${kpi(hfmt(med('horas_semana')),'estudam hoje por dia (seg–sex)')}${kpi(hfmt(med('horas_possiveis')),'dizem conseguir por dia')}${kpi(hfmt(med('horas_sab')),'no sábado')}${kpi(hfmt(med('horas_dom')),'no domingo')}${kpi(mt('acorda')!=null?mfmt(mt('acorda')):'—','acordam, em média')}${kpi(mt('dorme')!=null?mfmt(mt('dorme')):'—','dormem, em média')}${kpi(sono.length?hfmt(sono.reduce((a,b)=>a+b,0)/sono.length):'—','de sono por noite')}</div>
+  <div class="kps">${kpi(hfmt(med('horas_semana')),'estudam hoje por dia (seg–sex)')}${kpi(hfmt(med('horas_possiveis')),'vão estudar por dia (meta)')}${kpi(hfmt(med('horas_sab')),'no sábado')}${kpi(hfmt(med('horas_dom')),'no domingo')}${kpi(mt('acorda')!=null?mfmt(mt('acorda')):'—','acordam, em média')}${kpi(mt('dorme')!=null?mfmt(mt('dorme')):'—','dormem, em média')}${kpi(sono.length?hfmt(sono.reduce((a,b)=>a+b,0)/sono.length):'—','de sono por noite')}</div>
   <div class="gg">
    ${D('cursinho')}${D('aulas_mat')}${D('local_principal')}${D('local')}${D('lugar_fixo')}${D('ufu_exp')}${D('ufu_vezes')}
    ${card('Dificuldade por matéria',nivel.map(([a,v,pc])=>`<div class="br"><span class="bl">${esc(a)}</span><span class="bt"><i style="width:${v/4*100}%;background:${v>=3?'var(--laranja)':v>=2.3?'var(--amarelo)':'var(--verde)'}"></i></span><b>${pc}%</b><small>${v.toFixed(1)}</small></div>`).join(''),'barra = dificuldade média (1 tranquila – 4 muito difícil) · % = acham difícil ou muito difícil')}
@@ -428,7 +428,7 @@ function agenda(p){
 function ficha(r){const p=r.respostas;
   const sono=(()=>{const a=tmin(p.acorda),d=tmin(p.dorme);return a!=null&&d!=null?hfmt(((a-d+1440)%1440)/60):'—';})();
   const t=(v,l)=>`<div class="kp"><b>${esc(v||'—')}</b><span>${esc(l)}</span></div>`;
-  return `<div class="kps">${t(p.horas_semana,'estuda hoje (seg–sex)')}${t(p.horas_possiveis,'consegue estudar')}${t((p.horas_sab||'—')+' / '+(p.horas_dom||'—'),'sábado / domingo')}${t(sono,`de sono (${p.dorme||'?'} → ${p.acorda||'?'})`)}${t(p.cursinho,'cursinho')}${t(p.aulas_mat,'aulas de Matemática')}${t(p.local_principal,'onde estuda')}${t(p.anki,'Anki')}${t(p.ufu_exp+(p.ufu_vezes?' · '+p.ufu_vezes:''),'prova da UFU')}</div>
+  return `<div class="kps">${t(p.horas_semana,'estuda hoje (seg–sex)')}${t(p.horas_possiveis,'vai estudar (meta)')}${t((p.horas_sab||'—')+' / '+(p.horas_dom||'—'),'sábado / domingo')}${t(sono,`de sono (${p.dorme||'?'} → ${p.acorda||'?'})`)}${t(p.cursinho,'cursinho')}${t(p.aulas_mat,'aulas de Matemática')}${t(p.local_principal,'onde estuda')}${t(p.anki,'Anki')}${t(p.ufu_exp+(p.ufu_vezes?' · '+p.ufu_vezes:''),'prova da UFU')}</div>
   <h4>Semana do aluno</h4>${agenda(p)}
   <h4>Pré-cronograma do aluno</h4><div class="cronoBox"></div>
   <h4>Dificuldade por matéria</h4>${AREAS.map(a=>{const v=(p.nivel||{})[a]||0;return `<div class="br"><span class="bl">${esc(a)}</span><span class="bt"><i style="width:${v*25}%;background:${v>=4?'var(--bad)':v===3?'var(--laranja)':v===2?'var(--amarelo)':'var(--verde)'}"></i></span><b style="grid-column:span 2;text-align:left;font-weight:600">${v?DIFN[v-1]:'—'}</b></div>`;}).join('')}
@@ -475,7 +475,7 @@ function gerar(p){
     if(d==='Seg'||d==='Qui')out.dias[d].push({tipo:'prepara',ini:1140,fim:1230,label:'PREPARA UFU — aula ao vivo com o Prof. Jazz'});});
   // tempo livre por dia (seg a sáb)
   const cap={},livre={};
-  const hp=Math.max(hnum(p.horas_possiveis),1)*60,hs=Math.max(hnum(p.horas_sab),hnum(p.horas_possiveis))*60;
+  const meta=Math.max(hnum(p.horas_possiveis),hnum(p.horas_semana),1);const hp=meta*60,hs=Math.max(hnum(p.horas_sab),meta)*60;
   DS.slice(0,6).forEach((d,i)=>{
     let L=usaMarc?TURNOS.map((t,j)=>marc.includes(DIAS[i]+'|'+t)?[[360,720,1080][j],[720,1080,1440][j]]:null).filter(Boolean):[[0,1440]];
     L=L.map(([a,b])=>[Math.max(a,iniDia),Math.min(b,fimDia)]).filter(([a,b])=>b>a);
@@ -615,7 +615,7 @@ function desenhar(st){
   const H0=Math.min(6,...todos.map(b=>Math.floor(b.ini/60))),H1=24,px=76,top=m=>(m/60-H0)*px,alt=(H1-H0)*px;st.geo={H0,px};
   const conf=new Set(B.filter(b=>todos.some(o=>o!==b&&sobrepoe(o,b))).map(b=>b.id));
   const bl=b=>{const mv=b.id!=null,c=mv&&conf.has(b.id)?' conf':'';
-    return `<div class="cb ${b.tipo}${mv?' mov':''}${c}" ${mv?`data-id="${b.id}"`:''} style="top:${top(b.ini)}px;height:${Math.max(top(b.fim)-top(b.ini)-3,20)}px;${corBloco(b)}" title="${esc(b.label)} · ${hm(b.ini)}–${hm(b.fim)}">${rotulo(b.label,hm(b.ini)+'–'+hm(b.fim))}</div>`;};
+    return `<div class="cb ${b.tipo}${mv?' mov':''}${c}" ${mv?`data-id="${b.id}"`:''} style="top:${top(b.ini)}px;height:${Math.max(top(b.fim)-top(b.ini)-3,34)}px;${corBloco(b)}" title="${esc(b.label)} · ${hm(b.ini)}–${hm(b.fim)}">${rotulo(b.label,hm(b.ini)+'–'+hm(b.fim))}</div>`;};
   const grade=`<div class="cg"><div></div>${DS.map(d=>`<div class="cgh">${DIAS[DS.indexOf(d)]}</div>`).join('')}
     <div class="cgt" style="height:${alt}px">${Array.from({length:H1-H0+1},(_,i)=>`<span style="top:${i*px}px">${String(H0+i).padStart(2,'0')}h</span>`).join('')}</div>
     ${DS.map(d=>`<div class="cgc" data-d="${d}" style="height:${alt}px;background-size:100% ${px}px">${todos.filter(b=>b.d===d).map(bl).join('')}</div>`).join('')}</div>`;
