@@ -154,9 +154,6 @@ input[type=time]{max-width:160px}input[type=number]{max-width:160px}
 .cdlg .btns{display:flex;gap:8px;flex-wrap:wrap}.cdlg .del{color:var(--bad)}
 .cerr{margin:0;color:var(--bad);font-size:13.5px;min-height:0}
 @media print{.ctb,.chint,.cdlg{display:none!important}}
-.aedu{margin-top:14px;border:1px solid var(--line);border-radius:12px;padding:10px 14px;background:var(--bg)}
-.aedu summary{cursor:pointer;font:700 15px var(--display);color:var(--azul)}
-.aedu p{margin:8px 0}.ta td,.ta th{white-space:nowrap}.ta td:last-child{white-space:normal}.ta tr.opc td{color:var(--muted)}
 /* login */
 #gate{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px}
 #gate[hidden]{display:none}
@@ -408,13 +405,12 @@ function agenda(p){
   const sono=[];if(ac!=null&&dm!=null){if(dm>ac){sono.push([dm,1440]);sono.push([0,ac]);}else sono.push([dm,ac]);}
   const blocos=d=>{let h='';
     sono.forEach(([a,b])=>{const A=Math.max(a,H0*60),B=Math.min(b,H1*60);if(B>A)h+=`<div class="ev sono" style="top:${top(A)}px;height:${top(B)-top(A)}px">${B-A>=60?'dormindo':''}</div>`;});
-    TURNOS.forEach((t,i)=>{if((p.disp||[]).includes(DIAS[DS.indexOf(d)]+'|'+t)){const A=[6,12,18][i]*60,B=[12,18,24][i]*60;h+=`<div class="ev livre" style="top:${top(A)}px;height:${top(B)-top(A)}px"></div>`;}});
     (p.fixos||[]).filter(x=>x.dias.includes(d)).forEach(x=>{let A=tmin(x.ini),B=tmin(x.fim);if(A==null||B==null)return;if(B<=A)B=1440;A=Math.max(A,H0*60);B=Math.min(B,H1*60);if(B<=A)return;
       h+=`<div class="ev fx1" style="top:${top(A)}px;height:${Math.max(top(B)-top(A),14)}px;background:${COR[x.tipo]||'#8A93A6'}" title="${esc(x.tipo+(x.desc?' — '+x.desc:'')+' · '+x.ini+'–'+x.fim)}"><b>${esc(x.tipo)}</b>${x.desc?' '+esc(x.desc):''}<br>${x.ini}–${x.fim}</div>`;});
     return h;};
   const horas=Array.from({length:H1-H0+1},(_,i)=>`<span style="top:${i*px}px">${String(H0+i).padStart(2,'0')}h</span>`).join('');
   return `<div class="ag"><div class="agh"></div>${DS.map(d=>`<div class="agh">${d}</div>`).join('')}<div class="agt" style="height:${alt}px">${horas}</div>${DS.map(d=>`<div class="agc" style="height:${alt}px">${blocos(d)}</div>`).join('')}</div>
-  <div class="leg"><span><i class="sono"></i>dormindo</span><span><i class="livre"></i>marcou como livre para estudar</span>${[...new Set((p.fixos||[]).map(x=>x.tipo))].map(t=>`<span><i style="background:${COR[t]||'#8A93A6'}"></i>${esc(t)}</span>`).join('')}</div>`;}
+  <div class="leg"><span><i class="sono"></i>dormindo</span>${[...new Set((p.fixos||[]).map(x=>x.tipo))].map(t=>`<span><i style="background:${COR[t]||'#8A93A6'}"></i>${esc(t)}</span>`).join('')}</div>`;}
 function ficha(r){const p=r.respostas;
   const sono=(()=>{const a=tmin(p.acorda),d=tmin(p.dorme);return a!=null&&d!=null?hfmt(((a-d+1440)%1440)/60):'—';})();
   const t=(v,l)=>`<div class="kp"><b>${esc(v||'—')}</b><span>${esc(l)}</span></div>`;
@@ -593,21 +589,6 @@ function salvar(st){const s=st.el.querySelector('.cst');if(s){s.textContent='Sal
     if(error){s.textContent='Não foi possível salvar: '+error.message;s.className='cst err';}
     else{st.info={atualizado_em:agora,atualizado_por:EMAIL};s.textContent='✓ Salvo às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});s.className='cst ok';}},350);}
 const sobrepoe=(a,b)=>a.d===b.d&&a.ini<b.fim&&b.ini<a.fim;
-function tabelaAEDU(st){
-  const tipoA=b=>b.tipo==='sim'?'Simulado':b.tipo==='prepara'?'Estudo':b.tipo==='fixo'?(/Academia/.test(b.label)?'Treino':'Outro'):'Estudo';
-  const materia=b=>b.tipo==='rev'?'Revisão':b.tipo==='sim'?'Simulado':b.tipo==='prepara'?'Matemática':b.tipo==='fixo'?'—':b.label;
-  const titulo=b=>b.tipo==='rev'?b.label:b.tipo==='prepara'?'PREPARA UFU — aula ao vivo':b.tipo==='sim'?'Simulado / provas antigas da UFU':b.tipo==='fixo'?b.label:'Estudo de '+b.label;
-  const W=tmin(st.p.acorda),SL=tmin(st.p.dorme);
-  const linhas={};
-  [...st.B,...st.fix].forEach(b=>{const key=[tipoA(b),materia(b),titulo(b),b.ini,b.fim-b.ini].join('|');(linhas[key]=linhas[key]||{b,dias:[]}).dias.push(b.d);});
-  let L=Object.values(linhas).sort((a,b)=>(a.b.tipo==='fixo')-(b.b.tipo==='fixo')||DS.indexOf(a.dias[0])-DS.indexOf(b.dias[0])||a.b.ini-b.b.ini);
-  const dd=x=>DS.filter(d=>x.includes(d)).map(d=>d.toLowerCase()).join(', ');
-  const hoje=new Date().toLocaleDateString('pt-BR');
-  const rows=L.map(x=>`<tr class="${x.b.tipo==='fixo'?'opc':''}"><td>${dd(x.dias)}</td><td>${tipoA(x.b)}</td><td>${hm(x.b.ini)}</td><td>${x.b.fim-x.b.ini}</td><td>${esc(materia(x.b))}</td><td>${esc(titulo(x.b))}</td></tr>`).join('')
-   +(W!=null&&SL!=null?`<tr class="opc"><td>seg, ter, qua, qui, sex, sáb, dom</td><td>Dormir</td><td>${hm(SL)}</td><td>${(W-SL+1440)%1440}</td><td>—</td><td>Sono</td></tr>`:'');
-  return `<details class="aedu"><summary>Passar para a AEDU (tabela pronta)</summary>
-   <p class="pend">Na AEDU, em <b>Nova Atividade</b>, cada linha abaixo vira uma atividade: marque os <b>dias</b>, escolha o <b>tipo</b>, digite o <b>horário</b> e a <b>duração em minutos</b>, escolha a <b>matéria</b> e, se quiser, copie o <b>título</b>. Em "Aplicar a partir de", use a data de hoje (${hoje}). O <b>tópico</b> é o assunto da semana no planejamento do PREPARA. As linhas em cinza (compromissos e sono) são opcionais.</p>
-   <div style="overflow-x:auto"><table class="cr ta"><tr><th>Aplicar nos dias</th><th>Tipo</th><th>Horário</th><th>Duração (min)</th><th>Matéria</th><th>Título</th></tr>${rows}</table></div></details>`;}
 function desenhar(st){
   const B=st.B,F=st.fix,todos=[...B,...F];
   const H0=Math.min(6,...todos.map(b=>Math.floor(b.ini/60))),H1=24,px=46,top=m=>(m/60-H0)*px,alt=(H1-H0)*px;st.geo={H0,px};
@@ -631,7 +612,6 @@ function desenhar(st){
    <div class="cgw">${grade}</div><div class="clw">${listaM}</div>
    <div class="leg cleg"><span><i style="background:#16304F;border:2px solid var(--amarelo)"></i>PREPARA UFU (ao vivo, seg e qui 19h–20h30)</span><span><i class="fx"></i>compromisso fixo</span><span><i style="background:#212529;border:2px solid var(--amarelo)"></i>simulado de domingo</span><span><i style="border:2px solid #868E96"></i>revisão</span></div>
    <h4>Resumo da semana</h4>${resumo}
-   ${tabelaAEDU(st)}
    ${st.quem==='prof'&&st.curso.g?`<p class="pend" style="margin-top:8px">Ênfase de curso aplicada na montagem: ${esc(st.curso.g)} (${st.curso.k.map(k=>DISC.find(x=>x[0]===k)[1]).join(', ')}). Exatas e Biologia em blocos de 1h30; Humanas e Linguagens em 1h; Redação 1h30 por semana.</p>`:''}`;
   st.el.querySelector('[data-a=add]').onclick=()=>editar(st,null);
   st.el.querySelector('[data-a=print]').onclick=()=>window.print();
