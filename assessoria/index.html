@@ -706,7 +706,7 @@ async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!se
   EMAIL=(session.user.email||'').toLowerCase();IS_ADMIN=EMAIL===ADMIN;
   const {data:ok}=await SB.rpc('is_assessoria');
   $('gate').hidden=true;
-  if(!ok){$('app').innerHTML=`<div class="aviso"><h2>Área exclusiva da Assessoria ENEM</h2><p>O seu e-mail tem acesso ao Banco de Questões, mas não está cadastrado na Assessoria. Se você é aluno da Assessoria, fale com o Prof. Jazz.</p><a href="../bancodequestoes/">Ir para o Banco de Questões</a></div>`;return;}
+  if(!ok){$('app').innerHTML=`<div class="aviso"><h2>Área exclusiva da Assessoria PREPARA UFU</h2><p>Aqui os alunos da Assessoria preenchem o perfil de estudos e recebem um pré-cronograma personalizado, montado a partir da rotina, das dificuldades e do curso de cada um, e ajustado nos encontros com o Prof. Jazz.</p><p>O seu acesso hoje é ao Banco de Questões. Quer fazer parte da Assessoria? Fale com o Prof. Jazz. Se você já é aluno da Assessoria e está vendo esta mensagem, avise o Prof. Jazz para liberar o seu e-mail.</p><a href="../bancodequestoes/">Ir para o Banco de Questões</a></div>`;return;}
   $('tabForm').hidden=false;$('tabResp').hidden=!IS_ADMIN;$('tabGeral').hidden=!IS_ADMIN;
   ALVO=EMAIL;$('tabForm').onclick=telaForm;$('tabResp').onclick=telaResp;$('tabGeral').onclick=telaGeral;$('tabCrono').onclick=telaCrono;
   $('tabExemplo').hidden=!IS_ADMIN;$('tabExemplo').onclick=()=>modoExemplo(true);$('exSair').onclick=()=>modoExemplo(false);

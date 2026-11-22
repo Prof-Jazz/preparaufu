@@ -560,7 +560,7 @@ async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!se
   const {data:ok}=await SB.rpc('is_allowed');
   if(!ok){await SB.auth.signOut();$('gate').hidden=false;gm('Seu acesso não está liberado. Fale com o Prof. Jazz.');return;}
   $('gate').hidden=true;$('admBtn').hidden=(session.user.email||'').toLowerCase()!==ADMIN;
-  SB.rpc('is_assessoria').then(r=>{$('ckBtn').hidden=!r.data;});
+  $('ckBtn').hidden=false;
   if(!iniciado){iniciado=true;$('viewQ').innerHTML='<div class="empty">Carregando o banco de questões…</div>';await iniciar();}}
 $('sairBtn').onclick=async()=>{await SB.auth.signOut();location.reload();};
 /* painel do professor */
