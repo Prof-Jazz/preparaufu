@@ -108,7 +108,7 @@ input[type=time]{max-width:160px}input[type=number]{max-width:160px}
 .agc{position:relative;background:repeating-linear-gradient(to bottom,var(--soft) 0 1px,transparent 1px 40px);border-radius:6px;background-color:var(--bg)}
 .ev{position:absolute;left:2px;right:2px;border-radius:6px;overflow:hidden;padding:5px 7px;line-height:1.2;box-sizing:border-box}
 .ev.fx1{display:flex;flex-direction:column;gap:1px}.ev.fx1 b{font-size:11.5px}.ev .hr{font-size:10.5px;opacity:.95}
-.ev.f2{padding:3px 6px;line-height:1.12}.ev.f2 b{font-size:10.5px}.ev.f3{display:block}.ev.f3 b{margin-right:3px}.ev.f3 .hr{display:inline-block}.ev.f4{padding:2px 5px}.ev.f4 b,.ev.f4 .hr{font-size:9.5px}
+.ev.f2{padding:3px 6px;line-height:1.12}.ev.f2 b{font-size:10.5px}.ev.f3{display:block}.ev.f3 b{margin-right:3px}.ev.f3 .hr{display:inline-block}.ev.f4{padding:2px 5px;font-size:9.5px;line-height:1.1}.ev.f4 b,.ev.f4 .hr{font-size:9.5px}
 .ev.sono{background:repeating-linear-gradient(45deg,rgba(120,130,160,.28) 0 6px,rgba(120,130,160,.12) 6px 12px);color:var(--muted);left:0;right:0;border-radius:0;font-size:10.5px}
 .ev.livre{border:2px dashed var(--verde);background:rgba(27,175,122,.08);left:0;right:0}
 .ev.fx1{color:#fff;font-size:11px;box-shadow:0 1px 3px rgba(0,0,0,.25);z-index:2}
@@ -126,9 +126,9 @@ input[type=time]{max-width:160px}input[type=number]{max-width:160px}
 .cb b{font-weight:700;font-size:12.5px}
 .cb .ds,.ev .ds{font-style:normal;font-size:11.5px;opacity:.85}.cb .hr,.ev .hr{white-space:nowrap}.cb .hr{font-size:11.5px;opacity:.95;font-variant-numeric:tabular-nums}
 .cb.f1 .ds,.ev.f1 .ds{display:none}
-.cb.f2{padding:4px 8px;line-height:1.15}.cb.f2 b{font-size:11.5px}.cb.f2 .hr{font-size:11px}
+.cb.f2{padding:4px 8px;line-height:1.15;font-size:11.5px}.cb.f2 b{font-size:11.5px}.cb.f2 .hr{font-size:11px}
 .cb.f3{display:block}.cb.f3 b{margin-right:4px}.cb.f3 .hr{display:inline-block;white-space:nowrap}
-.cb.f4{padding:3px 6px}.cb.f4 b,.cb.f4 .hr{font-size:10.5px}
+.cb.f4{padding:3px 6px;font-size:10.5px;line-height:1.1}.cb.f4 b,.cb.f4 .hr{font-size:10.5px}
 
 .cb.fixo,.cli.fixo{background:repeating-linear-gradient(45deg,var(--soft) 0 6px,var(--card) 6px 12px);color:var(--muted);box-shadow:none;border:1px solid var(--line)}
 .cb.prepara,.cli.prepara{background:#16304F;color:#fff;border:2px solid var(--amarelo)}
@@ -612,7 +612,7 @@ function encaixa(root){root.querySelectorAll('.cb,.ev.fx1').forEach(e=>{
     if(k==='curto'){const n=e.querySelector('.nm');if(n&&n.dataset.curto)n.textContent=n.dataset.curto;}else e.classList.add(k);}});}
 function desenhar(st){
   const B=st.B,F=st.fix,todos=[...B,...F];
-  const H0=Math.min(6,...todos.map(b=>Math.floor(b.ini/60))),H1=24,px=68,top=m=>(m/60-H0)*px,alt=(H1-H0)*px;st.geo={H0,px};
+  const H0=Math.min(6,...todos.map(b=>Math.floor(b.ini/60))),H1=24,px=76,top=m=>(m/60-H0)*px,alt=(H1-H0)*px;st.geo={H0,px};
   const conf=new Set(B.filter(b=>todos.some(o=>o!==b&&sobrepoe(o,b))).map(b=>b.id));
   const bl=b=>{const mv=b.id!=null,c=mv&&conf.has(b.id)?' conf':'';
     return `<div class="cb ${b.tipo}${mv?' mov':''}${c}" ${mv?`data-id="${b.id}"`:''} style="top:${top(b.ini)}px;height:${Math.max(top(b.fim)-top(b.ini)-3,20)}px;${corBloco(b)}" title="${esc(b.label)} · ${hm(b.ini)}–${hm(b.fim)}">${rotulo(b.label,hm(b.ini)+'–'+hm(b.fim))}</div>`;};
