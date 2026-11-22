@@ -510,22 +510,24 @@ function gerar(p){
   const outros=(p.revisao||[]).filter(x=>!['Videoaulas','Não tenho método de revisão'].includes(x));
   const revNome='Revisão'+(ankiOn?' — Anki':'')+(outros.length?(ankiOn?' + ':' — ')+outros.join(', ').toLowerCase():'');
   const revDur=ankiOn?(REVMIN[p.anki_min]||30):30;
-  DS.slice(0,6).forEach(d=>{if(cap[d]>=revDur+60){out.dias[d].push({tipo:'rev',k:'REV',dur:revDur,label:revNome});usado[d]+=revDur;}});
+  const totSem=DS.slice(0,6).reduce((t,d)=>t+cap[d],0);const minimo=DISC.reduce((t,x)=>t+x[3],0)+90;
+  const enxuto=totSem<minimo+6*revDur;
+  DS.slice(0,6).forEach(d=>{if(cap[d]>=revDur+(enxuto?120:60)){out.dias[d].push({tipo:'rev',k:'REV',dur:revDur,label:revNome});usado[d]+=revDur;}});
   // quantas vezes cada disciplina
   const MK={'Matemática':'MAT','Física':'FIS','Química':'QUI','Biologia':'BIO','Língua Portuguesa':'LP','Literatura':'LIT','Língua estrangeira':'LE','História':'HIS','Geografia':'GEO','Filosofia':'FIL','Sociologia':'SOC','Redação':'RED'};
   const difn={};Object.entries(p.nivel||{}).forEach(([a,v])=>{if(MK[a])difn[MK[a]]=v||0;});
   (p.dificuldades||[]).forEach(x=>{const k=DIF2K[x];if(k&&!difn[k])difn[k]=3;});
   const pc=pesoCurso(p.curso);const LEnome=p.lingua&&p.lingua!=='Ainda não sei'?p.lingua:'Língua Estrangeira';
   const plano=DISC.map(([k,n,g,dur,base])=>{let v=base,why=[];const dv=difn[k]||0;if(dv>=3){v+=dv-2;why.push(DIFN[dv-1].toLowerCase());}if(pc.k.includes(k)){v++;why.push('peso para '+(p.curso||'o seu curso'));}
-    v=Math.min(v,g==='EX'?4:3);return {k,n:k==='LE'?LEnome:n,g,dur,v,why,feito:0,dias:[]};});
+    v=Math.min(v,g==='EX'?4:3);return {k,n:k==='LE'?LEnome:n,g,dur:enxuto?60:dur,v,why,feito:0,dias:[]};});
   const maxOutro=Math.max(...plano.filter(x=>x.g!=='EX').map(x=>x.v));
   plano.filter(x=>x.g==='EX').forEach(x=>{if(x.v<=maxOutro)x.v=Math.min(4,maxOutro+1);});
   plano.filter(x=>x.g!=='EX').forEach(x=>{const lim=Math.min(...plano.filter(y=>y.g==='EX').map(y=>y.v))-1;if(x.v>lim)x.v=Math.max(1,lim);});
   plano.sort((a,b)=>b.v-a.v);
-  const red={k:'RED',n:'Redação',g:'RED',dur:90,v:1,feito:0,dias:[]};
+  const red={k:'RED',n:'Redação',g:'RED',dur:enxuto?60:90,v:1,feito:0,dias:[]};
   const EXs=plano.filter(x=>x.g==='EX'),OUT=plano.filter(x=>x.g!=='EX');const maxV=Math.max(...plano.map(x=>x.v));
   const fila=[];for(let r=1;r<=maxV;r++)EXs.filter(x=>x.v>=r).forEach(x=>fila.push(x));
-  [90,60].forEach(dur=>{OUT.filter(x=>x.dur===dur).forEach(x=>fila.push(x));if(dur===90)fila.push(red);});
+  [90,60].forEach(dur=>{OUT.filter(x=>x.dur===dur).forEach(x=>fila.push(x));if(dur===(enxuto?60:90))fila.push(red);});
   for(let r=2;r<=maxV;r++)[90,60].forEach(dur=>OUT.filter(x=>x.dur===dur&&x.v>=r).forEach(x=>fila.push(x)));
   const dI=d=>DS.indexOf(d);const exDia=d=>out.dias[d].filter(b=>b.g==='EX').length+(isPrep(d)?1:0);
   const falta=[];
@@ -537,7 +539,7 @@ function gerar(p){
     if(!c){falta.push(x.n);return;}
     out.dias[c.d].push({tipo:x.k==='RED'?'red':'estudo',k:x.k,g:x.g,dur:x.dur,label:x.n});usado[c.d]+=x.dur;x.dias.push(c.d);x.feito++;});
   // garantia: toda matéria aparece pelo menos uma vez — tira uma repetição de quem aparece mais
-  const todas=[...plano,red];const trocas=[];
+  const todas=[...plano,red];const trocas=[],nao=[];
   const cabeEm=(x,d,livre)=>!out.dias[d].some(b=>b.k===x.k)&&!(x.g==='EX'&&exDia(d)>=2)&&livre>=x.dur;
   todas.filter(x=>x.feito===0).forEach(x=>{
     let d=DS.slice(0,6).find(d=>cabeEm(x,d,cap[d]-usado[d]));
@@ -552,8 +554,12 @@ function gerar(p){
           y.feito--;y.dias.splice(y.dias.indexOf(dd),1);x.feito=1;x.dias.push(dd);trocas.push([y.n,y.feito+1,y.feito,x.n]);d=dd;break;}
         out.dias[dd].splice(i,0,bl);usado[dd]+=bl.dur;}
       if(d)break;}
-    if(!d)out.avisos.push(`Não coube ${x.n} nem uma vez na semana. Toda matéria precisa aparecer pelo menos uma vez: aumente as suas horas de estudo no perfil ou fale com o seu mentor.`);});
-  trocas.forEach(([y,de,para,x])=>out.avisos.push(`Precisamos diminuir ${y} (de ${de} para ${para} vezes na semana), porque faltou tempo para ${x}. Toda matéria precisa aparecer pelo menos uma vez.`));
+    if(!d)nao.push(x.n);});
+  const vz=n=>n===1?'1 vez':n+' vezes';
+  const tg={};trocas.forEach(([y,de,para])=>{tg[y]=tg[y]?[tg[y][0],para]:[de,para];});
+  if(trocas.length)out.avisos.push('Precisamos diminuir '+Object.entries(tg).map(([y,[de,para]])=>`${y} (de ${vz(de)} para ${vz(para)})`).join(', ')+', porque faltou tempo para '+[...new Set(trocas.map(t=>t[3]))].join(', ')+'. Toda matéria precisa aparecer pelo menos uma vez na semana.');
+  if(nao.length)out.avisos.push(`Mesmo assim não coube ${nao.join(', ')} nem uma vez na semana. Toda matéria precisa aparecer pelo menos uma vez: aumente as suas horas de estudo no perfil ou fale com o seu mentor.`);
+  if(enxuto)out.avisos.push('Como o seu tempo de estudo está curto, os blocos ficaram de 1h para caber todas as matérias.');
   {const ok=new Set(todas.filter(x=>x.feito>=x.v).map(x=>x.n));const f2=falta.filter(n=>!ok.has(n));falta.splice(0,falta.length,...f2);}
   // domingo: simulado / provas antigas / matéria atrasada
   if(cap.Dom>=60)out.dias.Dom.push({tipo:'sim',k:'SIM',dur:Math.min(240,cap.Dom),label:SIMLBL});
