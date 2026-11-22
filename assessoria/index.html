@@ -97,7 +97,7 @@ input[type=time]{max-width:160px}input[type=number]{max-width:160px}
 .gc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:7px}
 .gc h4{margin:0 0 4px;font:700 15px var(--display)}.gs{margin:-6px 0 2px;color:var(--muted);font-size:12.5px}
 .br{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(60px,1fr) 42px 26px;gap:8px;align-items:center;font-size:13.5px}
-.bl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bl{line-height:1.25}
 .bt{height:12px;background:var(--soft);border-radius:99px;overflow:hidden}.bt i{display:block;height:100%;border-radius:99px}
 .br b{text-align:right;font-variant-numeric:tabular-nums}.br small{color:var(--muted);text-align:right}
 .heat{border-collapse:collapse;width:100%;font-size:13px}.heat th,.heat td{border:1px solid var(--line);padding:5px;text-align:center}.heat td:first-child{text-align:left;font-weight:600}
@@ -292,7 +292,7 @@ async function telaForm(){
   const {data}=await SB.from('checkup').select('respostas,atualizado_em').eq('email',EMAIL).maybeSingle();
   if(data){preencher(data.respostas);$('intro').classList.add('done');$('intro').insertAdjacentHTML('beforeend',`<p style="margin-top:8px;color:var(--ok);font-weight:600">✓ Check-up enviado em ${new Date(data.atualizado_em).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}. Se algo mudou, altere e envie de novo.</p>`);$('enviar').textContent='Atualizar check-up';}
   visiveis();
-  fm.onsubmit=async ev=>{ev.preventDefault();const r=ler(),f=faltando(r),m=$('msg');
+  fm.onsubmit=async ev=>{ev.preventDefault();const r=ler();CAMPOS.forEach(f=>{if(f.show&&!f.show(r))delete r[f.k];});const f=faltando(r),m=$('msg');
     if(f.length){m.className='err';m.textContent='Falta responder: '+f.map(x=>x.l.replace(/\?.*$/,'?')).slice(0,3).join(' · ')+(f.length>3?` (e mais ${f.length-3})`:'');
       document.querySelector(`.f[data-k="${f[0].k}"]`).scrollIntoView({behavior:'smooth',block:'center'});return;}
     const inc=fxIncompleto(r.fixos||[]);
