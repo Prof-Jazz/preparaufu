@@ -1,7 +1,74 @@
 <!DOCTYPE html>
-<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PREPARA UFU · Professor Jazz</title>
-<meta http-equiv="refresh" content="0; url=/bancodequestoes/">
-<link rel="canonical" href="https://preparaufu.com.br/bancodequestoes/">
-<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0B1020;color:#EEF0F7;font:16px system-ui,sans-serif}a{color:#DDDD24}</style>
-</head><body><p>Abrindo o <a href="/bancodequestoes/">Banco de Questões UFU</a>…</p></body></html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plataforma PREPARA UFU · Professor Jazz</title>
+<meta name="description" content="Plataforma PREPARA UFU do Professor Jazz: Banco de Questões UFU e Assessoria PREPARA UFU.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--azul:#3A8CCB;--amarelo:#DDDD24;--head:#16304F;--ink:#EEF0F7;--muted:#AEB6CF;--display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;--body:"Public Sans",system-ui,sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{min-height:100vh;color:var(--ink);font:400 16px/1.5 var(--body);background:radial-gradient(1200px 700px at 78% 30%,#24507F 0%,transparent 60%),linear-gradient(160deg,#0E2238 0%,#0B1020 70%);overflow-x:hidden}
+.wrap{max-width:1180px;margin:0 auto;min-height:100vh;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);align-items:end;gap:20px;padding:0 28px}
+.txt{align-self:center;padding:48px 0}
+.logos{display:flex;align-items:center;gap:16px;margin-bottom:34px}
+.logos img.j{height:46px}.logos img.p{height:34px}.logos img.u{height:40px}
+.logos .sep{width:1px;height:38px;background:#4A5568}
+.kicker{display:inline-block;font:700 13px var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--amarelo);margin-bottom:10px}
+h1{font:800 clamp(34px,4.6vw,56px)/1.05 var(--display);margin:0 0 14px;letter-spacing:-.01em}
+h1 span{color:var(--amarelo)}
+.lead{font-size:clamp(16px,1.6vw,19px);color:var(--muted);margin:0 0 30px;max-width:520px}
+.lead b{color:var(--ink)}
+.opcoes{display:grid;gap:14px;max-width:540px}
+.op{display:flex;align-items:center;gap:16px;text-decoration:none;color:var(--ink);background:rgba(21,28,46,.78);border:1px solid #2B3654;border-radius:18px;padding:18px 20px;transition:transform .15s,border-color .15s,background .15s;backdrop-filter:blur(4px)}
+.op:hover,.op:focus-visible{transform:translateY(-2px);border-color:var(--azul);background:rgba(30,40,66,.9);outline:none}
+.op .ic{flex:none;width:54px;height:54px;border-radius:14px;display:grid;place-items:center}
+.op.banco .ic{background:var(--azul)}
+.op.ass .ic{background:var(--amarelo)}
+.op svg{width:28px;height:28px}
+.op b{display:block;font:700 19px var(--display)}
+.op small{display:block;color:var(--muted);font-size:14px;line-height:1.35;margin-top:2px}
+.op .seta{margin-left:auto;font-size:22px;color:var(--muted)}
+.op.ass{border-color:rgba(221,221,36,.45)}
+.op.ass:hover{border-color:var(--amarelo)}
+.rod{margin-top:26px;color:#7F88A6;font-size:13px}
+.foto{position:relative;align-self:end;display:flex;justify-content:center;height:100%}
+.foto::before{content:"";position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:min(520px,92%);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 50% 45%,rgba(58,140,203,.55),rgba(58,140,203,.08) 62%,transparent 70%);z-index:0}
+.foto::after{content:"";position:absolute;bottom:16%;left:50%;transform:translateX(-50%);width:min(430px,78%);aspect-ratio:1;border-radius:50%;border:3px solid rgba(221,221,36,.55);z-index:0}
+.foto picture{position:relative;z-index:1;display:flex;align-items:flex-end}
+.foto img{display:block;width:auto;max-width:100%;max-height:88vh;align-self:flex-end;filter:drop-shadow(0 20px 40px rgba(0,0,0,.45))}
+@media (max-width:860px){
+  .wrap{grid-template-columns:1fr;align-items:start;padding:0 18px;gap:0}
+  .foto{order:-1;height:auto;margin-top:18px;border-bottom:4px solid var(--amarelo)}
+  .foto img{max-height:42vh}
+  .foto::before{width:76%}.foto::after{width:62%;bottom:10%}
+  .txt{padding:24px 0 36px}
+  .logos{margin-bottom:22px;gap:12px}.logos img.j{height:34px}.logos img.p{height:25px}.logos img.u{height:30px}.logos .sep{height:28px}
+  .op{padding:15px 16px}.op .ic{width:46px;height:46px}.op b{font-size:17px}
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <section class="txt">
+    <div class="logos"><img class="j" src="bancodequestoes/logo/jazz_claro.png" alt="Jazz, Professor de Matemática"><span class="sep"></span><img class="p" src="bancodequestoes/logo/prepara_transp.png" alt="PREPARA UFU"><span class="sep"></span><img class="u" src="bancodequestoes/logo/ufu_branco.png" alt="Universidade Federal de Uberlândia"></div>
+    <span class="kicker">Vestibular UFU 2027-2</span>
+    <h1>Seja bem-vindo à plataforma <span>PREPARA UFU</span></h1>
+    <p class="lead">Eu sou o <b>Professor Jazz</b>. Escolha abaixo o que você quer acessar.</p>
+    <nav class="opcoes" aria-label="Escolha o acesso">
+      <a class="op banco" href="bancodequestoes/">
+        <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 7h7M9 11h5"/></svg></span>
+        <span><b>Banco de Questões UFU</b><small>Questões das provas da UFU de 2015 a 2026, com gabarito, filtros e listas em PDF e Word.</small></span><span class="seta" aria-hidden="true">›</span></a>
+      <a class="op ass" href="assessoria/">
+        <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#16304F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h3M13 14h3M8 18h3"/></svg></span>
+        <span><b>Assessoria PREPARA UFU</b><small>Perfil de estudos e pré-cronograma personalizado, acompanhados pelo Prof. Jazz.</small></span><span class="seta" aria-hidden="true">›</span></a>
+    </nav>
+    <p class="rod">Acesso com o e-mail liberado pelo Prof. Jazz.</p>
+  </section>
+  <div class="foto"><picture><source srcset="img/jazz.webp" type="image/webp"><img src="img/jazz.png" alt="Professor Jazz" width="644" height="900"></picture></div>
+</main>
+</body>
+</html>
