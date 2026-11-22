@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Check-up do Aluno · Assessoria ENEM</title>
+<title>Perfil de estudos · Assessoria ENEM</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -194,8 +194,8 @@ input[type=time]{max-width:160px}input[type=number]{max-width:160px}
 
 <header>
   <div class="logos"><img class="j" src="../bancodequestoes/logo/jazz_claro.png" alt="Jazz, Professor de Matemática"><span class="sep"></span><img class="p" src="../bancodequestoes/logo/prepara_transp.png" alt="Prepara UFU"></div>
-  <div class="ttl"><h1>Assessoria ENEM</h1><p>Check-up do aluno para montar o seu cronograma de estudos</p></div>
-  <nav class="tabs"><button class="theme" id="theme" aria-label="Alternar modo diurno e noturno" title="Modo diurno / noturno"><span class="sun">☀</span><span class="moon">☾</span></button><a href="../bancodequestoes/">Banco de Questões</a><button id="tabGeral" hidden>Visão geral</button><button id="tabResp" hidden>Alunos</button><button class="on" id="tabForm" hidden>Meu check-up</button><button id="tabCrono" hidden>Meu pré-cronograma</button><button id="sair">Sair</button></nav>
+  <div class="ttl"><h1>Assessoria ENEM</h1><p>Perfil de estudos e pré-cronograma</p></div>
+  <nav class="tabs"><button class="theme" id="theme" aria-label="Alternar modo diurno e noturno" title="Modo diurno / noturno"><span class="sun">☀</span><span class="moon">☾</span></button><a href="../bancodequestoes/">Banco de Questões</a><button id="tabGeral" hidden>Visão geral</button><button id="tabResp" hidden>Alunos</button><button class="on" id="tabForm" hidden>Meu perfil de estudos</button><button id="tabCrono" hidden>Meu pré-cronograma</button><button id="sair">Sair</button></nav>
 </header>
 <main id="app"></main>
 
@@ -326,13 +326,13 @@ function faltando(r){const L=[];CAMPOS.forEach(f=>{if(!f.req)return;if(f.show&&!
 
 async function telaForm(){
   abas('tabForm');
-  $('app').innerHTML=`<div class="intro" id="intro"><h2>Check-up do aluno</h2><p>Responda com sinceridade: com essas respostas o Prof. Jazz monta o seu cronograma de estudos e a sua revisão. Leva uns 10 minutos. Você pode voltar aqui e alterar depois.</p></div>
+  $('app').innerHTML=`<div class="intro" id="intro"><h2>Meu perfil de estudos</h2><p>Responda com sinceridade: com essas respostas o Prof. Jazz monta o seu cronograma de estudos e a sua revisão. Leva uns 10 minutos. Você pode voltar aqui e alterar depois.</p></div>
   <form id="ck" novalidate>${S.map((s,i)=>`<section class="sec"><h3><span class="n">${i+1}</span>${esc(s.t)}</h3>${s.f.map(campo).join('')}</section>`).join('<div style="height:16px"></div>')}
-  <div class="send"><button class="btn pri" id="enviar" type="submit">Enviar check-up</button><span id="msg" role="status"></span></div></form>`;
+  <div class="send"><button class="btn pri" id="enviar" type="submit">Enviar perfil de estudos</button><span id="msg" role="status"></span></div></form>`;
   ['Escola',''].forEach((t,i)=>fxLinha(i?{}:{tipo:t}));$('fxAdd').onclick=()=>fxLinha();
   const fm=$('ck');fm.addEventListener('input',visiveis);fm.addEventListener('change',visiveis);
   const {data}=await SB.from('checkup').select('respostas,atualizado_em').eq('email',EMAIL).maybeSingle();
-  if(data){preencher(data.respostas);$('intro').classList.add('done');$('intro').insertAdjacentHTML('beforeend',`<p style="margin-top:8px;color:var(--ok);font-weight:600">✓ Check-up enviado em ${new Date(data.atualizado_em).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}. Se algo mudou, altere e envie de novo.</p>`);$('enviar').textContent='Atualizar check-up';}
+  if(data){preencher(data.respostas);$('intro').classList.add('done');$('intro').insertAdjacentHTML('beforeend',`<p style="margin-top:8px;color:var(--ok);font-weight:600">✓ Perfil de estudos enviado em ${new Date(data.atualizado_em).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}. Se algo mudou, altere e envie de novo.</p>`);$('enviar').textContent='Atualizar perfil de estudos';}
   visiveis();
   fm.onsubmit=async ev=>{ev.preventDefault();const r=ler();CAMPOS.forEach(f=>{if(f.show&&!f.show(r))delete r[f.k];});const f=faltando(r),m=$('msg');
     if(f.length){m.className='err';m.textContent='Falta responder: '+f.map(x=>x.l.replace(/\?.*$/,'?')).slice(0,3).join(' · ')+(f.length>3?` (e mais ${f.length-3})`:'');
@@ -344,7 +344,7 @@ async function telaForm(){
     const {error}=await SB.from('checkup').upsert({email:EMAIL,respostas:r,atualizado_em:agora},{onConflict:'email'});
     $('enviar').disabled=false;
     if(error){m.className='err';m.textContent='Não foi possível enviar: '+error.message;return;}
-    m.className='ok';m.innerHTML='✓ Check-up enviado! <button type="button" class="btn pri" id="verCrono" style="margin-left:8px">Ver meu pré-cronograma</button>';$('tabCrono').hidden=false;$('verCrono').onclick=telaCrono;$('enviar').textContent='Atualizar check-up';};
+    m.className='ok';m.innerHTML='✓ Perfil de estudos salvo! Se você mudou a rotina, o seu pré-cronograma se reorganiza sozinho ao abrir. <button type="button" class="btn pri" id="verCrono" style="margin-left:8px">Ver meu pré-cronograma</button>';$('tabCrono').hidden=false;$('verCrono').onclick=telaCrono;$('enviar').textContent='Atualizar perfil de estudos';};
 }
 
 /* ===== Área do professor ===== */
@@ -373,7 +373,7 @@ function card(t,body,sub){return `<div class="gc"><h4>${esc(t)}</h4>${sub?`<p cl
 async function telaGeral(){abas('tabGeral');$('app').innerHTML='<p class="pend">Carregando…</p>';
   try{await carregar();}catch(e){$('app').innerHTML='<p class="pend">Erro: '+esc(e.message)+'</p>';return;}
   const N=RESP.length,T=LIB.length;
-  if(!N){$('app').innerHTML=`<div class="intro"><h2>Visão geral da turma</h2><p>Nenhum check-up enviado ainda (0 de ${T} alunos da Assessoria). Os gráficos aparecem aqui assim que os alunos responderem.</p></div>`;return;}
+  if(!N){$('app').innerHTML=`<div class="intro"><h2>Visão geral da turma</h2><p>Nenhum perfil de estudos enviado ainda (0 de ${T} alunos da Assessoria). Os gráficos aparecem aqui assim que os alunos responderem.</p></div>`;return;}
   const med=k=>RESP.reduce((s,r)=>s+hnum(r.respostas[k]),0)/N;
   const mt=k=>{const v=RESP.map(r=>tmin(r.respostas[k])).filter(x=>x!=null);if(!v.length)return null;const ad=v.map(x=>k==='dorme'&&x<720?x+1440:x);return ad.reduce((a,b)=>a+b,0)/ad.length;};
   const sono=RESP.map(r=>{const a=tmin(r.respostas.acorda),d=tmin(r.respostas.dorme);return a!=null&&d!=null?((a-d+1440)%1440)/60:null;}).filter(x=>x!=null);
@@ -382,7 +382,7 @@ async function telaGeral(){abas('tabGeral');$('app').innerHTML='<p class="pend">
   const tipos={};RESP.forEach(r=>[...new Set((r.respostas.fixos||[]).map(x=>x.tipo))].forEach(t=>tipos[t]=(tipos[t]||0)+1));
   const heat=DIAS.map(d=>`<tr><td>${d.slice(0,3)}</td>${TURNOS.map(t=>{const n=RESP.filter(r=>(r.respostas.disp||[]).includes(d+'|'+t)).length,p=n/N;return `<td style="background:rgba(58,140,203,${(.08+p*.85).toFixed(2)})" title="${n} de ${N}">${Math.round(p*100)}%</td>`;}).join('')}</tr>`).join('');
   const D=k=>{const x=dist(k,N);return card(x.f.l.replace(/\s*\(.*?\)\s*/g,' ').trim(),x.html,x.base!==N?`base: ${x.base} aluno(s)`:'');};
-  $('app').innerHTML=`<div class="intro"><h2>Visão geral da turma</h2><p>${N} de ${T} alunos da Assessoria enviaram o check-up${T>N?` · faltam ${T-N}`:''}. Percentuais sobre quem respondeu.</p></div>
+  $('app').innerHTML=`<div class="intro"><h2>Visão geral da turma</h2><p>${N} de ${T} alunos da Assessoria enviaram o perfil de estudos${T>N?` · faltam ${T-N}`:''}. Percentuais sobre quem respondeu.</p></div>
   <div class="kps">${kpi(hfmt(med('horas_semana')),'estudam hoje por dia (seg–sex)')}${kpi(hfmt(med('horas_possiveis')),'dizem conseguir por dia')}${kpi(hfmt(med('horas_sab')),'no sábado')}${kpi(hfmt(med('horas_dom')),'no domingo')}${kpi(mt('acorda')!=null?mfmt(mt('acorda')):'—','acordam, em média')}${kpi(mt('dorme')!=null?mfmt(mt('dorme')):'—','dormem, em média')}${kpi(sono.length?hfmt(sono.reduce((a,b)=>a+b,0)/sono.length):'—','de sono por noite')}</div>
   <div class="gg">
    ${D('cursinho')}${D('aulas_mat')}${D('local_principal')}${D('local')}${D('lugar_fixo')}${D('ufu_exp')}${D('ufu_vezes')}
@@ -423,7 +423,7 @@ function lista(){const q=($('busca').value||'').toLowerCase();
   const pend=LIB.filter(x=>!RESP.some(r=>r.email===x.email));
   const R=RESP.filter(r=>!q||(r.email+' '+(r.respostas.nome||'')).toLowerCase().includes(q));
   $('lista').innerHTML=(R.map((r,i)=>{const p=r.respostas;
-    return `<details class="alu" data-i="${RESP.indexOf(r)}"><summary><b>${esc(p.nome||r.email)}</b><span class="m">${esc(p.curso||'')}${p.whats?' · '+esc(p.whats):''}</span><span class="d">enviado ${new Date(r.atualizado_em).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}</span></summary><div class="corpo"></div></details>`;}).join('')||'<p class="pend">Nenhum check-up enviado ainda.</p>')
+    return `<details class="alu" data-i="${RESP.indexOf(r)}"><summary><b>${esc(p.nome||r.email)}</b><span class="m">${esc(p.curso||'')}${p.whats?' · '+esc(p.whats):''}</span><span class="d">enviado ${new Date(r.atualizado_em).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}</span></summary><div class="corpo"></div></details>`;}).join('')||'<p class="pend">Nenhum perfil de estudos enviado ainda.</p>')
    +(pend.length&&!q?`<div class="intro"><p><b>Ainda não enviaram (${pend.length}):</b> ${pend.map(x=>esc(x.nome||x.email)).join(' · ')}</p></div>`:'');
   $('lista').querySelectorAll('details.alu').forEach(d=>d.addEventListener('toggle',()=>{const c=d.querySelector('.corpo');if(d.open&&!c.innerHTML){const r=RESP[+d.dataset.i];c.innerHTML=ficha(r);montarCrono(c.querySelector('.cronoBox'),r.respostas,r.email,'prof');}}));}
 function csv(){const cols=[['email','E-mail'],['atualizado_em','Enviado em'],...CAMPOS.map(f=>[f.k,f.l])];
@@ -433,8 +433,8 @@ function csv(){const cols=[['email','E-mail'],['atualizado_em','Enviado em'],...
 
 /* ===== Pré-cronograma ===== */
 const DISC=[ // chave, nome, grupo, minutos por bloco, vezes base na semana
- ['MAT','Matemática','EX',90,2],['FIS','Física','EX',90,1],['QUI','Química','EX',90,1],['BIO','Biologia','BIO',90,1],
- ['LP','Língua Portuguesa','LIN',60,2],['LIT','Literatura','LIN',60,1],['LE','Língua Estrangeira','LIN',60,1],
+ ['MAT','Matemática','EX',90,2],['FIS','Física','EX',90,2],['QUI','Química','EX',90,2],['BIO','Biologia','BIO',90,1],
+ ['LP','Língua Portuguesa','LIN',60,1],['LIT','Literatura','LIN',60,1],['LE','Língua Estrangeira','LIN',60,1],
  ['HIS','História','HUM',60,1],['GEO','Geografia','HUM',60,1],['FIL','Filosofia','HUM',60,1],['SOC','Sociologia','HUM',60,1]];
 const CORD={MAT:'#D9480F',FIS:'#1864AB',QUI:'#5F3DC4',BIO:'#2B8A3E',LP:'#C92A2A',LIT:'#A61E4D',LE:'#0B7285',HIS:'#7F4F24',GEO:'#5C7A0A',FIL:'#495057',SOC:'#8C6500',RED:'#C2255C'};
 const DIF2K={'Matemática':'MAT','Física':'FIS','Química':'QUI','Biologia':'BIO','Português':'LP','Literatura':'LIT','Inglês':'LE','Espanhol':'LE','História':'HIS','Geografia':'GEO','Filosofia':'FIL','Sociologia':'SOC'};
@@ -494,18 +494,25 @@ function gerar(p){
   (p.dificuldades||[]).forEach(x=>{const k=DIF2K[x];if(k&&!difn[k])difn[k]=3;});const pc=pesoCurso(p.curso);
   const LEnome=p.lingua||'Língua Estrangeira';
   const plano=DISC.map(([k,n,g,dur,base])=>{let v=base,why=[];const dv=difn[k]||0;if(dv>=3){v+=dv-2;why.push(DIFN[dv-1].toLowerCase());}if(pc.k.includes(k)){v++;why.push('peso para '+(p.curso||'o seu curso'));}
-    v=Math.min(v,4);return {k,n:k==='LE'?LEnome:n,g,dur,v,why,feito:0,dias:[]};});
+    v=Math.min(v,g==='EX'?4:3);return {k,n:k==='LE'?LEnome:n,g,dur,v,why,feito:0,dias:[]};});
+  // Matemática, Física e Química sempre aparecem mais vezes que qualquer outra disciplina
+  const maxOutro=Math.max(...plano.filter(x=>x.g!=='EX').map(x=>x.v));
+  plano.filter(x=>x.g==='EX').forEach(x=>{if(x.v<=maxOutro){x.v=Math.min(4,maxOutro+1);if(!x.why.length)x.why.push('exatas: prioridade do PREPARA');}});
+  plano.filter(x=>x.g!=='EX').forEach(x=>{const lim=Math.min(...plano.filter(y=>y.g==='EX').map(y=>y.v))-1;if(x.v>lim)x.v=Math.max(1,lim);});
   plano.sort((a,b)=>b.v-a.v||(b.g==='EX'||b.g==='BIO')-(a.g==='EX'||a.g==='BIO'));
   const red={k:'RED',n:'Redação',g:'LIN',dur:90,v:1,why:(difn.RED||0)>=3?[DIFN[difn.RED-1].toLowerCase()+' (1× por semana)']:[],feito:0,dias:[]};
   const fila=[];const maxV=Math.max(...plano.map(x=>x.v));
   // blocos longos (1h30) primeiro, em rodadas; depois os de 1h ocupam os espaços que sobram
   // 1º: todas as disciplinas uma vez (longas antes das curtas); 2º: repetições, das mais difíceis/pesadas para as demais
-  [90,60].forEach(dur=>{plano.filter(x=>x.dur===dur).forEach(x=>fila.push(x));if(dur===90)fila.push(red);});
-  for(let r=2;r<=maxV;r++)[90,60].forEach(dur=>plano.filter(x=>x.dur===dur&&x.v>=r).forEach(x=>fila.push(x)));
+  // 1º: Matemática, Física e Química em todas as repetições; 2º: Biologia e Redação; 3º: as demais uma vez; 4º: repetições das demais
+  const EXs=plano.filter(x=>x.g==='EX'),OUT=plano.filter(x=>x.g!=='EX');
+  for(let r=1;r<=maxV;r++)EXs.filter(x=>x.v>=r).forEach(x=>fila.push(x));
+  [90,60].forEach(dur=>{OUT.filter(x=>x.dur===dur).forEach(x=>fila.push(x));if(dur===90)fila.push(red);});
+  for(let r=2;r<=maxV;r++)[90,60].forEach(dur=>OUT.filter(x=>x.dur===dur&&x.v>=r).forEach(x=>fila.push(x)));
   const dIdx=d=>DS.indexOf(d);
   const exNoDia=d=>out.dias[d].filter(b=>b.g==='EX'||b.tipo==='prepara').length;
   const falta=[];
-  fila.forEach(x=>{let melhor=null;
+  fila.forEach(x=>{if(x.g!=='EX'&&x.k!=='RED'&&x.feito>=1&&x.feito+1>=Math.min(...EXs.map(y=>y.feito))){x.v=x.feito;return;}let melhor=null;
     for(const relax of [false,true]){
       const cands=DS.slice(0,6).filter(d=>!x.dias.includes(d)&&!(x.g==='EX'&&exNoDia(d)>=2)).map(d=>{
         const dist=x.dias.length?Math.min(...x.dias.map(e=>Math.abs(dIdx(e)-dIdx(d)))):6;
@@ -535,11 +542,45 @@ function fixosVis(p){const g=gerar(p);return DS.flatMap(d=>g.dias[d].filter(b=>b
 function corBloco(b){if(b.tipo==='estudo'||b.tipo==='red')return `background:${CORD[b.k]||CORD.OUT};color:#fff`;return '';}
 function opcoesMateria(p){const LE=p.lingua&&p.lingua!=='Ainda não sei'?p.lingua:'Língua Estrangeira';
   return DISC.map(([k,n])=>[k,k==='LE'?LE:n]).concat([['RED','Redação'],['REV','Revisão'],['SIM','Simulado / provas antigas'],['OUT','Outro (escrever)']]);}
+function janelasDia(p,d){
+  const W=tmin(p.acorda)??420,SL=tmin(p.dorme)??1380;const iniDia=W+30,fimDia=Math.min(SL<=W+120?1440:SL,1440)-30;
+  const F=(p.fixos||[]).filter(x=>(x.dias||[]).includes(d)).map(x=>{const a=tmin(x.ini),b=tmin(x.fim);return a==null||b==null?null:[a,b>a?b:1440];}).filter(Boolean);
+  if(d==='Dom'){let L=[[Math.max(iniDia,420),720]];F.forEach(([a,b])=>L=subtrai(L,a-15,b+15));return L;}
+  const marc=p.disp||[],i=DS.indexOf(d);
+  let L=marc.length?TURNOS.map((t,j)=>marc.includes(DIAS[i]+'|'+t)?[[360,720,1080][j],[720,1080,1440][j]]:null).filter(Boolean):[[0,1440]];
+  L=L.map(([a,b])=>[Math.max(a,iniDia),Math.min(b,fimDia)]).filter(([a,b])=>b>a);
+  F.forEach(([a,b])=>L=subtrai(L,a-15,b+15));
+  if(d==='Seg'||d==='Qui')L=subtrai(L,1125,1245);
+  const ab=F.find(([a,b])=>a<780&&b>720);L=subtrai(L,...(ab&&ab[1]<=870?[ab[1]+15,ab[1]+75]:[720,780]));L=subtrai(L,1110,1140);
+  return L;}
+function reorganizar(B,p){
+  // só conta como conflito o que é rígido: sono, compromissos fixos e PREPARA (o aluno pode ter movido blocos para fora dos períodos marcados de propósito)
+  const W=tmin(p.acorda)??420,SL=tmin(p.dorme)??1380,fimD=SL<=W+120?1440:SL;
+  const dentro=b=>{if(b.ini<W||b.fim>fimD)return false;
+    if((b.d==='Seg'||b.d==='Qui')&&b.ini<1230&&b.fim>1140)return false;
+    return !(p.fixos||[]).some(x=>(x.dias||[]).includes(b.d)&&tmin(x.ini)!=null&&b.ini<(tmin(x.fim)>tmin(x.ini)?tmin(x.fim):1440)&&b.fim>tmin(x.ini));};
+  const ok=B.filter(dentro),fora=B.filter(b=>!dentro(b));if(!fora.length)return {B,mov:0,rem:[]};
+  const dias=DS;const res=[...ok];let mov=0;const rem=[];
+  const exDia=d=>res.filter(b=>b.d===d&&['MAT','FIS','QUI'].includes(b.k)).length+((d==='Seg'||d==='Qui')?1:0);
+  fora.forEach(b=>{const dur=b.fim-b.ini,i0=dias.indexOf(b.d);
+    const ordem=dias.slice().sort((x,y)=>Math.abs(dias.indexOf(x)-i0)-Math.abs(dias.indexOf(y)-i0)).filter(d=>b.tipo==='sim'?d==='Dom':d!=='Dom');
+    let achou=null;
+    for(const d of ordem){
+      if(b.tipo==='estudo'&&b.d!==d&&res.some(o=>o.d===d&&o.k===b.k))continue;
+      if(['MAT','FIS','QUI'].includes(b.k)&&exDia(d)>=2)continue;
+      let L=janelasDia(p,d);res.filter(o=>o.d===d).forEach(o=>L=subtrai(L,o.ini-10,o.fim+10));
+      const prefer=L.map(([a,c])=>{const s=Math.max(a,Math.min(c-dur,b.ini));return s+dur<=c&&s>=a?s:null;}).filter(s=>s!=null).sort((x,y)=>Math.abs(x-b.ini)-Math.abs(y-b.ini));
+      if(prefer.length){achou={d,ini:prefer[0]};break;}}
+    if(achou){res.push({...b,d:achou.d,ini:achou.ini,fim:achou.ini+dur});mov++;}else rem.push(b.label);});
+  return {B:res,mov,rem};}
 async function montarCrono(el,p,email,quem){
   el.innerHTML='<p class="pend">Carregando cronograma…</p>';
   const {data}=await SB.from('cronograma').select('*').eq('email',email).maybeSingle();
   const st={el,p,email,quem,fix:fixosVis(p),avisos:[],B:null,info:data,curso:pesoCurso(p.curso)};
-  if(data&&Array.isArray(data.blocos))st.B=data.blocos;else{const g=gerar(p);st.B=paraBlocos(g);st.avisos=g.avisos;}
+  if(data&&Array.isArray(data.blocos)){st.B=data.blocos;
+    const r=reorganizar(st.B,p);
+    if(r.mov||r.rem.length){st.B=r.B;st.avisos.push(`A rotina no perfil de estudos mudou, e o cronograma se reorganizou sozinho: ${r.mov} bloco(s) foram para outro horário${r.rem.length?' e '+r.rem.length+' não couberam mais ('+r.rem.join(', ')+')':''}. Confira e ajuste se quiser.`);desenhar(st);salvar(st);return;}}
+  else{const g=gerar(p);st.B=paraBlocos(g);st.avisos=g.avisos;}
   desenhar(st);}
 function salvar(st){const s=st.el.querySelector('.cst');if(s){s.textContent='Salvando…';s.className='cst';}
   clearTimeout(st.tm);st.tm=setTimeout(async()=>{const agora=new Date().toISOString();
@@ -566,15 +607,15 @@ function desenhar(st){
   st.el.innerHTML=`<div class="cbanner">Este é um <b>pré-cronograma</b> para que você comece a estudar. Ele será totalmente validado no seu encontro com o seu mentor.</div>
    ${st.avisos.map(a=>`<div class="caviso">${esc(a)}</div>`).join('')}
    ${conf.size?'<div class="caviso">Há blocos se sobrepondo a outros compromissos (contorno vermelho). Arraste-os para outro horário.</div>':''}
-   <div class="ctb"><button class="btn pri" data-a="add">+ Adicionar bloco</button><button class="btn" data-a="refazer">Montar de novo pelo check-up</button><button class="btn" data-a="print">Imprimir / PDF</button><span class="cst">${st.info&&st.info.atualizado_em?`Última alteração: ${new Date(st.info.atualizado_em).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}${quem?' por '+esc(quem):''}`:'Ainda não alterado'}</span></div>
-   <p class="pend chint"><span class="sodesk">Arraste os blocos coloridos para outro dia ou horário. Clique num bloco para alterar ou excluir.</span><span class="somob">Toque num bloco para mudar o dia, o horário ou excluir.</span> Escola, compromissos fixos e as aulas do PREPARA UFU vêm do check-up e não se movem.</p>
+   <div class="ctb"><button class="btn pri" data-a="add">+ Adicionar bloco</button><button class="btn" data-a="refazer">Montar de novo pelo perfil de estudos</button><button class="btn" data-a="print">Imprimir / PDF</button><span class="cst">${st.info&&st.info.atualizado_em?`Última alteração: ${new Date(st.info.atualizado_em).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}${quem?' por '+esc(quem):''}`:'Ainda não alterado'}</span></div>
+   <p class="pend chint"><span class="sodesk">Arraste os blocos coloridos para outro dia ou horário. Clique num bloco para alterar ou excluir.</span><span class="somob">Toque num bloco para mudar o dia, o horário ou excluir.</span> Escola, compromissos fixos e as aulas do PREPARA UFU vêm do perfil de estudos e não se movem.</p>
    <div class="cgw">${grade}</div><div class="clw">${listaM}</div>
    <div class="leg cleg"><span><i style="background:#16304F;border:2px solid var(--amarelo)"></i>PREPARA UFU (ao vivo, seg e qui 19h–20h30)</span><span><i class="fx"></i>compromisso fixo</span><span><i style="background:#212529;border:2px solid var(--amarelo)"></i>simulado de domingo</span><span><i style="border:2px solid #868E96"></i>revisão</span></div>
    <h4>Resumo da semana</h4>${resumo}
    ${st.quem==='prof'&&st.curso.g?`<p class="pend" style="margin-top:8px">Ênfase de curso aplicada na montagem: ${esc(st.curso.g)} (${st.curso.k.map(k=>DISC.find(x=>x[0]===k)[1]).join(', ')}). Exatas e Biologia em blocos de 1h30; Humanas e Linguagens em 1h; Redação 1h30 por semana.</p>`:''}`;
   st.el.querySelector('[data-a=add]').onclick=()=>editar(st,null);
   st.el.querySelector('[data-a=print]').onclick=()=>window.print();
-  st.el.querySelector('[data-a=refazer]').onclick=()=>{if(!confirm('Isso apaga todas as mudanças feitas e monta o cronograma de novo a partir do check-up. Continuar?'))return;const g=gerar(st.p);st.B=paraBlocos(g);st.avisos=g.avisos;desenhar(st);salvar(st);};
+  st.el.querySelector('[data-a=refazer]').onclick=()=>{if(!confirm('Isso apaga todas as mudanças feitas e monta o cronograma de novo a partir do perfil de estudos. Continuar?'))return;const g=gerar(st.p);st.B=paraBlocos(g);st.avisos=g.avisos;desenhar(st);salvar(st);};
   st.el.querySelectorAll('.cli.mov').forEach(e=>e.onclick=()=>editar(st,B.find(b=>b.id==e.dataset.id)));
   st.el.querySelectorAll('.cb.mov').forEach(e=>arrastavel(st,e));}
 function arrastavel(st,e){
@@ -611,8 +652,8 @@ function editar(st,b){const novo=!b;const ops=opcoesMateria(st.p);
     if(b)Object.assign(b,nb);else st.B.push(nb);fecha();desenhar(st);salvar(st);};}
 async function telaCrono(){abas('tabCrono');
   const {data}=await SB.from('checkup').select('respostas').eq('email',EMAIL).maybeSingle();
-  if(!data){$('app').innerHTML='<div class="aviso"><h2>Responda o check-up primeiro</h2><p>O seu pré-cronograma é montado a partir das suas respostas.</p></div>';return;}
-  $('app').innerHTML=`<div class="intro"><h2>Meu pré-cronograma</h2><p>Montado a partir do seu check-up. Você pode arrastar, alterar, excluir e adicionar blocos: as mudanças ficam salvas, e o Prof. Jazz vê e ajusta com você no encontro.</p></div><div class="sec" id="cronoBox"></div>`;
+  if(!data){$('app').innerHTML='<div class="aviso"><h2>Preencha o seu perfil de estudos primeiro</h2><p>O seu pré-cronograma é montado a partir das suas respostas.</p></div>';return;}
+  $('app').innerHTML=`<div class="intro"><h2>Meu pré-cronograma</h2><p>Montado a partir do seu perfil de estudos. Você pode arrastar, alterar, excluir e adicionar blocos: as mudanças ficam salvas, e o Prof. Jazz vê e ajusta com você no encontro.</p></div><div class="sec" id="cronoBox"></div>`;
   montarCrono($('cronoBox'),data.respostas,EMAIL,'aluno');}
 
 /* ===== Login (mesma conta do Banco de Questões) ===== */
