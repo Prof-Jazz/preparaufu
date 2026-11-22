@@ -154,6 +154,9 @@ input[type=time]{max-width:160px}input[type=number]{max-width:160px}
 .cdlg .btns{display:flex;gap:8px;flex-wrap:wrap}.cdlg .del{color:var(--bad)}
 .cerr{margin:0;color:var(--bad);font-size:13.5px;min-height:0}
 @media print{.ctb,.chint,.cdlg{display:none!important}}
+.aedu{margin-top:14px;border:1px solid var(--line);border-radius:12px;padding:10px 14px;background:var(--bg)}
+.aedu summary{cursor:pointer;font:700 15px var(--display);color:var(--azul)}
+.aedu p{margin:8px 0}.ta td,.ta th{white-space:nowrap}.ta td:last-child{white-space:normal}.ta tr.opc td{color:var(--muted)}
 /* login */
 #gate{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px}
 #gate[hidden]{display:none}
@@ -231,7 +234,7 @@ const S=[
   {k:'curso',l:'Curso que você quer fazer',type:'text',req:1},
   {k:'universidades',l:'Universidades em que pretende entrar',type:'checks',opts:['UFU','UFTM','UFMG','UFG','USP / Unicamp','Outras']},
   {k:'provas',l:'Quais provas você vai fazer?',type:'checks',opts:['ENEM','Vestibular UFU','Outros vestibulares'],req:1},
-  {k:'lingua',l:'Língua estrangeira que você vai fazer na UFU',type:'radio',opts:['Inglês','Espanhol','Ainda não sei'],req:1},
+  {k:'lingua',l:'Língua estrangeira que você vai fazer na UFU',type:'radio',opts:['Inglês','Espanhol','Francês','Ainda não sei'],req:1},
   {k:'ufu_exp',l:'Qual a sua experiência com a prova da UFU?',type:'radio',opts:['Não conheço a prova','Conheço, mas nunca fiz','Já fiz'],req:1},
   {k:'ufu_vezes',l:'Quantas vezes você já fez a prova da UFU?',type:'radio',opts:['1 vez','2 vezes','3 vezes','4 vezes ou mais'],req:1,show:r=>r.ufu_exp==='Já fiz'},
   {k:'enem_antes',l:'Já fez o ENEM antes?',type:'radio',opts:['Sim','Não'],req:1},
@@ -590,6 +593,21 @@ function salvar(st){const s=st.el.querySelector('.cst');if(s){s.textContent='Sal
     if(error){s.textContent='Não foi possível salvar: '+error.message;s.className='cst err';}
     else{st.info={atualizado_em:agora,atualizado_por:EMAIL};s.textContent='✓ Salvo às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});s.className='cst ok';}},350);}
 const sobrepoe=(a,b)=>a.d===b.d&&a.ini<b.fim&&b.ini<a.fim;
+function tabelaAEDU(st){
+  const tipoA=b=>b.tipo==='sim'?'Simulado':b.tipo==='prepara'?'Estudo':b.tipo==='fixo'?(/Academia/.test(b.label)?'Treino':'Outro'):'Estudo';
+  const materia=b=>b.tipo==='rev'?'Revisão':b.tipo==='sim'?'Simulado':b.tipo==='prepara'?'Matemática':b.tipo==='fixo'?'—':b.label;
+  const titulo=b=>b.tipo==='rev'?b.label:b.tipo==='prepara'?'PREPARA UFU — aula ao vivo':b.tipo==='sim'?'Simulado / provas antigas da UFU':b.tipo==='fixo'?b.label:'Estudo de '+b.label;
+  const W=tmin(st.p.acorda),SL=tmin(st.p.dorme);
+  const linhas={};
+  [...st.B,...st.fix].forEach(b=>{const key=[tipoA(b),materia(b),titulo(b),b.ini,b.fim-b.ini].join('|');(linhas[key]=linhas[key]||{b,dias:[]}).dias.push(b.d);});
+  let L=Object.values(linhas).sort((a,b)=>(a.b.tipo==='fixo')-(b.b.tipo==='fixo')||DS.indexOf(a.dias[0])-DS.indexOf(b.dias[0])||a.b.ini-b.b.ini);
+  const dd=x=>DS.filter(d=>x.includes(d)).map(d=>d.toLowerCase()).join(', ');
+  const hoje=new Date().toLocaleDateString('pt-BR');
+  const rows=L.map(x=>`<tr class="${x.b.tipo==='fixo'?'opc':''}"><td>${dd(x.dias)}</td><td>${tipoA(x.b)}</td><td>${hm(x.b.ini)}</td><td>${x.b.fim-x.b.ini}</td><td>${esc(materia(x.b))}</td><td>${esc(titulo(x.b))}</td></tr>`).join('')
+   +(W!=null&&SL!=null?`<tr class="opc"><td>seg, ter, qua, qui, sex, sáb, dom</td><td>Dormir</td><td>${hm(SL)}</td><td>${(W-SL+1440)%1440}</td><td>—</td><td>Sono</td></tr>`:'');
+  return `<details class="aedu"><summary>Passar para a AEDU (tabela pronta)</summary>
+   <p class="pend">Na AEDU, em <b>Nova Atividade</b>, cada linha abaixo vira uma atividade: marque os <b>dias</b>, escolha o <b>tipo</b>, digite o <b>horário</b> e a <b>duração em minutos</b>, escolha a <b>matéria</b> e, se quiser, copie o <b>título</b>. Em "Aplicar a partir de", use a data de hoje (${hoje}). O <b>tópico</b> é o assunto da semana no planejamento do PREPARA. As linhas em cinza (compromissos e sono) são opcionais.</p>
+   <div style="overflow-x:auto"><table class="cr ta"><tr><th>Aplicar nos dias</th><th>Tipo</th><th>Horário</th><th>Duração (min)</th><th>Matéria</th><th>Título</th></tr>${rows}</table></div></details>`;}
 function desenhar(st){
   const B=st.B,F=st.fix,todos=[...B,...F];
   const H0=Math.min(6,...todos.map(b=>Math.floor(b.ini/60))),H1=24,px=46,top=m=>(m/60-H0)*px,alt=(H1-H0)*px;st.geo={H0,px};
@@ -613,6 +631,7 @@ function desenhar(st){
    <div class="cgw">${grade}</div><div class="clw">${listaM}</div>
    <div class="leg cleg"><span><i style="background:#16304F;border:2px solid var(--amarelo)"></i>PREPARA UFU (ao vivo, seg e qui 19h–20h30)</span><span><i class="fx"></i>compromisso fixo</span><span><i style="background:#212529;border:2px solid var(--amarelo)"></i>simulado de domingo</span><span><i style="border:2px solid #868E96"></i>revisão</span></div>
    <h4>Resumo da semana</h4>${resumo}
+   ${tabelaAEDU(st)}
    ${st.quem==='prof'&&st.curso.g?`<p class="pend" style="margin-top:8px">Ênfase de curso aplicada na montagem: ${esc(st.curso.g)} (${st.curso.k.map(k=>DISC.find(x=>x[0]===k)[1]).join(', ')}). Exatas e Biologia em blocos de 1h30; Humanas e Linguagens em 1h; Redação 1h30 por semana.</p>`:''}`;
   st.el.querySelector('[data-a=add]').onclick=()=>editar(st,null);
   st.el.querySelector('[data-a=print]').onclick=()=>window.print();
@@ -637,10 +656,11 @@ function editar(st,b){const novo=!b;const ops=opcoesMateria(st.p);
    <label class="outro" ${k0==='OUT'?'':'hidden'}>Nome<input name="nome" type="text" value="${b&&b.k==='OUT'?esc(b.label):''}" placeholder="ex.: Lista de exercícios"></label>
    <label>Dia<select name="d">${DS.map((d,i)=>`<option value="${d}"${(b?b.d:'Seg')===d?' selected':''}>${DIAS[i]}</option>`).join('')}</select></label>
    <div class="row2"><label>Começa<input name="ini" type="time" step="300" value="${b?hm(b.ini):'14:00'}" required></label><label>Termina<input name="fim" type="time" step="300" value="${b?hm(b.fim):'15:30'}" required></label></div>
-   <p class="cerr" role="status"></p>
+   <p class="pend cdur" style="margin:0"></p><p class="cerr" role="status"></p>
    <div class="btns"><button class="btn pri" type="submit">${novo?'Adicionar':'Salvar'}</button>${novo?'':'<button class="btn del" type="button" data-x="del">Excluir bloco</button>'}<button class="btn" type="button" data-x="cancel">Cancelar</button></div></form>`;
   document.body.appendChild(dlg);const f=dlg.querySelector('form');
   f.k.onchange=()=>{dlg.querySelector('.outro').hidden=f.k.value!=='OUT';const dur={MAT:90,FIS:90,QUI:90,BIO:90,RED:90,REV:30,SIM:240}[f.k.value]||60;const i=tmin(f.ini.value);if(i!=null)f.fim.value=hm(Math.min(1439,i+dur));};
+  const durTxt=()=>{const a=tmin(f.ini.value),z=tmin(f.fim.value);dlg.querySelector('.cdur').textContent=a!=null&&z!=null&&z>a?`Duração: ${z-a} min`:'';};f.ini.addEventListener('input',durTxt);f.fim.addEventListener('input',durTxt);durTxt();
   const fecha=()=>dlg.remove();dlg.onclick=ev=>{if(ev.target===dlg)fecha();};
   dlg.querySelector('[data-x=cancel]').onclick=fecha;
   const del=dlg.querySelector('[data-x=del]');if(del)del.onclick=()=>{if(!confirm('Excluir este bloco?'))return;st.B=st.B.filter(x=>x!==b);fecha();desenhar(st);salvar(st);};
