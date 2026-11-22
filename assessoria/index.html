@@ -582,7 +582,7 @@ function desenhar(st){
   const card=b=>`<div class="ci ${b.tipo}" draggable="true" data-id="${b.id}" style="${corBloco(b)}" title="Clique para alterar · arraste para outro dia"><b>${esc(b.label)}</b><span>${durTxt(b.dur)}</span></div>`;
   const col=(d,i)=>{const C=compromissos(st.p,d),E=B.filter(b=>b.d===d).sort((a,b)=>a.ord-b.ord);const usado=E.reduce((s,b)=>s+b.dur,0),cap=Math.round((HD[d]||0)*60);
     return `<div class="cd" data-d="${d}"><div class="cdh"><b>${DIAS[i]}</b><small class="${usado>cap?'exc':''}">estudo: ${durTxt(usado)}${cap?` de ${durTxt(cap)}`:''}</small></div>
-      ${C.length?`<div class="cdsec">Compromissos</div>${C.map(c=>`<div class="ci ${c.tipo}"><b>${esc(c.label)}</b><span>${durTxt(c.dur)}</span></div>`).join('')}`:''}
+      ${C.length?`<div class="cdsec">Compromissos</div>${C.map(c=>`<div class="ci ${c.tipo}"><b>${esc(c.label)}</b><span>${hm(c.ini)}–${hm(Math.min(c.ini+c.dur,1440))}</span></div>`).join('')}`:''}
       <div class="cdsec">Estudos</div><div class="cde" data-d="${d}">${E.map(card).join('')||'<p class="vz">Sem estudo neste dia</p>'}</div></div>`;};
   const R={};B.forEach(b=>{const k=b.tipo==='rev'?'REV':b.tipo==='sim'?'SIM':(b.k==='OUT'?'OUT:'+b.label:b.k);(R[k]=R[k]||{n:b.tipo==='rev'?'Revisão':b.tipo==='sim'?'Simulado / provas antigas':b.label,k:b.k,v:0,min:0,tipo:b.tipo});R[k].v++;R[k].min+=b.dur;});
   const ordem=Object.values(R).sort((a,b)=>b.min-a.min);const tot=ordem.reduce((s,x)=>s+x.min,0);
@@ -592,7 +592,7 @@ function desenhar(st){
   st.el.innerHTML=`<div class="cbanner">Este é um <b>pré-cronograma</b> para que você comece a estudar. Ele será totalmente validado no seu encontro com o seu mentor.</div>
    ${st.avisos.map(a=>`<div class="caviso">${esc(a)}</div>`).join('')}
    <div class="ctb"><button class="btn pri" data-a="add">+ Adicionar bloco</button><button class="btn" data-a="refazer">Montar de novo pelo perfil de estudos</button><button class="btn" data-a="print">Imprimir / PDF</button><span class="cst">${st.info&&st.info.atualizado_em?`Última alteração: ${new Date(st.info.atualizado_em).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}${quem?' por '+esc(quem):''}`:'Ainda não alterado'}</span></div>
-   <p class="pend chint">Cada dia mostra os seus compromissos e, embaixo, o que estudar, na ordem e com a duração. Você escolhe o horário. <span class="sodesk">Arraste um bloco para outro dia ou para mudar a ordem; clique nele para alterar ou excluir.</span><span class="somob">Toque num bloco para mudar o dia, a duração ou excluir.</span></p>
+   <p class="pend chint">Cada dia mostra os seus compromissos, com horário, e embaixo o que estudar, na ordem e com a duração de cada matéria. <span class="sodesk">Arraste um bloco para outro dia ou para mudar a ordem; clique nele para alterar ou excluir.</span><span class="somob">Toque num bloco para mudar o dia, a duração ou excluir.</span></p>
    <div class="cw">${DS.map(col).join('')}</div>
    <h4>Resumo da semana</h4>${resumo}
    ${st.quem==='prof'&&st.curso.g?`<p class="pend" style="margin-top:8px">Ênfase de curso aplicada na montagem: ${esc(st.curso.g)} (${st.curso.k.map(k=>DISC.find(x=>x[0]===k)[1]).join(', ')}).</p>`:''}`;
