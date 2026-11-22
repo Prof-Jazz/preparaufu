@@ -454,6 +454,7 @@ function gerar(p){
     const almocoBloq=F.find(f=>f.ini<780&&f.fim>720);const alm=almocoBloq&&almocoBloq.fim<=870?[almocoBloq.fim+15,almocoBloq.fim+75]:[720,780];
     L=subtrai(L,alm[0],alm[1]);L=subtrai(L,1110,1140);
     livre[d]=L.map(([a,b])=>({a,b,prev:(d==='Seg'||d==='Qui')&&a===1245?'EX':null}));cap[d]=d==='Sáb'?hs:hp;});
+  const dispTot=DS.slice(0,6).reduce((t,d)=>t+Math.min(cap[d],livre[d].reduce((a,iv)=>a+iv.b-iv.a,0)),0);
   const usado={};DS.forEach(d=>usado[d]=0);
   function coloca(d,dur,grupo,relax){if(usado[d]+dur>cap[d])return null;
     for(const iv of livre[d]){if(iv.b-iv.a<dur)continue;
@@ -493,8 +494,10 @@ function gerar(p){
   const dm=dom.sort((a,b)=>(b[1]-b[0])-(a[1]-a[0]))[0];
   if(dm&&dm[1]-dm[0]>=90)out.dias['Dom'].push({tipo:'sim',ini:dm[0],fim:Math.min(dm[1],dm[0]+240),label:'Simulado · provas antigas da UFU · matéria atrasada'});
   else out.avisos.push('Seus compromissos de domingo de manhã não deixam espaço para o simulado/provas antigas. Vamos ajustar isso no encontro com o mentor.');
-  if(falta.length){const c={};falta.forEach(n=>c[n]=(c[n]||0)+1);
-    out.avisos.unshift('A quantidade de horas que você estuda hoje é insuficiente para a quantidade de conteúdos que você precisa estudar. Ficaram de fora desta semana: '+Object.entries(c).map(([n,k])=>k>1?`${n} (${k}×)`:n).join(', ')+'. Vamos rever o seu tempo de estudo no encontro com o mentor.');}
+  if(falta.length){const c={};falta.forEach(n=>c[n]=(c[n]||0)+1);const lst=Object.entries(c).map(([n,k])=>k>1?`${n} (${k}×)`:n).join(', ');
+    const precisa=[...plano,red].reduce((t,x)=>t+x.v*x.dur,0)+revDur*6;
+    out.avisos.unshift(precisa>dispTot?'A quantidade de horas que você estuda é insuficiente para a quantidade de conteúdos que você precisa estudar. Ficaram de fora desta semana: '+lst+'. Vamos rever o seu tempo de estudo no encontro com o mentor.'
+      :'Não foi possível encaixar tudo sem colocar matérias parecidas em sequência. Ficaram de fora desta semana: '+lst+'. O seu mentor vai ajustar isso com você.');}
   if(!usaMarc)out.avisos.push('Você não marcou os períodos livres para estudar; usamos todo o horário em que você está acordado e sem compromissos.');
   out.resumo=[...plano,red].map(x=>({n:x.n,k:x.k,v:x.feito,pedido:x.v,min:x.feito*x.dur,why:x.why}));
   out.revMin=DS.slice(0,6).reduce((s,d)=>s+out.dias[d].filter(b=>b.tipo==='rev').reduce((a,b)=>a+b.fim-b.ini,0),0);
