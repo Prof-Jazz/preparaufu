@@ -154,6 +154,10 @@ input[type=time]{max-width:160px}input[type=number]{max-width:160px}
 .cdlg .btns{display:flex;gap:8px;flex-wrap:wrap}.cdlg .del{color:var(--bad)}
 .cerr{margin:0;color:var(--bad);font-size:13.5px;min-height:0}
 @media print{.ctb,.chint,.cdlg{display:none!important}}
+#exBar{background:var(--amarelo);color:#16304F;font:600 14px var(--body);padding:8px 16px;text-align:center;position:sticky;top:0;z-index:30}
+#exBar[hidden]{display:none}
+#exBar button{margin-left:10px;font:700 13px var(--body);background:#16304F;color:#fff;border:0;border-radius:999px;padding:5px 12px;cursor:pointer}
+.exacoes{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:rgba(221,221,36,.12);border:1px dashed var(--amarelo);border-radius:12px;padding:10px 14px;font-size:14px}
 /* login */
 #gate{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px}
 #gate[hidden]{display:none}
@@ -196,8 +200,9 @@ input[type=time]{max-width:160px}input[type=number]{max-width:160px}
 <header>
   <div class="logos"><img class="j" src="../bancodequestoes/logo/jazz_claro.png" alt="Jazz, Professor de Matemática"><span class="sep"></span><img class="p" src="../bancodequestoes/logo/prepara_transp.png" alt="Prepara UFU"></div>
   <div class="ttl"><h1>Assessoria ENEM</h1><p>Perfil de estudos e pré-cronograma</p></div>
-  <nav class="tabs"><button class="theme" id="theme" aria-label="Alternar modo diurno e noturno" title="Modo diurno / noturno"><span class="sun">☀</span><span class="moon">☾</span></button><a href="../bancodequestoes/">Banco de Questões</a><button id="tabGeral" hidden>Visão geral</button><button id="tabResp" hidden>Alunos</button><button class="on" id="tabForm" hidden>Meu perfil de estudos</button><button id="tabCrono" hidden>Meu pré-cronograma</button><button id="sair">Sair</button></nav>
+  <nav class="tabs"><button class="theme" id="theme" aria-label="Alternar modo diurno e noturno" title="Modo diurno / noturno"><span class="sun">☀</span><span class="moon">☾</span></button><a href="../bancodequestoes/">Banco de Questões</a><button id="tabGeral" hidden>Visão geral</button><button id="tabResp" hidden>Alunos</button><button id="tabExemplo" hidden>Ver como aluno</button><button class="on" id="tabForm" hidden>Meu perfil de estudos</button><button id="tabCrono" hidden>Meu pré-cronograma</button><button id="sair">Sair</button></nav>
 </header>
+<div id="exBar" hidden>Modo aluno exemplo — é assim que o aluno vê. Nada aqui entra nas estatísticas da turma. <button type="button" id="exSair">Sair do modo exemplo</button></div>
 <main id="app"></main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
@@ -210,7 +215,8 @@ const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
 
 const SB=supabase.createClient('https://ygdlbhoqyqjsqoyyfizk.supabase.co','sb_publishable_jB2I59Ruw4MaMT63KLWtSA_O-DMf63b');
 const ADMIN='jesrrael.santos@gmail.com';
-let EMAIL='',IS_ADMIN=false;
+let EMAIL='',IS_ADMIN=false,ALVO='',EXMODO=false;
+const EXEMPLO='exemplo@preparaufu.com.br';
 
 /* ===== Questionário ===== */
 const SIMNAO=['Sim','Não'];
@@ -331,8 +337,9 @@ async function telaForm(){
   <form id="ck" novalidate>${S.map((s,i)=>`<section class="sec"><h3><span class="n">${i+1}</span>${esc(s.t)}</h3>${s.f.map(campo).join('')}</section>`).join('<div style="height:16px"></div>')}
   <div class="send"><button class="btn pri" id="enviar" type="submit">Enviar perfil de estudos</button><span id="msg" role="status"></span></div></form>`;
   ['Escola',''].forEach((t,i)=>fxLinha(i?{}:{tipo:t}));$('fxAdd').onclick=()=>fxLinha();
+  exemploAcoes();
   const fm=$('ck');fm.addEventListener('input',visiveis);fm.addEventListener('change',visiveis);
-  const {data}=await SB.from('checkup').select('respostas,atualizado_em').eq('email',EMAIL).maybeSingle();
+  const {data}=await SB.from('checkup').select('respostas,atualizado_em').eq('email',ALVO).maybeSingle();
   if(data){preencher(data.respostas);$('intro').classList.add('done');$('intro').insertAdjacentHTML('beforeend',`<p style="margin-top:8px;color:var(--ok);font-weight:600">✓ Perfil de estudos enviado em ${new Date(data.atualizado_em).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}. Se algo mudou, altere e envie de novo.</p>`);$('enviar').textContent='Atualizar perfil de estudos';}
   visiveis();
   fm.onsubmit=async ev=>{ev.preventDefault();const r=ler();CAMPOS.forEach(f=>{if(f.show&&!f.show(r))delete r[f.k];});const f=faltando(r),m=$('msg');
@@ -342,7 +349,7 @@ async function telaForm(){
     if(inc){m.className='err';m.textContent='Complete cada compromisso fixo: tipo, dias e horário de início e fim (ou remova a linha vazia com ✕).';document.querySelector('.f[data-k="fixos"]').scrollIntoView({behavior:'smooth',block:'center'});return;}
     $('enviar').disabled=true;m.className='';m.textContent='Enviando…';
     const agora=new Date().toISOString();
-    const {error}=await SB.from('checkup').upsert({email:EMAIL,respostas:r,atualizado_em:agora},{onConflict:'email'});
+    const {error}=await SB.from('checkup').upsert({email:ALVO,respostas:r,atualizado_em:agora},{onConflict:'email'});
     $('enviar').disabled=false;
     if(error){m.className='err';m.textContent='Não foi possível enviar: '+error.message;return;}
     m.className='ok';m.innerHTML='✓ Perfil de estudos salvo! Se você mudou a rotina, o seu pré-cronograma se reorganiza sozinho ao abrir. <button type="button" class="btn pri" id="verCrono" style="margin-left:8px">Ver meu pré-cronograma</button>';$('tabCrono').hidden=false;$('verCrono').onclick=telaCrono;$('enviar').textContent='Atualizar perfil de estudos';};
@@ -360,11 +367,11 @@ function fmt(f,v){
   if(f.type==='fixos')return v.map(x=>`${x.tipo}${x.desc?' ('+x.desc+')':''}: ${x.dias.join(', ')} · ${x.ini||'?'}–${x.fim||'?'}`).join('\n');
   if(f.type==='scale')return AREAS.map(a=>a+': '+(v[a]?DIFN[v[a]-1]:'—')).join('\n');
   return Array.isArray(v)?v.join(', '):String(v);}
-let RESP=[],LIB=[];
+let RESP=[],LIB=[],EXR=null,LST=[];
 function abas(on){['tabGeral','tabResp','tabForm','tabCrono'].forEach(t=>$(t).classList.toggle('on',t===on));}
 async function carregar(){
   const [a,b]=await Promise.all([SB.from('checkup').select('*').order('atualizado_em',{ascending:false}),SB.rpc('admin_lista')]);
-  if(a.error)throw a.error;RESP=(a.data||[]).filter(r=>r.email!==ADMIN);LIB=(b.data||[]).filter(x=>x.assessoria&&x.email!==ADMIN);}
+  if(a.error)throw a.error;RESP=(a.data||[]).filter(r=>r.email!==ADMIN&&r.email!==EXEMPLO);EXR=(a.data||[]).find(r=>r.email===EXEMPLO)||null;LIB=(b.data||[]).filter(x=>x.assessoria&&x.email!==ADMIN);}
 const bar=(rot,n,tot,cor)=>{const p=tot?Math.round(100*n/tot):0;return `<div class="br"><span class="bl" title="${esc(rot)}">${esc(rot)}</span><span class="bt"><i style="width:${p}%;background:${cor||'var(--azul)'}"></i></span><b>${p}%</b><small>${n}</small></div>`;};
 function dist(k,tot){const f=CAMPOS.find(x=>x.k===k);const c={};RESP.filter(r=>!f.show||f.show(r.respostas)).forEach(r=>{const v=r.respostas[k];(Array.isArray(v)?v:v?[v]:[]).forEach(x=>c[x]=(c[x]||0)+1);});
   const base=f.show?RESP.filter(r=>f.show(r.respostas)).length:tot;
@@ -421,11 +428,11 @@ function ficha(r){const p=r.respostas;
   ${S.map(s=>{const it=s.f.filter(f=>!['nivel','disp'].includes(f.k)).map(f=>{const v=fmt(f,p[f.k]);return v?`<dt>${esc(f.l)}</dt><dd>${esc(v)}</dd>`:'';}).join('');return it?`<h4>${esc(s.t)}</h4><dl>${it}</dl>`:'';}).join('')}`;}
 function lista(){const q=($('busca').value||'').toLowerCase();
   const pend=LIB.filter(x=>!RESP.some(r=>r.email===x.email));
-  const R=RESP.filter(r=>!q||(r.email+' '+(r.respostas.nome||'')).toLowerCase().includes(q));
-  $('lista').innerHTML=(R.map((r,i)=>{const p=r.respostas;
-    return `<details class="alu" data-i="${RESP.indexOf(r)}"><summary><b>${esc(p.nome||r.email)}</b><span class="m">${esc(p.curso||'')}${p.whats?' · '+esc(p.whats):''}</span><span class="d">enviado ${new Date(r.atualizado_em).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}</span></summary><div class="corpo"></div></details>`;}).join('')||'<p class="pend">Nenhum perfil de estudos enviado ainda.</p>')
+  const R=RESP.filter(r=>!q||(r.email+' '+(r.respostas.nome||'')).toLowerCase().includes(q));LST=(EXR&&!q?[EXR]:[]).concat(R);
+  $('lista').innerHTML=(LST.map((r,i)=>{const p=r.respostas;
+    return `<details class="alu" data-i="${i}"><summary>${r.email===EXEMPLO?'<span class="tag" style="background:var(--amarelo);color:#16304F;font-weight:700">ALUNO EXEMPLO</span>':''}<b>${esc(p.nome||r.email)}</b><span class="m">${esc(p.curso||'')}${p.whats?' · '+esc(p.whats):''}</span><span class="d">enviado ${new Date(r.atualizado_em).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}</span></summary><div class="corpo"></div></details>`;}).join('')||'<p class="pend">Nenhum perfil de estudos enviado ainda.</p>')
    +(pend.length&&!q?`<div class="intro"><p><b>Ainda não enviaram (${pend.length}):</b> ${pend.map(x=>esc(x.nome||x.email)).join(' · ')}</p></div>`:'');
-  $('lista').querySelectorAll('details.alu').forEach(d=>d.addEventListener('toggle',()=>{const c=d.querySelector('.corpo');if(d.open&&!c.innerHTML){const r=RESP[+d.dataset.i];c.innerHTML=ficha(r);montarCrono(c.querySelector('.cronoBox'),r.respostas,r.email,'prof');}}));}
+  $('lista').querySelectorAll('details.alu').forEach(d=>d.addEventListener('toggle',()=>{const c=d.querySelector('.corpo');if(d.open&&!c.innerHTML){const r=LST[+d.dataset.i];c.innerHTML=ficha(r);montarCrono(c.querySelector('.cronoBox'),r.respostas,r.email,'prof');}}));}
 function csv(){const cols=[['email','E-mail'],['atualizado_em','Enviado em'],...CAMPOS.map(f=>[f.k,f.l])];
   const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
   const linhas=[cols.map(c=>q(c[1])).join(';')].concat(RESP.map(r=>cols.map(([k])=>{if(k==='email')return q(r.email);if(k==='atualizado_em')return q(new Date(r.atualizado_em).toLocaleString('pt-BR'));const f=CAMPOS.find(x=>x.k===k);return q(fmt(f,r.respostas[k]).replace(/\n/g,' | '));}).join(';')));
@@ -603,7 +610,7 @@ function desenhar(st){
   const ordem=Object.values(R).sort((a,b)=>b.min-a.min);const tot=ordem.reduce((s,x)=>s+x.min,0);
   const sw=x=>x.tipo==='rev'?'background:#fff;border:2px solid #868E96':x.tipo==='sim'?'background:#212529;border:2px solid var(--amarelo)':`background:${CORD[x.k]||CORD.OUT}`;
   const resumo=`<table class="cr"><tr><th>Disciplina</th><th>Blocos na semana</th><th>Horas</th></tr>${ordem.map(x=>`<tr><td><i style="${sw(x)}"></i>${esc(x.n)}</td><td>${x.v}</td><td>${hfmt(x.min/60)}</td></tr>`).join('')}<tr class="tt"><td>Total de estudo na semana</td><td></td><td>${hfmt(tot/60)}</td></tr></table>`;
-  const quem=st.info&&st.info.atualizado_por?(st.info.atualizado_por===ADMIN?'Prof. Jazz':(st.info.atualizado_por===st.email?(st.quem==='prof'?'o aluno':'você'):st.info.atualizado_por)):'';
+  const quem=st.info&&st.info.atualizado_por?(st.info.atualizado_por===ADMIN?(st.email===EXEMPLO?'você':'Prof. Jazz'):(st.info.atualizado_por===st.email?(st.quem==='prof'?'o aluno':'você'):st.info.atualizado_por)):'';
   st.el.innerHTML=`<div class="cbanner">Este é um <b>pré-cronograma</b> para que você comece a estudar. Ele será totalmente validado no seu encontro com o seu mentor.</div>
    ${st.avisos.map(a=>`<div class="caviso">${esc(a)}</div>`).join('')}
    ${conf.size?'<div class="caviso">Há blocos se sobrepondo a outros compromissos (contorno vermelho). Arraste-os para outro horário.</div>':''}
@@ -651,11 +658,31 @@ function editar(st,b){const novo=!b;const ops=opcoesMateria(st.p);
       tipo:k==='REV'?'rev':k==='SIM'?'sim':k==='RED'?'red':'estudo',k,
       label:k==='OUT'?f.nome.value.trim():k==='SIM'?SIMLBL:k==='REV'?(b&&b.tipo==='rev'?b.label:'Revisão'):nome};
     if(b)Object.assign(b,nb);else st.B.push(nb);fecha();desenhar(st);salvar(st);};}
+
+const EXEMPLO_RESP={nome:'Aluno Exemplo',whats:'(34) 99999-0000',cidade:'Uberlândia',situacao:'Estou no 3º ano do Ensino Médio',escola_turno:'Manhã',curso:'Medicina',universidades:['UFU','UFTM'],provas:['ENEM','Vestibular UFU'],lingua:'Inglês',ufu_exp:'Já fiz',ufu_vezes:'1 vez',enem_antes:'Sim',enem_media:'600 a 700',
+ acorda:'06:00',dorme:'23:00',sono_fds:'Durmo e acordo mais tarde',trabalha:'Não',cursinho:'Sim, online',cursinho_nome:'Cursinho online',atividade:'Sim',atividade_qual:['Academia'],atividade_fixo:'Sim, dias e horários fixos',
+ fixos:[{tipo:'Escola',desc:'Ensino médio',dias:['Seg','Ter','Qua','Qui','Sex'],ini:'07:00',fim:'12:20'},{tipo:'Academia / esporte',desc:'musculação',dias:['Ter','Qui'],ini:'17:30',fim:'18:30'},{tipo:'Cursinho',desc:'aula online ao vivo',dias:['Qua'],ini:'19:00',fim:'21:00'},{tipo:'Psicólogo / terapia',desc:'',dias:['Sex'],ini:'15:00',fim:'16:00'}],fixos_ok:['Sim, está tudo aí'],
+ aulas_mat:'Ao vivo',horas_semana:'3 h',horas_sab:'3 h',horas_dom:'2 h',horas_possiveis:'4 h 30',disp:['Segunda|Tarde','Segunda|Noite','Terça|Tarde','Terça|Noite','Quarta|Tarde','Quinta|Tarde','Quinta|Noite','Sexta|Tarde','Sexta|Noite','Sábado|Manhã','Sábado|Tarde','Domingo|Manhã'],melhor_periodo:['Tarde','Noite'],
+ local_principal:'No meu quarto',local:['Biblioteca'],lugar_fixo:'Mais ou menos',anki:'Sim, de vez em quando',anki_min:'15 a 30 min',anki_baralho:'Faço os meus',revisao:['Resumos','Caderno de erros'],questoes_semana:'100 a 200',simulados:'Às vezes',
+ nivel:{'Matemática':4,'Física':3,'Química':3,'Biologia':2,'Língua Portuguesa':2,'Literatura':3,'Língua estrangeira':1,'História':2,'Geografia':2,'Filosofia':3,'Sociologia':2,'Redação':3},redacao_freq:'A cada 15 dias',obstaculos:['Celular e redes sociais','Cansaço']};
+async function modoExemplo(on){EXMODO=on;ALVO=on?EXEMPLO:EMAIL;
+  ['tabGeral','tabResp','tabExemplo'].forEach(t=>$(t).hidden=on);
+  $('tabForm').textContent=on?'Meu perfil de estudos':'Ver formulário';
+  $('exBar').hidden=!on;
+  if(on){const {data:ex}=await SB.from('checkup').select('email').eq('email',EXEMPLO).maybeSingle();$('tabCrono').hidden=!ex;telaForm();}
+  else{$('tabCrono').hidden=true;telaGeral();}}
+async function exemploAcoes(){
+  if(!EXMODO)return;const box=document.createElement('div');box.className='exacoes';
+  box.innerHTML='<b>Aluno exemplo:</b> <button type="button" class="btn" data-x="fill">Preencher com respostas de exemplo</button><button type="button" class="btn" data-x="zero">Começar do zero</button>';
+  $('intro').after(box);
+  box.querySelector('[data-x=fill]').onclick=()=>{preencher(EXEMPLO_RESP);visiveis();};
+  box.querySelector('[data-x=zero]').onclick=async()=>{if(!confirm('Apagar o perfil e o cronograma do aluno exemplo para começar do zero?'))return;
+    await SB.from('cronograma').delete().eq('email',EXEMPLO);await SB.from('checkup').delete().eq('email',EXEMPLO);$('tabCrono').hidden=true;telaForm();};}
 async function telaCrono(){abas('tabCrono');
-  const {data}=await SB.from('checkup').select('respostas').eq('email',EMAIL).maybeSingle();
+  const {data}=await SB.from('checkup').select('respostas').eq('email',ALVO).maybeSingle();
   if(!data){$('app').innerHTML='<div class="aviso"><h2>Preencha o seu perfil de estudos primeiro</h2><p>O seu pré-cronograma é montado a partir das suas respostas.</p></div>';return;}
   $('app').innerHTML=`<div class="intro"><h2>Meu pré-cronograma</h2><p>Montado a partir do seu perfil de estudos. Você pode arrastar, alterar, excluir e adicionar blocos: as mudanças ficam salvas, e o Prof. Jazz vê e ajusta com você no encontro.</p></div><div class="sec" id="cronoBox"></div>`;
-  montarCrono($('cronoBox'),data.respostas,EMAIL,'aluno');}
+  montarCrono($('cronoBox'),data.respostas,ALVO,'aluno');}
 
 /* ===== Login (mesma conta do Banco de Questões) ===== */
 let novo=false;
@@ -681,7 +708,8 @@ async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!se
   $('gate').hidden=true;
   if(!ok){$('app').innerHTML=`<div class="aviso"><h2>Área exclusiva da Assessoria ENEM</h2><p>O seu e-mail tem acesso ao Banco de Questões, mas não está cadastrado na Assessoria. Se você é aluno da Assessoria, fale com o Prof. Jazz.</p><a href="../bancodequestoes/">Ir para o Banco de Questões</a></div>`;return;}
   $('tabForm').hidden=false;$('tabResp').hidden=!IS_ADMIN;$('tabGeral').hidden=!IS_ADMIN;
-  $('tabForm').onclick=telaForm;$('tabResp').onclick=telaResp;$('tabGeral').onclick=telaGeral;$('tabCrono').onclick=telaCrono;
+  ALVO=EMAIL;$('tabForm').onclick=telaForm;$('tabResp').onclick=telaResp;$('tabGeral').onclick=telaGeral;$('tabCrono').onclick=telaCrono;
+  $('tabExemplo').hidden=!IS_ADMIN;$('tabExemplo').onclick=()=>modoExemplo(true);$('exSair').onclick=()=>modoExemplo(false);
   if(!IS_ADMIN){const {data:ex}=await SB.from('checkup').select('email').eq('email',EMAIL).maybeSingle();$('tabCrono').hidden=!ex;}
   if(IS_ADMIN){$('tabForm').textContent='Ver formulário';telaGeral();}else telaForm();}
 $('sair').onclick=async()=>{await SB.auth.signOut();location.reload();};
