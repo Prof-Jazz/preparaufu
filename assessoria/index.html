@@ -165,6 +165,8 @@ input[type=time]{max-width:160px}input[type=number]{max-width:160px}
 #exBar[hidden]{display:none}
 #exBar button{margin-left:10px;font:700 13px var(--body);background:#16304F;color:#fff;border:0;border-radius:999px;padding:5px 12px;cursor:pointer}
 .exacoes{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:rgba(221,221,36,.12);border:1px dashed var(--amarelo);border-radius:12px;padding:10px 14px;font-size:14px}
+.hdia{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.hdia label{display:flex;flex-direction:column;gap:4px;font-size:14px;font-weight:600}
 /* login */
 #gate{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px}
 #gate[hidden]{display:none}
@@ -268,10 +270,7 @@ const S=[
  ]},
  {t:'Seu tempo e lugar de estudo',f:[
   {k:'aulas_mat',l:'Como você vai assistir às aulas do Curso de Matemática?',type:'radio',opts:['Ao vivo','Gravadas','Parte ao vivo, parte gravadas','Ainda não sei'],req:1},
-  {k:'horas_semana',l:'Quantas horas por dia você estuda hoje, fora da escola/cursinho? (segunda a sexta)',type:'select',opts:HORAS,req:1},
-  {k:'horas_sab',l:'E no sábado?',type:'select',opts:['Não estudo',...HORAS],req:1},
-  {k:'horas_dom',l:'E no domingo?',type:'select',opts:['Não estudo',...HORAS],req:1},
-  {k:'horas_possiveis',l:'Quantas horas por dia você VAI estudar a partir de agora, seguindo o cronograma? (segunda a sexta)',h:'É com esse número que o seu pré-cronograma é montado.',type:'select',opts:HORAS,req:1},
+  {k:'horas_dia',l:'Quantas horas você estuda em cada dia da semana?',type:'horasdia',req:1,h:'Conte só o tempo de estudo seu, fora das aulas da escola e do cursinho. É com essas horas que o seu pré-cronograma é montado.'},
   {k:'disp',l:'Marque os períodos em que você está livre para estudar',type:'grid',h:'Marque só o que dá para cumprir toda semana.'},
   {k:'melhor_periodo',l:'Em que período você rende mais?',type:'checks',opts:['Manhã','Tarde','Noite','Madrugada'],req:1},
   {k:'local_principal',l:'Onde você estuda na maior parte do tempo?',type:'radio',opts:LOCAIS,req:1},
@@ -302,6 +301,7 @@ function campo(f){
   else if(f.type==='select')inner=`<select id="${id}" name="${f.k}"><option value="">Escolha…</option>${f.opts.map(o=>`<option>${esc(o)}</option>`).join('')}</select>`;
   else if(f.type==='radio'||f.type==='checks')inner=`<div class="opts" role="${f.type==='radio'?'radiogroup':'group'}">${f.opts.map(o=>`<label><input type="${f.type==='radio'?'radio':'checkbox'}" name="${f.k}" value="${esc(o)}"> ${esc(o)}</label>`).join('')}</div>`;
   else if(f.type==='grid')inner=`<div style="overflow-x:auto"><table class="grid"><tr><th></th>${TURNOS.map(t=>`<th>${t}</th>`).join('')}</tr>${DIAS.map(d=>`<tr><td>${d}</td>${TURNOS.map(t=>`<td><input type="checkbox" name="disp" value="${d}|${t}" aria-label="${d} — ${t}"></td>`).join('')}</tr>`).join('')}</table></div>`;
+  else if(f.type==='horasdia')inner=`<div class="hdia">${DS.map((d,i)=>`<label><span>${DIAS[i]}</span><select name="hd_${d}"><option value="">Escolha…</option><option>Não estudo</option>${HORAS.map(o=>`<option>${o}</option>`).join('')}</select></label>`).join('')}</div>`;
   else if(f.type==='fixos')inner=`<div class="fx" id="fx"></div><button type="button" class="btn" id="fxAdd" style="align-self:flex-start">+ Adicionar compromisso</button>`;
   else if(f.type==='scale')inner=`<div class="scale"><span></span>${DIFN.map(n=>`<span class="hd">${n}</span>`).join('')}${AREAS.map((a,i)=>`<span>${esc(a)}</span>${[1,2,3,4].map(n=>`<label><input type="radio" name="nivel_${i}" value="${n}" aria-label="${esc(a)}: ${DIFN[n-1]}"></label>`).join('')}`).join('')}</div>`;
   const lab=['radio','checks','grid','scale'].includes(f.type)?`<div class="q">${esc(f.l)}${rq}</div>`:`<label class="q" for="${id}">${esc(f.l)}${rq}</label>`;
@@ -323,6 +323,7 @@ function ler(){const fm=$('ck'),r={};
     if(f.type==='checks')r[f.k]=[...fm.querySelectorAll(`input[name="${f.k}"]:checked`)].map(i=>i.value);
     else if(f.type==='radio'){const c=fm.querySelector(`input[name="${f.k}"]:checked`);r[f.k]=c?c.value:'';}
     else if(f.type==='grid')r.disp=[...fm.querySelectorAll('input[name="disp"]:checked')].map(i=>i.value);
+    else if(f.type==='horasdia'){r.horas_dia={};DS.forEach(d=>{const v=fm.querySelector(`[name="hd_${d}"]`).value;if(v)r.horas_dia[d]=v;});}
     else if(f.type==='fixos')r.fixos=fxLer();
     else if(f.type==='scale'){r.nivel={};AREAS.forEach((a,i)=>{const c=fm.querySelector(`input[name="nivel_${i}"]:checked`);r.nivel[a]=c?+c.value:null;});}
     else r[f.k]=(fm.querySelector(`[name="${f.k}"]`).value||'').trim();});
@@ -331,12 +332,13 @@ function preencher(r){const fm=$('ck');
   CAMPOS.forEach(f=>{const v=r[f.k];if(v==null)return;
     if(f.type==='checks'||f.type==='grid')fm.querySelectorAll(`input[name="${f.k}"]`).forEach(i=>i.checked=(v||[]).includes(i.value));
     else if(f.type==='radio')fm.querySelectorAll(`input[name="${f.k}"]`).forEach(i=>i.checked=i.value===v);
+    else if(f.type==='horasdia')DS.forEach(d=>{const e=fm.querySelector(`[name="hd_${d}"]`);if(e)e.value=(v||{})[d]||'';});
     else if(f.type==='fixos'){$('fx').innerHTML='';(v.length?v:[{}]).forEach(fxLinha);}
     else if(f.type==='scale')AREAS.forEach((a,i)=>fm.querySelectorAll(`input[name="nivel_${i}"]`).forEach(x=>x.checked=+x.value===(v||{})[a]));
     else fm.querySelector(`[name="${f.k}"]`).value=v;});}
 function visiveis(){const r=ler();CAMPOS.forEach(f=>{if(f.show){const el=document.querySelector(`.f[data-k="${f.k}"]`);el.hidden=!f.show(r);}});}
 function faltando(r){const L=[];CAMPOS.forEach(f=>{if(!f.req)return;if(f.show&&!f.show(r))return;
-  const v=r[f.k];const vazio=f.type==='scale'?AREAS.some(a=>!(v||{})[a]):Array.isArray(v)?!v.length:!v;if(vazio)L.push(f);});return L;}
+  const v=r[f.k];const vazio=f.type==='horasdia'?DS.some(d=>!(v||{})[d]):f.type==='scale'?AREAS.some(a=>!(v||{})[a]):Array.isArray(v)?!v.length:!v;if(vazio)L.push(f);});return L;}
 
 async function telaForm(){
   abas('tabForm');
@@ -363,6 +365,8 @@ async function telaForm(){
 }
 
 /* ===== Área do professor ===== */
+function horasDia(p){const o={};if(p.horas_dia&&Object.keys(p.horas_dia).length){DS.forEach(d=>o[d]=hnum(p.horas_dia[d]));return o;}
+  const sem=Math.max(hnum(p.horas_semana),hnum(p.horas_possiveis));DS.slice(0,5).forEach(d=>o[d]=sem);o['Sáb']=hnum(p.horas_sab);o['Dom']=hnum(p.horas_dom);return o;}
 const hnum=v=>{if(!v||v==='Não estudo')return 0;if(v==='Menos de 1 h')return .5;const m=v.match(/(\d+) h(?: (\d+))?/);return m?+m[1]+(m[2]?+m[2]/60:0):0;};
 const hfmt=h=>{const H=Math.floor(h),M=Math.round((h-H)*60);return M?`${H} h ${String(M).padStart(2,'0')}`:`${H} h`;};
 const tmin=t=>{if(!t)return null;const [h,m]=t.split(':').map(Number);return h*60+m;};
@@ -371,6 +375,7 @@ const COR={'Escola':'#3A8CCB','Cursinho':'#7B61FF','Trabalho / estágio':'#EB683
 function fmt(f,v){
   if(v==null||v===''||(Array.isArray(v)&&!v.length))return '';
   if(f.type==='grid'){return DIAS.map(d=>{const t=TURNOS.filter(t=>v.includes(d+'|'+t));return t.length?d+': '+t.join(', '):'';}).filter(Boolean).join('\n');}
+  if(f.type==='horasdia')return DS.map(d=>d+': '+((v||{})[d]||'—')).join(' · ');
   if(f.type==='fixos')return v.map(x=>`${x.tipo}${x.desc?' ('+x.desc+')':''}: ${x.dias.join(', ')} · ${x.ini||'?'}–${x.fim||'?'}`).join('\n');
   if(f.type==='scale')return AREAS.map(a=>a+': '+(v[a]?DIFN[v[a]-1]:'—')).join('\n');
   return Array.isArray(v)?v.join(', '):String(v);}
@@ -389,7 +394,7 @@ async function telaGeral(){abas('tabGeral');$('app').innerHTML='<p class="pend">
   try{await carregar();}catch(e){$('app').innerHTML='<p class="pend">Erro: '+esc(e.message)+'</p>';return;}
   const N=RESP.length,T=LIB.length;
   if(!N){$('app').innerHTML=`<div class="intro"><h2>Visão geral da turma</h2><p>Nenhum perfil de estudos enviado ainda (0 de ${T} alunos da Assessoria). Os gráficos aparecem aqui assim que os alunos responderem.</p></div>`;return;}
-  const med=k=>RESP.reduce((s,r)=>s+hnum(r.respostas[k]),0)/N;
+  const medD=ds=>RESP.reduce((s,r)=>{const h=horasDia(r.respostas);return s+ds.reduce((a,d)=>a+(h[d]||0),0)/ds.length;},0)/N;
   const mt=k=>{const v=RESP.map(r=>tmin(r.respostas[k])).filter(x=>x!=null);if(!v.length)return null;const ad=v.map(x=>k==='dorme'&&x<720?x+1440:x);return ad.reduce((a,b)=>a+b,0)/ad.length;};
   const sono=RESP.map(r=>{const a=tmin(r.respostas.acorda),d=tmin(r.respostas.dorme);return a!=null&&d!=null?((a-d+1440)%1440)/60:null;}).filter(x=>x!=null);
   const kpi=(v,l)=>`<div class="kp"><b>${v}</b><span>${l}</span></div>`;
@@ -398,7 +403,7 @@ async function telaGeral(){abas('tabGeral');$('app').innerHTML='<p class="pend">
   const heat=DIAS.map(d=>`<tr><td>${d.slice(0,3)}</td>${TURNOS.map(t=>{const n=RESP.filter(r=>(r.respostas.disp||[]).includes(d+'|'+t)).length,p=n/N;return `<td style="background:rgba(58,140,203,${(.08+p*.85).toFixed(2)})" title="${n} de ${N}">${Math.round(p*100)}%</td>`;}).join('')}</tr>`).join('');
   const D=k=>{const x=dist(k,N);return card(x.f.l.replace(/\s*\(.*?\)\s*/g,' ').trim(),x.html,x.base!==N?`base: ${x.base} aluno(s)`:'');};
   $('app').innerHTML=`<div class="intro"><h2>Visão geral da turma</h2><p>${N} de ${T} alunos da Assessoria enviaram o perfil de estudos${T>N?` · faltam ${T-N}`:''}. Percentuais sobre quem respondeu.</p></div>
-  <div class="kps">${kpi(hfmt(med('horas_semana')),'estudam hoje por dia (seg–sex)')}${kpi(hfmt(med('horas_possiveis')),'vão estudar por dia (meta)')}${kpi(hfmt(med('horas_sab')),'no sábado')}${kpi(hfmt(med('horas_dom')),'no domingo')}${kpi(mt('acorda')!=null?mfmt(mt('acorda')):'—','acordam, em média')}${kpi(mt('dorme')!=null?mfmt(mt('dorme')):'—','dormem, em média')}${kpi(sono.length?hfmt(sono.reduce((a,b)=>a+b,0)/sono.length):'—','de sono por noite')}</div>
+  <div class="kps">${kpi(hfmt(medD(DS.slice(0,5))),'estudam por dia (seg–sex)')}${kpi(hfmt(medD(['Sáb'])),'no sábado')}${kpi(hfmt(medD(['Dom'])),'no domingo')}${kpi(hfmt(medD(DS)*7),'por semana')}${kpi(mt('acorda')!=null?mfmt(mt('acorda')):'—','acordam, em média')}${kpi(mt('dorme')!=null?mfmt(mt('dorme')):'—','dormem, em média')}${kpi(sono.length?hfmt(sono.reduce((a,b)=>a+b,0)/sono.length):'—','de sono por noite')}</div>
   <div class="gg">
    ${D('cursinho')}${D('aulas_mat')}${D('local_principal')}${D('local')}${D('lugar_fixo')}${D('ufu_exp')}${D('ufu_vezes')}
    ${card('Dificuldade por matéria',nivel.map(([a,v,pc])=>`<div class="br"><span class="bl">${esc(a)}</span><span class="bt"><i style="width:${v/4*100}%;background:${v>=3?'var(--laranja)':v>=2.3?'var(--amarelo)':'var(--verde)'}"></i></span><b>${pc}%</b><small>${v.toFixed(1)}</small></div>`).join(''),'barra = dificuldade média (1 tranquila – 4 muito difícil) · % = acham difícil ou muito difícil')}
@@ -428,7 +433,7 @@ function agenda(p){
 function ficha(r){const p=r.respostas;
   const sono=(()=>{const a=tmin(p.acorda),d=tmin(p.dorme);return a!=null&&d!=null?hfmt(((a-d+1440)%1440)/60):'—';})();
   const t=(v,l)=>`<div class="kp"><b>${esc(v||'—')}</b><span>${esc(l)}</span></div>`;
-  return `<div class="kps">${t(p.horas_semana,'estuda hoje (seg–sex)')}${t(p.horas_possiveis,'vai estudar (meta)')}${t((p.horas_sab||'—')+' / '+(p.horas_dom||'—'),'sábado / domingo')}${t(sono,`de sono (${p.dorme||'?'} → ${p.acorda||'?'})`)}${t(p.cursinho,'cursinho')}${t(p.aulas_mat,'aulas de Matemática')}${t(p.local_principal,'onde estuda')}${t(p.anki,'Anki')}${t(p.ufu_exp+(p.ufu_vezes?' · '+p.ufu_vezes:''),'prova da UFU')}</div>
+  return `<div class="kps">${(()=>{const h=horasDia(p);return t(DS.map(d=>hfmt(h[d]||0).replace(' h','h')).join(' · '),'horas por dia: seg · ter · qua · qui · sex · sáb · dom')+t(hfmt(DS.reduce((a,d)=>a+(h[d]||0),0)),'de estudo por semana');})()}${t(sono,`de sono (${p.dorme||'?'} → ${p.acorda||'?'})`)}${t(p.cursinho,'cursinho')}${t(p.aulas_mat,'aulas de Matemática')}${t(p.local_principal,'onde estuda')}${t(p.anki,'Anki')}${t(p.ufu_exp+(p.ufu_vezes?' · '+p.ufu_vezes:''),'prova da UFU')}</div>
   <h4>Semana do aluno</h4>${agenda(p)}
   <h4>Pré-cronograma do aluno</h4><div class="cronoBox"></div>
   <h4>Dificuldade por matéria</h4>${AREAS.map(a=>{const v=(p.nivel||{})[a]||0;return `<div class="br"><span class="bl">${esc(a)}</span><span class="bt"><i style="width:${v*25}%;background:${v>=4?'var(--bad)':v===3?'var(--laranja)':v===2?'var(--amarelo)':'var(--verde)'}"></i></span><b style="grid-column:span 2;text-align:left;font-weight:600">${v?DIFN[v-1]:'—'}</b></div>`;}).join('')}
@@ -475,7 +480,7 @@ function gerar(p){
     if(d==='Seg'||d==='Qui')out.dias[d].push({tipo:'prepara',ini:1140,fim:1230,label:'PREPARA UFU — aula ao vivo com o Prof. Jazz'});});
   // tempo livre por dia (seg a sáb)
   const cap={},livre={};
-  const meta=Math.max(hnum(p.horas_possiveis),hnum(p.horas_semana),1);const hp=meta*60,hs=Math.max(hnum(p.horas_sab),meta)*60;
+  const HD=horasDia(p);
   DS.slice(0,6).forEach((d,i)=>{
     let L=usaMarc?TURNOS.map((t,j)=>marc.includes(DIAS[i]+'|'+t)?[[360,720,1080][j],[720,1080,1440][j]]:null).filter(Boolean):[[0,1440]];
     L=L.map(([a,b])=>[Math.max(a,iniDia),Math.min(b,fimDia)]).filter(([a,b])=>b>a);
@@ -484,7 +489,7 @@ function gerar(p){
     if(d==='Seg'||d==='Qui')L=subtrai(L,1125,1245);
     const almocoBloq=F.find(f=>f.ini<780&&f.fim>720);const alm=almocoBloq&&almocoBloq.fim<=870?[almocoBloq.fim+15,almocoBloq.fim+75]:[720,780];
     L=subtrai(L,alm[0],alm[1]);L=subtrai(L,1110,1140);
-    livre[d]=L.map(([a,b])=>({a,b,prev:(d==='Seg'||d==='Qui')&&a===1245?'EX':null}));cap[d]=d==='Sáb'?hs:hp;});
+    livre[d]=L.map(([a,b])=>({a,b,prev:(d==='Seg'||d==='Qui')&&a===1245?'EX':null}));cap[d]=Math.round((HD[d]||0)*60);});
   const dispTot=DS.slice(0,6).reduce((t,d)=>t+Math.min(cap[d],livre[d].reduce((a,iv)=>a+iv.b-iv.a,0)),0);
   const usado={};DS.forEach(d=>usado[d]=0);
   function achaIv(d,dur,grupo,relax){if(usado[d]+dur>cap[d])return null;let m=null;
@@ -539,8 +544,10 @@ function gerar(p){
   // domingo: só de manhã
   let dom=[[Math.max(W+30,420),720]];fixosDia('Dom').forEach(f=>dom=subtrai(dom,f.ini-15,f.fim+15));
   const dm=dom.sort((a,b)=>(b[1]-b[0])-(a[1]-a[0]))[0];
-  if(dm&&dm[1]-dm[0]>=90)out.dias['Dom'].push({tipo:'sim',ini:dm[0],fim:Math.min(dm[1],dm[0]+240),label:'Simulado · provas antigas da UFU · matéria atrasada'});
-  else out.avisos.push('Seus compromissos de domingo de manhã não deixam espaço para o simulado/provas antigas. Vamos ajustar isso no encontro com o mentor.');
+  const domMin=Math.round((HD['Dom']||0)*60);
+  if(domMin<60)out.avisos.push('Você não estuda no domingo. O domingo de manhã é o momento das provas antigas e dos simulados: converse sobre isso com o seu mentor.');
+  else if(dm&&dm[1]-dm[0]>=60)out.dias['Dom'].push({tipo:'sim',ini:dm[0],fim:Math.min(dm[1],dm[0]+Math.min(240,domMin)),label:'Simulado · provas antigas da UFU · matéria atrasada'});
+  else if(domMin>=60)out.avisos.push('Seus compromissos de domingo de manhã não deixam espaço para o simulado/provas antigas. Vamos ajustar isso no encontro com o mentor.');
   if(falta.length){const c={};falta.forEach(n=>c[n]=(c[n]||0)+1);const lst=Object.entries(c).map(([n,k])=>k>1?`${n} (${k}×)`:n).join(', ');
     const precisa=[...plano,red].reduce((t,x)=>t+x.v*x.dur,0)+revDur*6;
     out.avisos.unshift(precisa>dispTot*0.9?'A quantidade de horas que você estuda é insuficiente para a quantidade de conteúdos que você precisa estudar. Ficaram de fora desta semana: '+lst+'. Vamos rever o seu tempo de estudo no encontro com o mentor.'
@@ -677,7 +684,7 @@ function editar(st,b){const novo=!b;const ops=opcoesMateria(st.p);
 const EXEMPLO_RESP={nome:'Aluno Exemplo',whats:'(34) 99999-0000',cidade:'Uberlândia',situacao:'Estou no 3º ano do Ensino Médio',escola_turno:'Manhã',curso:'Medicina',universidades:['UFU','UFTM'],provas:['ENEM','Vestibular UFU'],lingua:'Inglês',ufu_exp:'Já fiz',ufu_vezes:'1 vez',enem_antes:'Sim',enem_media:'600 a 700',
  acorda:'06:00',dorme:'23:00',sono_fds:'Durmo e acordo mais tarde',trabalha:'Não',cursinho:'Sim, online',cursinho_nome:'Cursinho online',atividade:'Sim',atividade_qual:['Academia'],atividade_fixo:'Sim, dias e horários fixos',
  fixos:[{tipo:'Escola',desc:'Ensino médio',dias:['Seg','Ter','Qua','Qui','Sex'],ini:'07:00',fim:'12:20'},{tipo:'Academia / esporte',desc:'musculação',dias:['Ter','Qui'],ini:'17:30',fim:'18:30'},{tipo:'Cursinho',desc:'aula online ao vivo',dias:['Qua'],ini:'19:00',fim:'21:00'},{tipo:'Psicólogo / terapia',desc:'',dias:['Sex'],ini:'15:00',fim:'16:00'}],fixos_ok:['Sim, está tudo aí'],
- aulas_mat:'Ao vivo',horas_semana:'3 h',horas_sab:'3 h',horas_dom:'2 h',horas_possiveis:'4 h 30',disp:['Segunda|Tarde','Segunda|Noite','Terça|Tarde','Terça|Noite','Quarta|Tarde','Quinta|Tarde','Quinta|Noite','Sexta|Tarde','Sexta|Noite','Sábado|Manhã','Sábado|Tarde','Domingo|Manhã'],melhor_periodo:['Tarde','Noite'],
+ aulas_mat:'Ao vivo',horas_dia:{Seg:'4 h 30',Ter:'4 h 30',Qua:'4 h',Qui:'4 h 30',Sex:'4 h 30',Sáb:'4 h',Dom:'3 h'},disp:['Segunda|Tarde','Segunda|Noite','Terça|Tarde','Terça|Noite','Quarta|Tarde','Quinta|Tarde','Quinta|Noite','Sexta|Tarde','Sexta|Noite','Sábado|Manhã','Sábado|Tarde','Domingo|Manhã'],melhor_periodo:['Tarde','Noite'],
  local_principal:'No meu quarto',local:['Biblioteca'],lugar_fixo:'Mais ou menos',anki:'Sim, de vez em quando',anki_min:'15 a 30 min',anki_baralho:'Faço os meus',revisao:['Resumos','Caderno de erros'],questoes_semana:'100 a 200',simulados:'Às vezes',
  nivel:{'Matemática':4,'Física':3,'Química':3,'Biologia':2,'Língua Portuguesa':2,'Literatura':3,'Língua estrangeira':1,'História':2,'Geografia':2,'Filosofia':3,'Sociologia':2,'Redação':3},redacao_freq:'A cada 15 dias',obstaculos:['Celular e redes sociais','Cansaço']};
 async function modoExemplo(on){EXMODO=on;ALVO=on?EXEMPLO:EMAIL;
