@@ -120,7 +120,8 @@ input[type=time]{max-width:160px}input[type=number]{max-width:160px}
 .cgt{position:relative}.cgt span{position:absolute;right:5px;transform:translateY(-50%);font-size:11px;color:var(--muted)}
 .cgc{position:relative;border-radius:8px;background-color:var(--bg);background-image:linear-gradient(to bottom,var(--line) 1px,transparent 1px)}
 .cb{position:absolute;left:2px;right:2px;border-radius:7px;padding:3px 6px;overflow:hidden;font-size:12px;line-height:1.2;display:flex;flex-direction:column;box-shadow:0 1px 2px rgba(0,0,0,.2)}
-.cb b{font-weight:700;font-size:12.5px}.cb span{opacity:.92;font-size:11.5px}
+.cb b{font-weight:700;font-size:12.5px}
+.cb.curto{display:block;white-space:nowrap;text-overflow:ellipsis;padding:2px 6px;font-size:11.5px}.cb.curto b,.cb.curto span{font-size:11.5px}.cb span{opacity:.92;font-size:11.5px}
 .cb.fixo,.cli.fixo{background:repeating-linear-gradient(45deg,var(--soft) 0 6px,var(--card) 6px 12px);color:var(--muted);box-shadow:none;border:1px solid var(--line)}
 .cb.prepara,.cli.prepara{background:#16304F;color:#fff;border:2px solid var(--amarelo)}
 .cb.sim,.cli.sim{background:#212529;color:#fff;border:2px solid var(--amarelo)}
@@ -507,7 +508,7 @@ function renderCrono(p,quem){const c=gerar(p);
   const todos=DS.flatMap(d=>c.dias[d]);if(!todos.length)return '<p class="pend">Sem dados suficientes para montar o cronograma.</p>';
   const H0=Math.max(0,Math.floor(Math.min(...todos.map(b=>b.ini))/60)),H1=Math.min(24,Math.ceil(Math.max(...todos.map(b=>b.fim))/60));
   const px=46,top=m=>(m/60-H0)*px,alt=(H1-H0)*px;
-  const bl=b=>`<div class="cb ${b.tipo}" style="top:${top(b.ini)}px;height:${Math.max(top(b.fim)-top(b.ini)-2,18)}px;${corBloco(b)}" title="${esc(b.label)} · ${hm(b.ini)}–${hm(b.fim)}"><b>${esc(b.label)}</b><span>${hm(b.ini)}–${hm(b.fim)}</span></div>`;
+  const bl=b=>b.fim-b.ini<50?`<div class="cb ${b.tipo} curto" style="top:${top(b.ini)}px;height:${Math.max(top(b.fim)-top(b.ini)-2,18)}px;${corBloco(b)}" title="${esc(b.label)} · ${hm(b.ini)}–${hm(b.fim)}"><span>${hm(b.ini)}–${hm(b.fim)}</span> <b>${esc(b.label.split(' — ')[0])}</b></div>`:`<div class="cb ${b.tipo}" style="top:${top(b.ini)}px;height:${Math.max(top(b.fim)-top(b.ini)-2,18)}px;${corBloco(b)}" title="${esc(b.label)} · ${hm(b.ini)}–${hm(b.fim)}"><b>${esc(b.label)}</b><span>${hm(b.ini)}–${hm(b.fim)}</span></div>`;
   const grade=`<div class="cg" style="--n:${H1-H0}"><div></div>${DS.map(d=>`<div class="cgh">${DIAS[DS.indexOf(d)]}</div>`).join('')}
     <div class="cgt" style="height:${alt}px">${Array.from({length:H1-H0+1},(_,i)=>`<span style="top:${i*px}px">${String(H0+i).padStart(2,'0')}h</span>`).join('')}</div>
     ${DS.map(d=>`<div class="cgc" style="height:${alt}px;background-size:100% ${px}px">${c.dias[d].map(bl).join('')}</div>`).join('')}</div>`;
