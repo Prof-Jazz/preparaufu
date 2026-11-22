@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Check-up do Aluno · Assessoria ENEM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --azul:#3A8CCB; --amarelo:#DDDD24; --grafite:#222322; --laranja:#EB6834; --verde:#1BAF7A;
+  --bg:#F4F6FB; --card:#FFFFFF; --ink:#141A2E; --muted:#5C6380; --line:#DDE1EC; --soft:#ECEFF6; --head:#16304F;
+  --ok:#1A8A4C; --bad:#D33A2C; --shadow:0 1px 2px rgba(20,26,46,.05),0 6px 20px rgba(20,26,46,.06);
+  --display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif; --body:"Public Sans",system-ui,sans-serif;
+}
+:root[data-theme="dark"]{--bg:#0B1020;--card:#151C2E;--ink:#EEF0F7;--muted:#9AA1BD;--line:#262E46;--soft:#1E2740;--shadow:none;color-scheme:dark;}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:400 15.5px/1.5 var(--body)}
+header{background:var(--head);padding:14px 22px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;border-bottom:4px solid var(--amarelo);position:relative}
+.logos{display:flex;align-items:center;gap:16px}
+.logos img.j{height:46px}.logos img.p{height:34px}
+.logos .sep{width:1px;height:40px;background:#55595E}
+.ttl{color:#fff}
+.ttl h1{font:700 18px/1.2 var(--display);margin:0}
+.ttl p{margin:0;color:#BFC5CA;font-size:13.5px}
+.tabs{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.tabs a,.tabs button{font:600 14px var(--body);border:1px solid #4A4F55;background:transparent;color:#fff;padding:7px 14px;border-radius:999px;cursor:pointer;text-decoration:none}
+.tabs .on{background:var(--azul);border-color:var(--azul)}
+.theme{display:inline-flex!important;gap:2px;padding:3px!important;border:1px solid #3B5878!important;background:#0E2238!important}
+.theme span{width:28px;height:26px;display:grid;place-items:center;border-radius:999px;color:#9FB3CC;font-size:15px}
+:root:not([data-theme="dark"]) .theme .sun,:root[data-theme="dark"] .theme .moon{background:#fff;color:#16304F}
+@media (max-width:760px){
+  header{padding:12px 14px;gap:10px}
+  .logos{gap:10px}.logos img.j{height:32px}.logos img.p{height:24px}.logos .sep{height:28px}
+  .ttl{flex:1 1 100%}.ttl h1{font-size:17px}.ttl p{font-size:12.5px}
+  .tabs{margin-left:0;flex:1 1 100%}
+  .tabs a,.tabs button{padding:6px 11px;font-size:13px}
+  .tabs .theme{position:absolute;top:13px;right:12px}
+  html,body{overflow-x:clip}
+}
+main{max-width:860px;margin:0 auto;padding:22px 16px 60px;display:flex;flex-direction:column;gap:16px}
+.intro{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px;box-shadow:var(--shadow)}
+.intro h2{margin:0 0 6px;font:800 24px var(--display)}
+.intro p{margin:0;color:var(--muted)}
+.sec{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:16px}
+.sec h3{margin:0;font:700 18px var(--display);display:flex;align-items:center;gap:10px}
+.sec h3 .n{width:28px;height:28px;border-radius:50%;background:var(--azul);color:#fff;display:grid;place-items:center;font-size:14px;flex:none}
+.f{display:flex;flex-direction:column;gap:6px}
+.f[hidden]{display:none}
+.f>label.q,.f>.q{font-weight:600;font-size:15px}
+.f .h{color:var(--muted);font-size:13.5px;margin-top:-3px}
+.req{color:var(--laranja)}
+input[type=text],input[type=tel],input[type=number],input[type=time],input[type=email],input[type=password],select,textarea{font:500 15px var(--body);padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink);width:100%}
+textarea{min-height:76px;resize:vertical}
+input[type=time]{max-width:160px}input[type=number]{max-width:160px}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opts label{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:6px 13px;cursor:pointer;font-size:14.5px}
+.opts label:has(input:checked){border-color:var(--azul);background:rgba(58,140,203,.14)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:560px){.row2{grid-template-columns:1fr}}
+.grid{border-collapse:collapse;width:100%;font-size:14px}
+.grid th,.grid td{border:1px solid var(--line);padding:6px 4px;text-align:center}
+.grid th{background:var(--soft);font-weight:600}
+.grid td:first-child{text-align:left;padding-left:8px;font-weight:600;white-space:nowrap}
+.grid input{width:20px;height:20px;cursor:pointer;accent-color:var(--azul)}
+.scale{display:grid;grid-template-columns:minmax(140px,1fr) repeat(5,44px);gap:6px;align-items:center;font-size:14.5px}
+.scale .hd{color:var(--muted);font-size:12.5px;text-align:center}
+.scale label{display:grid;place-items:center}
+.scale input{width:20px;height:20px;accent-color:var(--azul)}
+@media (max-width:480px){.scale{grid-template-columns:minmax(110px,1fr) repeat(5,34px)}}
+.btn{font:600 15px var(--body);border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:10px 16px;border-radius:9px;cursor:pointer}
+.btn.pri{background:var(--azul);border-color:var(--azul);color:#fff}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.send{position:sticky;bottom:0;background:linear-gradient(transparent,var(--bg) 30%);padding:18px 0 8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+#msg{font-size:14.5px}#msg.ok{color:var(--ok)}#msg.err{color:var(--bad)}
+.done{border-left:5px solid var(--verde)}
+.aviso{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px;text-align:center}
+.aviso h2{font:800 22px var(--display);margin:0 0 8px}.aviso p{color:var(--muted);margin:0 0 16px}
+.aviso a{color:#fff;background:var(--azul);padding:10px 18px;border-radius:9px;text-decoration:none;font-weight:600}
+/* login */
+#gate{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px}
+#gate[hidden]{display:none}
+#gate .box{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);max-width:400px;width:100%;overflow:hidden}
+#gate .top{background:var(--head);border-bottom:4px solid var(--amarelo);padding:18px;display:flex;gap:14px;align-items:center;justify-content:center}
+#gate .top img{height:38px}
+#gate form{padding:20px 22px 22px;display:flex;flex-direction:column;gap:12px}
+#gate h2{margin:0;font:800 22px var(--display)}
+#gate p{margin:0;color:var(--muted);font-size:14px}
+#gate .lnk{background:none;border:0;color:var(--azul);font:600 14px var(--body);cursor:pointer;padding:2px}
+#gMsg{min-height:20px;font-size:14px;color:var(--bad)}#gMsg.ok{color:var(--ok)}
+/* painel do professor */
+.adm-top{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.adm-top input{flex:1;min-width:200px}
+.alu{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.alu summary{padding:13px 16px;cursor:pointer;display:flex;gap:10px;align-items:center;flex-wrap:wrap;list-style:none}
+.alu summary::-webkit-details-marker{display:none}
+.alu summary b{font-size:16px}
+.alu summary .m{color:var(--muted);font-size:13.5px}
+.alu summary .d{margin-left:auto;color:var(--muted);font-size:13px}
+.alu .corpo{padding:4px 16px 16px;border-top:1px solid var(--line)}
+.alu h4{margin:14px 0 6px;font:700 15px var(--display);color:var(--azul)}
+.alu dl{display:grid;grid-template-columns:minmax(160px,34%) 1fr;gap:4px 14px;margin:0;font-size:14.5px}
+.alu dt{color:var(--muted)}.alu dd{margin:0;white-space:pre-wrap}
+@media (max-width:560px){.alu dl{grid-template-columns:1fr}.alu dd{margin-bottom:6px}}
+.pend{font-size:14px;color:var(--muted)}
+.tag{font-size:12px;padding:2px 9px;border-radius:99px;background:var(--soft);color:var(--muted)}
+</style>
+</head>
+<body>
+<div id="gate"><div class="box"><div class="top"><img src="../bancodequestoes/logo/jazz_claro.png" alt="Jazz, Professor de Matemática"></div>
+<form id="gForm"><h2 id="gTit">Assessoria ENEM</h2><p id="gTxt">Entre com o mesmo e-mail e senha do Banco de Questões.</p>
+<input id="gEmail" type="email" placeholder="seu e-mail" autocomplete="email" required>
+<input id="gPass" type="password" placeholder="senha (mínimo 6 caracteres)" autocomplete="current-password" minlength="6" required>
+<input id="gPass2" type="password" placeholder="repita a senha" autocomplete="new-password" minlength="6" hidden>
+<button class="btn pri" id="gBtn" type="submit">Entrar</button>
+<div id="gMsg" role="status"></div>
+<button class="lnk" id="gMode" type="button">Primeiro acesso? Crie sua senha</button></form></div></div>
+
+<header>
+  <div class="logos"><img class="j" src="../bancodequestoes/logo/jazz_claro.png" alt="Jazz, Professor de Matemática"><span class="sep"></span><img class="p" src="../bancodequestoes/logo/prepara_transp.png" alt="Prepara UFU"></div>
+  <div class="ttl"><h1>Assessoria ENEM</h1><p>Check-up do aluno para montar o seu cronograma de estudos</p></div>
+  <nav class="tabs"><button class="theme" id="theme" aria-label="Alternar modo diurno e noturno" title="Modo diurno / noturno"><span class="sun">☀</span><span class="moon">☾</span></button><a href="../bancodequestoes/">Banco de Questões</a><button class="on" id="tabForm" hidden>Meu check-up</button><button id="tabResp" hidden>Respostas dos alunos</button><button id="sair">Sair</button></nav>
+</header>
+<main id="app"></main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+(function(){let m=null;try{m=localStorage.getItem('bqufu-tema');}catch(e){}
+  const set=t=>{document.documentElement.setAttribute('data-theme',t);try{localStorage.setItem('bqufu-tema',t);}catch(e){}};
+  set(m||'dark');$('theme').onclick=()=>set(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');})();
+
+const SB=supabase.createClient('https://ygdlbhoqyqjsqoyyfizk.supabase.co','sb_publishable_jB2I59Ruw4MaMT63KLWtSA_O-DMf63b');
+const ADMIN='jesrrael.santos@gmail.com';
+let EMAIL='',IS_ADMIN=false;
+
+/* ===== Questionário ===== */
+const SIMNAO=['Sim','Não'];
+const DIAS=['Segunda','Terça','Quarta','Quinta','Sexta','Sábado','Domingo'],TURNOS=['Manhã','Tarde','Noite'];
+const AREAS=['Matemática','Linguagens (Português, Literatura, Inglês/Espanhol)','Ciências Humanas','Ciências da Natureza','Redação'];
+const HORAS=['Menos de 1 h','1 h','1 h 30','2 h','2 h 30','3 h','3 h 30','4 h','4 h 30','5 h','6 h','7 h','8 h ou mais'];
+const S=[
+ {t:'Quem é você',f:[
+  {k:'nome',l:'Nome completo',type:'text',req:1},
+  {k:'whats',l:'WhatsApp (com DDD)',type:'tel',ph:'(34) 9 9999-9999',req:1},
+  {k:'cidade',l:'Cidade onde mora',type:'text'},
+  {k:'situacao',l:'Situação escolar',type:'radio',opts:['Estou no 2º ano do Ensino Médio','Estou no 3º ano do Ensino Médio','Já concluí o Ensino Médio'],req:1},
+  {k:'escola_turno',l:'Em que turno você vai à escola?',type:'radio',opts:['Manhã','Tarde','Integral','Noite','Não frequento escola'],req:1},
+  {k:'escola_horario',l:'Horário da escola (entrada e saída)',type:'text',ph:'ex.: 7h às 12h20; terças até 13h10',show:r=>r.escola_turno&&r.escola_turno!=='Não frequento escola'},
+ ]},
+ {t:'Seu objetivo',f:[
+  {k:'curso',l:'Curso que você quer fazer',type:'text',req:1},
+  {k:'universidades',l:'Universidades em que pretende entrar',type:'text',ph:'ex.: UFU, UFMG, UFTM'},
+  {k:'provas',l:'Quais provas você vai fazer?',type:'checks',opts:['ENEM','Vestibular UFU','Outros vestibulares'],req:1},
+  {k:'provas_outras',l:'Quais outros vestibulares?',type:'text',show:r=>(r.provas||[]).includes('Outros vestibulares')},
+  {k:'enem_antes',l:'Já fez o ENEM antes?',type:'radio',opts:SIMNAO},
+  {k:'enem_notas',l:'Se lembrar, quais foram suas notas? (ano e notas por área e redação)',type:'textarea',show:r=>r.enem_antes==='Sim'},
+ ]},
+ {t:'Sua rotina',f:[
+  {k:'acorda',l:'Que horas você costuma acordar? (dias de semana)',type:'time',req:1},
+  {k:'dorme',l:'Que horas você costuma dormir? (dias de semana)',type:'time',req:1},
+  {k:'sono_fds',l:'No fim de semana o seu horário de sono muda? Como?',type:'text',ph:'ex.: acordo às 9h e durmo à 1h'},
+  {k:'trabalha',l:'Você trabalha ou faz estágio?',type:'radio',opts:SIMNAO,req:1},
+  {k:'trabalho_horario',l:'Dias e horários do trabalho/estágio',type:'textarea',show:r=>r.trabalha==='Sim'},
+  {k:'cursinho',l:'Você faz cursinho presencial?',type:'radio',opts:SIMNAO,req:1},
+  {k:'cursinho_horario',l:'Qual cursinho, em que dias e horários?',type:'textarea',show:r=>r.cursinho==='Sim'},
+  {k:'atividade',l:'Você pratica atividade física?',type:'radio',opts:SIMNAO,req:1},
+  {k:'atividade_qual',l:'Qual atividade?',type:'text',ph:'ex.: academia, futebol, natação',show:r=>r.atividade==='Sim'},
+  {k:'atividade_fixo',l:'Tem horário fixo?',type:'radio',opts:['Sim, dias e horários fixos','Não, faço quando dá'],show:r=>r.atividade==='Sim'},
+  {k:'atividade_horario',l:'Em que dias e horários?',type:'textarea',ph:'ex.: seg, qua e sex das 18h às 19h',show:r=>r.atividade==='Sim'&&r.atividade_fixo==='Sim, dias e horários fixos'},
+  {k:'outras',l:'Outros compromissos fixos na semana',type:'textarea',h:'Curso de inglês, música, igreja, aula particular, transporte demorado… Coloque dias e horários.'},
+ ]},
+ {t:'Seu tempo de estudo',f:[
+  {k:'horas_semana',l:'Quantas horas por dia você estuda hoje, fora da escola/cursinho? (segunda a sexta)',type:'select',opts:HORAS,req:1},
+  {k:'horas_sab',l:'E no sábado?',type:'select',opts:['Não estudo',...HORAS],req:1},
+  {k:'horas_dom',l:'E no domingo?',type:'select',opts:['Não estudo',...HORAS],req:1},
+  {k:'horas_possiveis',l:'Quantas horas por dia você consegue estudar de verdade, se se organizar? (segunda a sexta)',type:'select',opts:HORAS,req:1},
+  {k:'disp',l:'Marque os períodos em que você está livre para estudar',type:'grid',h:'Marque só o que dá para cumprir toda semana.'},
+  {k:'melhor_periodo',l:'Em que período você rende mais?',type:'checks',opts:['Manhã','Tarde','Noite','Madrugada']},
+  {k:'local',l:'Onde você estuda?',type:'checks',opts:['Em casa','Na escola','Na biblioteca','No cursinho','Outro lugar']},
+ ]},
+ {t:'Como você revisa',f:[
+  {k:'anki',l:'Você usa o Anki?',type:'radio',opts:['Sim, todos os dias','Sim, de vez em quando','Já usei, mas parei','Nunca usei'],req:1},
+  {k:'anki_min',l:'Quanto tempo por dia você passa no Anki?',type:'select',opts:['Até 15 min','15 a 30 min','30 min a 1 h','Mais de 1 h'],show:r=>(r.anki||'').startsWith('Sim')},
+  {k:'anki_baralho',l:'Que baralhos você usa?',type:'radio',opts:['Faço os meus','Uso baralhos prontos','Os dois'],show:r=>(r.anki||'').startsWith('Sim')},
+  {k:'revisao',l:'O que mais você usa para revisar?',type:'checks',opts:['Resumos','Mapas mentais','Flashcards de papel','Refazer questões','Caderno de erros','Videoaulas','Não tenho método de revisão']},
+  {k:'questoes_semana',l:'Quantas questões você resolve por semana, em média?',type:'select',opts:['Menos de 50','50 a 100','100 a 200','200 a 400','Mais de 400']},
+  {k:'simulados',l:'Faz simulados completos?',type:'radio',opts:['Sim, com frequência','Às vezes','Nunca fiz']},
+ ]},
+ {t:'Como você se avalia',f:[
+  {k:'nivel',l:'De 1 a 5, como está o seu nível em cada área?',type:'scale',h:'1 = muito fraco · 5 = muito bom',req:1},
+  {k:'dificuldades',l:'Quais matérias ou conteúdos você mais tem dificuldade?',type:'textarea',req:1},
+  {k:'redacao_freq',l:'Com que frequência você escreve redação?',type:'radio',opts:['Toda semana','A cada 15 dias','Raramente','Nunca']},
+  {k:'obstaculos',l:'O que mais atrapalha os seus estudos hoje?',type:'checks',opts:['Falta de tempo','Celular e redes sociais','Cansaço','Falta de organização','Ansiedade','Desânimo','Não sei por onde começar','Outro']},
+  {k:'obs',l:'Quer contar mais alguma coisa sobre a sua rotina ou sobre você?',type:'textarea'},
+ ]},
+];
+
+function campo(f){
+  const id='q_'+f.k,rq=f.req?' <span class="req">*</span>':'',h=f.h?`<div class="h">${esc(f.h)}</div>`:'';
+  let inner='';
+  if(['text','tel','time','number'].includes(f.type))inner=`<input id="${id}" name="${f.k}" type="${f.type}" placeholder="${esc(f.ph||'')}">`;
+  else if(f.type==='textarea')inner=`<textarea id="${id}" name="${f.k}" placeholder="${esc(f.ph||'')}"></textarea>`;
+  else if(f.type==='select')inner=`<select id="${id}" name="${f.k}"><option value="">Escolha…</option>${f.opts.map(o=>`<option>${esc(o)}</option>`).join('')}</select>`;
+  else if(f.type==='radio'||f.type==='checks')inner=`<div class="opts" role="${f.type==='radio'?'radiogroup':'group'}">${f.opts.map(o=>`<label><input type="${f.type==='radio'?'radio':'checkbox'}" name="${f.k}" value="${esc(o)}"> ${esc(o)}</label>`).join('')}</div>`;
+  else if(f.type==='grid')inner=`<div style="overflow-x:auto"><table class="grid"><tr><th></th>${TURNOS.map(t=>`<th>${t}</th>`).join('')}</tr>${DIAS.map(d=>`<tr><td>${d}</td>${TURNOS.map(t=>`<td><input type="checkbox" name="disp" value="${d}|${t}" aria-label="${d} — ${t}"></td>`).join('')}</tr>`).join('')}</table></div>`;
+  else if(f.type==='scale')inner=`<div class="scale"><span></span>${[1,2,3,4,5].map(n=>`<span class="hd">${n}</span>`).join('')}${AREAS.map((a,i)=>`<span>${esc(a)}</span>${[1,2,3,4,5].map(n=>`<label><input type="radio" name="nivel_${i}" value="${n}" aria-label="${esc(a)}: ${n}"></label>`).join('')}`).join('')}</div>`;
+  const lab=['radio','checks','grid','scale'].includes(f.type)?`<div class="q">${esc(f.l)}${rq}</div>`:`<label class="q" for="${id}">${esc(f.l)}${rq}</label>`;
+  return `<div class="f" data-k="${f.k}">${lab}${h}${inner}</div>`;
+}
+const CAMPOS=S.flatMap(s=>s.f);
+function ler(){const fm=$('ck'),r={};
+  CAMPOS.forEach(f=>{
+    if(f.type==='checks')r[f.k]=[...fm.querySelectorAll(`input[name="${f.k}"]:checked`)].map(i=>i.value);
+    else if(f.type==='radio'){const c=fm.querySelector(`input[name="${f.k}"]:checked`);r[f.k]=c?c.value:'';}
+    else if(f.type==='grid')r.disp=[...fm.querySelectorAll('input[name="disp"]:checked')].map(i=>i.value);
+    else if(f.type==='scale'){r.nivel={};AREAS.forEach((a,i)=>{const c=fm.querySelector(`input[name="nivel_${i}"]:checked`);r.nivel[a]=c?+c.value:null;});}
+    else r[f.k]=(fm.querySelector(`[name="${f.k}"]`).value||'').trim();});
+  return r;}
+function preencher(r){const fm=$('ck');
+  CAMPOS.forEach(f=>{const v=r[f.k];if(v==null)return;
+    if(f.type==='checks'||f.type==='grid')fm.querySelectorAll(`input[name="${f.k}"]`).forEach(i=>i.checked=(v||[]).includes(i.value));
+    else if(f.type==='radio')fm.querySelectorAll(`input[name="${f.k}"]`).forEach(i=>i.checked=i.value===v);
+    else if(f.type==='scale')AREAS.forEach((a,i)=>fm.querySelectorAll(`input[name="nivel_${i}"]`).forEach(x=>x.checked=+x.value===(v||{})[a]));
+    else fm.querySelector(`[name="${f.k}"]`).value=v;});}
+function visiveis(){const r=ler();CAMPOS.forEach(f=>{if(f.show){const el=document.querySelector(`.f[data-k="${f.k}"]`);el.hidden=!f.show(r);}});}
+function faltando(r){const L=[];CAMPOS.forEach(f=>{if(!f.req)return;if(f.show&&!f.show(r))return;
+  const v=r[f.k];const vazio=f.type==='scale'?AREAS.some(a=>!(v||{})[a]):Array.isArray(v)?!v.length:!v;if(vazio)L.push(f);});return L;}
+
+async function telaForm(){
+  $('tabForm').classList.add('on');$('tabResp').classList.remove('on');
+  $('app').innerHTML=`<div class="intro" id="intro"><h2>Check-up do aluno</h2><p>Responda com sinceridade: com essas respostas o Prof. Jazz monta o seu cronograma de estudos e a sua revisão. Leva uns 10 minutos. Você pode voltar aqui e alterar depois.</p></div>
+  <form id="ck" novalidate>${S.map((s,i)=>`<section class="sec"><h3><span class="n">${i+1}</span>${esc(s.t)}</h3>${s.f.map(campo).join('')}</section>`).join('<div style="height:16px"></div>')}
+  <div class="send"><button class="btn pri" id="enviar" type="submit">Enviar check-up</button><span id="msg" role="status"></span></div></form>`;
+  const fm=$('ck');fm.addEventListener('input',visiveis);fm.addEventListener('change',visiveis);
+  const {data}=await SB.from('checkup').select('respostas,atualizado_em').eq('email',EMAIL).maybeSingle();
+  if(data){preencher(data.respostas);$('intro').classList.add('done');$('intro').insertAdjacentHTML('beforeend',`<p style="margin-top:8px;color:var(--ok);font-weight:600">✓ Check-up enviado em ${new Date(data.atualizado_em).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}. Se algo mudou, altere e envie de novo.</p>`);$('enviar').textContent='Atualizar check-up';}
+  visiveis();
+  fm.onsubmit=async ev=>{ev.preventDefault();const r=ler(),f=faltando(r),m=$('msg');
+    if(f.length){m.className='err';m.textContent='Falta responder: '+f.map(x=>x.l.replace(/\?.*$/,'?')).slice(0,3).join(' · ')+(f.length>3?` (e mais ${f.length-3})`:'');
+      document.querySelector(`.f[data-k="${f[0].k}"]`).scrollIntoView({behavior:'smooth',block:'center'});return;}
+    $('enviar').disabled=true;m.className='';m.textContent='Enviando…';
+    const agora=new Date().toISOString();
+    const {error}=await SB.from('checkup').upsert({email:EMAIL,respostas:r,atualizado_em:agora},{onConflict:'email'});
+    $('enviar').disabled=false;
+    if(error){m.className='err';m.textContent='Não foi possível enviar: '+error.message;return;}
+    m.className='ok';m.textContent='✓ Check-up enviado! Obrigado. O Prof. Jazz vai usar essas respostas para montar o seu cronograma.';$('enviar').textContent='Atualizar check-up';};
+}
+
+/* ===== Respostas (professor) ===== */
+function fmt(f,v){
+  if(v==null||v===''||(Array.isArray(v)&&!v.length))return '';
+  if(f.type==='grid'){return DIAS.map(d=>{const t=TURNOS.filter(t=>v.includes(d+'|'+t));return t.length?d+': '+t.join(', '):'';}).filter(Boolean).join('\n');}
+  if(f.type==='scale')return AREAS.map(a=>a.replace(/ \(.*\)/,'')+': '+(v[a]??'—')).join('\n');
+  return Array.isArray(v)?v.join(', '):String(v);}
+let RESP=[],LIB=[];
+async function telaResp(){
+  $('tabResp').classList.add('on');$('tabForm').classList.remove('on');
+  $('app').innerHTML='<div class="intro"><h2>Respostas dos alunos</h2><p>Check-ups enviados pelos alunos marcados como Assessoria. Para liberar ou marcar um aluno, use o botão “Alunos” no Banco de Questões.</p></div><div class="adm-top"><input type="search" id="busca" placeholder="procurar aluno"><button class="btn" id="csv">Baixar planilha (CSV)</button></div><div id="lista" style="display:flex;flex-direction:column;gap:10px"><p class="pend">Carregando…</p></div>';
+  const [a,b]=await Promise.all([SB.from('checkup').select('*').order('atualizado_em',{ascending:false}),SB.rpc('admin_lista')]);
+  if(a.error){$('lista').innerHTML='<p class="pend">Erro: '+esc(a.error.message)+'</p>';return;}
+  RESP=a.data||[];LIB=(b.data||[]).filter(x=>x.assessoria&&x.email!==ADMIN);
+  $('busca').oninput=lista;$('csv').onclick=csv;lista();}
+function lista(){const q=($('busca').value||'').toLowerCase();
+  const pend=LIB.filter(x=>!RESP.some(r=>r.email===x.email));
+  const R=RESP.filter(r=>!q||(r.email+' '+(r.respostas.nome||'')).toLowerCase().includes(q));
+  $('lista').innerHTML=(R.map(r=>{const p=r.respostas;
+    return `<details class="alu"><summary><b>${esc(p.nome||r.email)}</b><span class="m">${esc(r.email)}${p.whats?' · '+esc(p.whats):''}</span><span class="d">enviado ${new Date(r.atualizado_em).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}</span></summary><div class="corpo">${
+      S.map(s=>{const it=s.f.map(f=>{const v=fmt(f,p[f.k]);return v?`<dt>${esc(f.l)}</dt><dd>${esc(v)}</dd>`:'';}).join('');return it?`<h4>${esc(s.t)}</h4><dl>${it}</dl>`:'';}).join('')}</div></details>`;}).join('')||'<p class="pend">Nenhum check-up enviado ainda.</p>')
+   +(pend.length&&!q?`<div class="intro"><p><b>Ainda não enviaram (${pend.length}):</b> ${pend.map(x=>esc(x.nome||x.email)).join(' · ')}</p></div>`:'');}
+function csv(){const cols=[['email','E-mail'],['atualizado_em','Enviado em'],...CAMPOS.map(f=>[f.k,f.l])];
+  const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
+  const linhas=[cols.map(c=>q(c[1])).join(';')].concat(RESP.map(r=>cols.map(([k])=>{if(k==='email')return q(r.email);if(k==='atualizado_em')return q(new Date(r.atualizado_em).toLocaleString('pt-BR'));const f=CAMPOS.find(x=>x.k===k);return q(fmt(f,r.respostas[k]).replace(/\n/g,' | '));}).join(';')));
+  const b=new Blob(['﻿'+linhas.join('\r\n')],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='checkup-assessoria.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);}
+
+/* ===== Login (mesma conta do Banco de Questões) ===== */
+let novo=false;
+const gm=(t,ok)=>{$('gMsg').textContent=t;$('gMsg').className=ok?'ok':'';};
+function modo(n){novo=n;$('gPass2').hidden=!n;$('gPass2').required=n;$('gBtn').textContent=n?'Criar senha e entrar':'Entrar';
+  $('gMode').textContent=n?'Já tenho senha — entrar':'Primeiro acesso? Crie sua senha';
+  $('gTxt').textContent=n?'Use o e-mail que o Prof. Jazz liberou e escolha uma senha.':'Entre com o mesmo e-mail e senha do Banco de Questões.';gm('');}
+$('gMode').onclick=()=>modo(!novo);
+$('gForm').onsubmit=async ev=>{ev.preventDefault();const email=$('gEmail').value.trim().toLowerCase(),password=$('gPass').value;$('gBtn').disabled=true;gm('Aguarde…',true);
+  try{
+    if(novo){if(password!==$('gPass2').value)throw new Error('As senhas não conferem.');
+      const {data:ok}=await SB.rpc('email_permitido',{e:email});if(!ok)throw new Error('Este e-mail ainda não foi liberado pelo Prof. Jazz.');
+      const {data,error}=await SB.auth.signUp({email,password});
+      if(error){if(/registered|exists/i.test(error.message))throw new Error('Esse e-mail já tem senha. Clique em “Já tenho senha — entrar”.');throw error;}
+      if(!data.session){const r=await SB.auth.signInWithPassword({email,password});if(r.error)throw r.error;}
+    }else{const {error}=await SB.auth.signInWithPassword({email,password});
+      if(error){if(/invalid/i.test(error.message))throw new Error('E-mail ou senha incorretos. É a mesma senha do Banco de Questões.');throw error;}}
+    gm('');await entrar();
+  }catch(e){gm(e.message||'Não foi possível entrar.');}finally{$('gBtn').disabled=false;}};
+async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!session){$('gate').hidden=false;return;}
+  EMAIL=(session.user.email||'').toLowerCase();IS_ADMIN=EMAIL===ADMIN;
+  const {data:ok}=await SB.rpc('is_assessoria');
+  $('gate').hidden=true;
+  if(!ok){$('app').innerHTML=`<div class="aviso"><h2>Área exclusiva da Assessoria ENEM</h2><p>O seu e-mail tem acesso ao Banco de Questões, mas não está cadastrado na Assessoria. Se você é aluno da Assessoria, fale com o Prof. Jazz.</p><a href="../bancodequestoes/">Ir para o Banco de Questões</a></div>`;return;}
+  $('tabForm').hidden=false;$('tabResp').hidden=!IS_ADMIN;
+  $('tabForm').onclick=telaForm;$('tabResp').onclick=telaResp;
+  if(IS_ADMIN)telaResp();else telaForm();}
+$('sair').onclick=async()=>{await SB.auth.signOut();location.reload();};
+entrar();
+</script>
+</body>
+</html>
