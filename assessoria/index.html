@@ -323,7 +323,7 @@ async function carregar(){
   const [a,b]=await Promise.all([SB.from('checkup').select('*').order('atualizado_em',{ascending:false}),SB.rpc('admin_lista')]);
   if(a.error)throw a.error;RESP=(a.data||[]).filter(r=>r.email!==ADMIN);LIB=(b.data||[]).filter(x=>x.assessoria&&x.email!==ADMIN);}
 const bar=(rot,n,tot,cor)=>{const p=tot?Math.round(100*n/tot):0;return `<div class="br"><span class="bl" title="${esc(rot)}">${esc(rot)}</span><span class="bt"><i style="width:${p}%;background:${cor||'var(--azul)'}"></i></span><b>${p}%</b><small>${n}</small></div>`;};
-function dist(k,tot){const f=CAMPOS.find(x=>x.k===k);const c={};RESP.forEach(r=>{const v=r.respostas[k];(Array.isArray(v)?v:v?[v]:[]).forEach(x=>c[x]=(c[x]||0)+1);});
+function dist(k,tot){const f=CAMPOS.find(x=>x.k===k);const c={};RESP.filter(r=>!f.show||f.show(r.respostas)).forEach(r=>{const v=r.respostas[k];(Array.isArray(v)?v:v?[v]:[]).forEach(x=>c[x]=(c[x]||0)+1);});
   const base=f.show?RESP.filter(r=>f.show(r.respostas)).length:tot;
   const ord=(f.opts||Object.keys(c)).filter(o=>c[o]);
   return {f,base,html:ord.sort((x,y)=>f.type==='checks'?c[y]-c[x]:0).map(o=>bar(o,c[o],base)).join('')||'<p class="pend">Sem respostas.</p>'};}
