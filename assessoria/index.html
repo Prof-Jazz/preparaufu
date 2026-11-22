@@ -473,18 +473,21 @@ function gerar(p){
     livre[d]=L.map(([a,b])=>({a,b,prev:(d==='Seg'||d==='Qui')&&a===1245?'EX':null}));cap[d]=d==='Sáb'?hs:hp;});
   const dispTot=DS.slice(0,6).reduce((t,d)=>t+Math.min(cap[d],livre[d].reduce((a,iv)=>a+iv.b-iv.a,0)),0);
   const usado={};DS.forEach(d=>usado[d]=0);
-  function coloca(d,dur,grupo,relax){if(usado[d]+dur>cap[d])return null;
+  function achaIv(d,dur,grupo,relax){if(usado[d]+dur>cap[d])return null;let m=null;
     for(const iv of livre[d]){if(iv.b-iv.a<dur)continue;
       if(!relax&&iv.prev&&iv.prev===grupo&&grupo!=='REV')continue;
       if(relax&&iv.prev==='EX'&&grupo==='EX')continue;
-      const s=iv.a;iv.a=s+dur+10;iv.prev=grupo;usado[d]+=dur;return [s,s+dur];}
-    return null;}
+      const w=iv.b-iv.a-dur;if(!m||w<m.w)m={iv,w};}
+    return m;}
+  function coloca(d,dur,grupo,relax,first){let m;
+    if(first){if(usado[d]+dur>cap[d])return null;const iv=livre[d].find(iv=>iv.b-iv.a>=dur);m=iv&&{iv};}else m=achaIv(d,dur,grupo,relax);
+    if(!m)return null;const iv=m.iv,s=iv.a;iv.a=s+dur+10;iv.prev=grupo;usado[d]+=dur;return [s,s+dur];}
   // revisão diária (seg a sáb)
   const ankiOn=(p.anki||'').startsWith('Sim');
   const outros=(p.revisao||[]).filter(x=>!['Videoaulas','Não tenho método de revisão'].includes(x));
   const revNome='Revisão'+(ankiOn?' — Anki':'')+(outros.length?(ankiOn?' + ':' — ')+outros.join(', ').toLowerCase():'');
   const revDur=ankiOn?(REVMIN[p.anki_min]||30):30;
-  DS.slice(0,6).forEach(d=>{const r=coloca(d,revDur,'REV');if(r)out.dias[d].push({tipo:'rev',ini:r[0],fim:r[1],label:revNome});});
+  DS.slice(0,6).forEach(d=>{const r=coloca(d,revDur,'REV',false,true);if(r)out.dias[d].push({tipo:'rev',ini:r[0],fim:r[1],label:revNome});});
   // quantas vezes cada disciplina
   const MK={'Matemática':'MAT','Física':'FIS','Química':'QUI','Biologia':'BIO','Língua Portuguesa':'LP','Literatura':'LIT','Língua estrangeira':'LE','História':'HIS','Geografia':'GEO','Filosofia':'FIL','Sociologia':'SOC','Redação':'RED'};
   const difn={};Object.entries(p.nivel||{}).forEach(([a,v])=>{if(MK[a])difn[MK[a]]=v||0;});
@@ -495,7 +498,10 @@ function gerar(p){
   plano.sort((a,b)=>b.v-a.v||(b.g==='EX'||b.g==='BIO')-(a.g==='EX'||a.g==='BIO'));
   const red={k:'RED',n:'Redação',g:'LIN',dur:90,v:1,why:(difn.RED||0)>=3?[DIFN[difn.RED-1].toLowerCase()+' (1× por semana)']:[],feito:0,dias:[]};
   const fila=[];const maxV=Math.max(...plano.map(x=>x.v));
-  for(let r=1;r<=maxV;r++){plano.filter(x=>x.v>=r).forEach(x=>fila.push(x));if(r===1)fila.splice(Math.min(3,fila.length),0,red);}
+  // blocos longos (1h30) primeiro, em rodadas; depois os de 1h ocupam os espaços que sobram
+  // 1º: todas as disciplinas uma vez (longas antes das curtas); 2º: repetições, das mais difíceis/pesadas para as demais
+  [90,60].forEach(dur=>{plano.filter(x=>x.dur===dur).forEach(x=>fila.push(x));if(dur===90)fila.push(red);});
+  for(let r=2;r<=maxV;r++)[90,60].forEach(dur=>plano.filter(x=>x.dur===dur&&x.v>=r).forEach(x=>fila.push(x)));
   const dIdx=d=>DS.indexOf(d);
   const exNoDia=d=>out.dias[d].filter(b=>b.g==='EX'||b.tipo==='prepara').length;
   const falta=[];
@@ -503,7 +509,8 @@ function gerar(p){
     for(const relax of [false,true]){
       const cands=DS.slice(0,6).filter(d=>!x.dias.includes(d)&&!(x.g==='EX'&&exNoDia(d)>=2)).map(d=>{
         const dist=x.dias.length?Math.min(...x.dias.map(e=>Math.abs(dIdx(e)-dIdx(d)))):6;
-        return {d,dist,resto:cap[d]-usado[d]};}).sort((a,b)=>b.dist-a.dist||b.resto-a.resto||dIdx(a.d)-dIdx(b.d));
+        const m=achaIv(d,x.dur,x.g,relax);return {d,dist,w:m?m.w:1e9,resto:cap[d]-usado[d]};}).filter(c=>c.w<1e9)
+        .sort((a,b)=>b.dist-a.dist||(x.dur<90?a.w-b.w:b.resto-a.resto)||b.resto-a.resto||dIdx(a.d)-dIdx(b.d));
       for(const c of cands){const r=coloca(c.d,x.dur,x.g,relax);if(r){melhor={d:c.d,r};break;}}
       if(melhor)break;}
     if(melhor){x.dias.push(melhor.d);x.feito++;out.dias[melhor.d].push({tipo:x.k==='RED'?'red':'estudo',k:x.k,g:x.g,ini:melhor.r[0],fim:melhor.r[1],label:x.n});}
@@ -515,7 +522,7 @@ function gerar(p){
   else out.avisos.push('Seus compromissos de domingo de manhã não deixam espaço para o simulado/provas antigas. Vamos ajustar isso no encontro com o mentor.');
   if(falta.length){const c={};falta.forEach(n=>c[n]=(c[n]||0)+1);const lst=Object.entries(c).map(([n,k])=>k>1?`${n} (${k}×)`:n).join(', ');
     const precisa=[...plano,red].reduce((t,x)=>t+x.v*x.dur,0)+revDur*6;
-    out.avisos.unshift(precisa>dispTot?'A quantidade de horas que você estuda é insuficiente para a quantidade de conteúdos que você precisa estudar. Ficaram de fora desta semana: '+lst+'. Vamos rever o seu tempo de estudo no encontro com o mentor.'
+    out.avisos.unshift(precisa>dispTot*0.9?'A quantidade de horas que você estuda é insuficiente para a quantidade de conteúdos que você precisa estudar. Ficaram de fora desta semana: '+lst+'. Vamos rever o seu tempo de estudo no encontro com o mentor.'
       :'Não foi possível encaixar tudo sem colocar matérias parecidas em sequência. Ficaram de fora desta semana: '+lst+'. O seu mentor vai ajustar isso com você.');}
   if(!usaMarc)out.avisos.push('Você não marcou os períodos livres para estudar; usamos todo o horário em que você está acordado e sem compromissos.');
   out.resumo=[...plano,red].map(x=>({n:x.n,k:x.k,v:x.feito,pedido:x.v,min:x.feito*x.dur,why:x.why}));
