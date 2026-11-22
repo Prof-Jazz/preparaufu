@@ -491,7 +491,7 @@ function gerar(p){
     for(const iv of livre[d]){if(iv.b-iv.a<dur)continue;
       if(!relax&&iv.prev&&iv.prev===grupo&&grupo!=='REV')continue;
       if(relax&&iv.prev==='EX'&&grupo==='EX')continue;
-      const w=iv.b-iv.a-dur;if(!m||w<m.w)m={iv,w};}
+      const w=iv.b-iv.a-dur,per=iv.a<720?0:iv.a<1080?1:2;if(!m||per<m.per||(per===m.per&&w<m.w))m={iv,w,per};}
     return m;}
   function coloca(d,dur,grupo,relax,first){let m;
     if(first){if(usado[d]+dur>cap[d])return null;const iv=livre[d].find(iv=>iv.b-iv.a>=dur);m=iv&&{iv};}else m=achaIv(d,dur,grupo,relax);
@@ -530,8 +530,8 @@ function gerar(p){
     for(const relax of [false,true]){
       const cands=DS.slice(0,6).filter(d=>!x.dias.includes(d)&&!(x.g==='EX'&&exNoDia(d)>=2)).map(d=>{
         const dist=x.dias.length?Math.min(...x.dias.map(e=>Math.abs(dIdx(e)-dIdx(d)))):6;
-        const m=achaIv(d,x.dur,x.g,relax);return {d,dist,w:m?m.w:1e9,resto:cap[d]-usado[d]};}).filter(c=>c.w<1e9)
-        .sort((a,b)=>b.dist-a.dist||(x.dur<90?a.w-b.w:b.resto-a.resto)||b.resto-a.resto||dIdx(a.d)-dIdx(b.d));
+        const m=achaIv(d,x.dur,x.g,relax);return {d,dist,w:m?m.w:1e9,per:m?m.per:9,resto:cap[d]-usado[d]};}).filter(c=>c.w<1e9)
+        .sort((a,b)=>b.dist-a.dist||a.per-b.per||(x.dur<90?a.w-b.w:b.resto-a.resto)||b.resto-a.resto||dIdx(a.d)-dIdx(b.d));
       for(const c of cands){const r=coloca(c.d,x.dur,x.g,relax);if(r){melhor={d:c.d,r};break;}}
       if(melhor)break;}
     if(melhor){x.dias.push(melhor.d);x.feito++;out.dias[melhor.d].push({tipo:x.k==='RED'?'red':'estudo',k:x.k,g:x.g,ini:melhor.r[0],fim:melhor.r[1],label:x.n});}
