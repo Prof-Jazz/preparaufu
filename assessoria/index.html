@@ -483,7 +483,8 @@ async function telaGeral(){abas('tabGeral');$('app').innerHTML='<p class="pend">
   const tipos={};RESP.forEach(r=>[...new Set((r.respostas.fixos||[]).map(x=>x.tipo))].forEach(t=>tipos[t]=(tipos[t]||0)+1));
   const pend=LIB.filter(x=>!RESP.some(r=>r.email===x.email));
   const atM=new Map();const addA=(r,t)=>{const k=r.email;if(!atM.has(k))atM.set(k,{n:r.respostas.nome||r.email,L:[]});atM.get(k).L.push(t);};
-  comChoque.forEach(r=>choques(r.respostas).forEach(c=>addA(r,c.replace(/^Choque de horário na /,'Choque de horário — '))));
+  comChoque.forEach(r=>{const g=new Map();choques(r.respostas).forEach(c=>{const m=c.match(/^Choque de horário na ([^:]+): (.*)$/);if(!m)return;if(!g.has(m[2]))g.set(m[2],[]);g.get(m[2]).push(m[1].slice(0,3));});
+    g.forEach((dias,txt)=>addA(r,`Choque de horário (${dias.join(', ')}): ${txt}`));});
   curtos.forEach(x=>addA(x.r,'Tempo insuficiente — não coube: '+x.f.join(', ')));
   const aten=[...atM.values()];
   $('app').innerHTML=`<div class="intro"><h2>Comportamento da turma</h2><p>Retrato da turma da Assessoria a partir dos perfis de estudos. Percentuais sobre quem respondeu cada pergunta.</p></div>
@@ -566,7 +567,7 @@ function sono(p){const W=tmin(p.acorda)??420;let SL=tmin(p.dorme)??1380;
   if(SL>W&&SL-W<8*60)SL=Math.min(SL+720,1440); // "12:00" = meia-noite
   return [W,SL];}
 function choques(p){const L=[];DS.forEach((d,i)=>{
-  const ev=(p.fixos||[]).filter(x=>(x.dias||[]).includes(d)).map(x=>{const a=tmin(x.ini),b=tmin(x.fim);return a==null||b==null?null:{n:x.tipo.split(' / ')[0]+(x.desc?' ('+x.desc+')':''),a,b:b>a?b:1440};}).filter(Boolean);
+  const ev=(p.fixos||[]).filter(x=>(x.dias||[]).includes(d)).map(x=>{const a=tmin(x.ini),b=tmin(x.fim);return a==null||b==null?null:{n:x.tipo.split(' / ')[0],a,b:b>a?b:1440};}).filter(Boolean);
   if(d==='Seg'||d==='Qui')ev.push({n:'a aula do PREPARA UFU',a:1140,b:1230});
   for(let x=0;x<ev.length;x++)for(let y=x+1;y<ev.length;y++){const A=ev[x],B=ev[y];if(A.a<B.b&&B.a<A.b)
     L.push(`Choque de horário na ${DIAS[i].toLowerCase()}: ${A.n} (${hm(A.a)}–${hm(A.b)}) bate com ${B.n} (${hm(B.a)}–${hm(B.b)}).`);}});
