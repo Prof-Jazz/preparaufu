@@ -226,8 +226,8 @@ td.h{font-weight:700}.z{color:var(--line)}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
 let B=[],shown=20,cart=[];
-(function(){let m=null;try{m=localStorage.getItem('bqufu-tema');}catch(e){}
-  const set=t=>{document.documentElement.setAttribute('data-theme',t);try{localStorage.setItem('bqufu-tema',t);}catch(e){}};
+(function(){let m=null;try{m=localStorage.getItem('bqufu-tema-v2');}catch(e){}
+  const set=t=>{document.documentElement.setAttribute('data-theme',t);try{localStorage.setItem('bqufu-tema-v2',t);}catch(e){}};
   window.__setTheme=set;const cur=m||'dark';
   document.addEventListener('DOMContentLoaded',()=>{set(cur);document.getElementById('theme').onclick=()=>set(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');});})();const $=id=>document.getElementById(id);
 const LV={F:'Fácil',M:'Médio',D:'Difícil'},K={1:'Complementar 2027',2:'Fora 2027 · caiu recente',3:'Fora 2027 · sem queda recente'};
