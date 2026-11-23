@@ -192,6 +192,41 @@ input[type=time]{max-width:160px}input[type=number]{max-width:160px}
 .faq summary::before{content:"+";color:var(--azul);font-weight:800;width:14px;flex:none}.faq details[open] summary::before{content:"–"}
 .faq p{margin:8px 0 2px 22px;color:var(--muted);line-height:1.55}
 .caviso.choque{background:rgba(211,58,44,.12);border-color:var(--bad);font-weight:600}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.kpi{border-radius:18px;padding:16px 18px;display:grid;grid-template-columns:64px 1fr;gap:14px;align-items:center;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);min-width:0}
+.kpi>div{min-width:0;display:flex;flex-direction:column}
+.kpi span{font:600 12px var(--body);text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}
+.kpi b{font:800 27px/1.15 var(--display);font-variant-numeric:tabular-nums}
+.kpi small{font-size:13.5px;color:var(--muted);line-height:1.3}
+.kpi .of{font:600 14px var(--body);color:var(--muted);font-style:normal}
+.k-a{background:linear-gradient(135deg,#3A8CCB,#16304F);border:0;color:#fff}.k-a span,.k-a small,.k-a .of{color:#D6E6F5}
+.ring{width:64px;height:64px}.ring .rv{font:800 15px var(--display);fill:var(--ink)}.k-a .ring .rv{fill:#fff}
+.ico{width:56px;height:56px;border-radius:16px;display:grid;place-items:center;font-size:24px;background:var(--soft)}
+.chart{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 20px;box-shadow:var(--shadow);min-width:0}
+.chart h3{font:700 18px var(--display);margin:0 0 2px;display:flex;align-items:center;gap:10px}
+.hi{width:12px;height:24px;border-radius:6px;flex:none}.hi.a{background:linear-gradient(#3A8CCB,#DDDD24)}.hi.b{background:linear-gradient(#EB6834,#7B61FF)}.hi.c{background:linear-gradient(#D33A2C,#EB6834)}
+.cs{margin:0 0 6px 22px;color:var(--muted);font-size:13px}
+.gsec{font:800 20px var(--display);margin:10px 0 -4px;display:flex;align-items:center;gap:10px}
+.gsec::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,var(--amarelo),transparent);border-radius:2px}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:14px}
+@media (max-width:560px){.g2{grid-template-columns:1fr}}
+.bars{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.bar{display:grid;grid-template-columns:minmax(120px,230px) 1fr 84px;gap:10px;align-items:center;font-size:14.5px}
+.bar .bl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar .bt{height:26px;background:var(--soft);border-radius:999px;overflow:hidden}
+.bar .bf{display:flex;align-items:center;justify-content:flex-end;padding-right:8px;height:100%;border-radius:999px;font:700 12px var(--display);white-space:nowrap}
+.bar .bv{color:var(--muted);font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
+@media (max-width:560px){.bar{grid-template-columns:1fr 70px}.bar .bt{grid-column:1/-1;order:3}}
+.dwrap{display:flex;flex-wrap:wrap;gap:18px;align-items:center;margin-top:6px}
+.dwrap .donut{flex:0 0 170px;width:170px;height:170px}
+.dwrap .legend{flex:1 1 180px;min-width:0;display:flex;flex-direction:column;gap:6px}
+.donut .dn{font:800 26px var(--display);fill:var(--ink)}.donut .dm{font:700 11px var(--body);fill:var(--muted)}
+.lg{display:grid;grid-template-columns:14px minmax(0,1fr) auto 26px;gap:8px;align-items:center;font-size:14px}
+.lg i{width:14px;height:14px;border-radius:4px}.lg span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.lg b{font-variant-numeric:tabular-nums}.lg small{color:var(--muted);text-align:right}
+.aten{border-color:rgba(211,58,44,.45)}
+.atl{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px;margin-top:10px}
+.atl div{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 12px;display:flex;flex-direction:column;font-size:14px}
+.atl span{color:var(--muted);font-size:13px}
 /* login */
 #gate{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px}
 #gate[hidden]{display:none}
@@ -234,7 +269,7 @@ input[type=time]{max-width:160px}input[type=number]{max-width:160px}
 <header>
   <a class="logos" href="/" title="Início da plataforma PREPARA UFU" style="text-decoration:none"><img class="j" src="../bancodequestoes/logo/jazz_claro.png" alt="Jazz, Professor de Matemática"><span class="sep"></span><img class="p" src="../bancodequestoes/logo/prepara_transp.png" alt="Prepara UFU"></a>
   <div class="ttl"><h1>Assessoria ENEM</h1><p>Perfil de estudos e pré-cronograma</p></div>
-  <nav class="tabs"><button class="theme" id="theme" aria-label="Alternar modo diurno e noturno" title="Modo diurno / noturno"><span class="sun">☀</span><span class="moon">☾</span></button><a href="../bancodequestoes/">Banco de Questões</a><button id="tabGeral" hidden>Visão geral</button><button id="tabResp" hidden>Alunos</button><button id="tabExemplo" hidden>Ver como aluno</button><button class="on" id="tabForm" hidden>Meu perfil de estudos</button><button id="tabCrono" hidden>Meu pré-cronograma</button><button id="tabFaq" hidden>Dúvidas</button><button id="sair">Sair</button></nav>
+  <nav class="tabs"><button class="theme" id="theme" aria-label="Alternar modo diurno e noturno" title="Modo diurno / noturno"><span class="sun">☀</span><span class="moon">☾</span></button><a href="../bancodequestoes/">Banco de Questões</a><button id="tabGeral" hidden>Comportamento da turma</button><button id="tabResp" hidden>Alunos</button><button id="tabExemplo" hidden>Ver como aluno</button><button class="on" id="tabForm" hidden>Meu perfil de estudos</button><button id="tabCrono" hidden>Meu pré-cronograma</button><button id="tabFaq" hidden>Dúvidas</button><button id="sair">Sair</button></nav>
 </header>
 <div id="exBar" hidden>Modo aluno exemplo — é assim que o aluno vê. Nada aqui entra nas estatísticas da turma. <button type="button" id="exSair">Sair do modo exemplo</button></div>
 <main id="app"></main>
@@ -406,29 +441,71 @@ function dist(k,tot){const f=CAMPOS.find(x=>x.k===k);const c={};RESP.filter(r=>!
   const ord=(f.opts||Object.keys(c)).filter(o=>c[o]);
   return {f,base,html:ord.sort((x,y)=>f.type==='checks'?c[y]-c[x]:0).map(o=>bar(o,c[o],base)).join('')||'<p class="pend">Sem respostas.</p>'};}
 function card(t,body,sub){return `<div class="gc"><h4>${esc(t)}</h4>${sub?`<p class="gs">${esc(sub)}</p>`:''}${body}</div>`;}
+const PAL=['#3A8CCB','#DDDD24','#EB6834','#1BAF7A','#7B61FF','#E0559B','#1F5F8F','#C9A227','#2BB3C0','#8A93A6'];
+const palText=c=>['#DDDD24','#C9A227','#2BB3C0','#8A93A6'].includes(c)?'#141A2E':'#FFFFFF';
+const lighten=(c,f=.45)=>{const[r,g,b]=[1,3,5].map(i=>parseInt(c.slice(i,i+2),16));return `rgb(${[r,g,b].map(v=>Math.round(v+(255-v)*f)).join(',')})`;};
+const pctBR=(n,t)=>t?(n/t*100).toFixed(0)+'%':'0%';
+function ringSVG(f,c,lab){const r=26,C=2*Math.PI*r;return `<svg class="ring" viewBox="0 0 64 64"><circle cx="32" cy="32" r="${r}" fill="none" stroke="var(--soft)" stroke-width="7"/><circle cx="32" cy="32" r="${r}" fill="none" stroke="${c}" stroke-width="7" stroke-linecap="round" stroke-dasharray="${C*Math.min(1,f)} ${C}" transform="rotate(-90 32 32)"/><text x="32" y="37" text-anchor="middle" class="rv">${esc(lab)}</text></svg>`;}
+function donutSVG(rows,tot,id){let a0=-Math.PI/2,R=88,r=56,cx=100,cy=100,out='';
+  rows.forEach(([k,n],i)=>{const f=n/tot,a1=a0+f*2*Math.PI,big=f>.5?1:0,c=PAL[i%PAL.length];
+    if(f>=0.9999)out+=`<circle cx="${cx}" cy="${cy}" r="${(R+r)/2}" fill="none" stroke="url(#${id}${i})" stroke-width="${R-r}"/>`;
+    else{const p=(rr,a)=>`${cx+rr*Math.cos(a)},${cy+rr*Math.sin(a)}`;out+=`<path d="M${p(R,a0)} A${R},${R} 0 ${big} 1 ${p(R,a1)} L${p(r,a1)} A${r},${r} 0 ${big} 0 ${p(r,a0)} Z" fill="url(#${id}${i})" stroke="var(--card)" stroke-width="1.5"><title>${esc(k)}: ${pctBR(n,tot)}</title></path>`;}
+    a0=a1;});
+  const defs='<defs>'+rows.map((_,i)=>`<linearGradient id="${id}${i}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${lighten(PAL[i%PAL.length],.25)}"/><stop offset="1" stop-color="${PAL[i%PAL.length]}"/></linearGradient>`).join('')+'</defs>';
+  const L0=rows[0],nm=L0[0].length>15?L0[0].slice(0,14)+'…':L0[0];
+  return `<svg viewBox="0 0 200 200" class="donut" role="img">${defs}${out}<text x="100" y="96" text-anchor="middle" class="dn">${pctBR(L0[1],tot)}</text><text x="100" y="114" text-anchor="middle" class="dm">${esc(nm)}</text></svg>`;}
+function contagem(k){const f=CAMPOS.find(x=>x.k===k);const base=RESP.filter(r=>!f.show||f.show(r.respostas));const c={};
+  base.forEach(r=>{const v=r.respostas[k];(Array.isArray(v)?v:v?[v]:[]).forEach(x=>c[x]=(c[x]||0)+1);});
+  const ord=(f.opts||Object.keys(c)).filter(o=>c[o]).map(o=>[o,c[o]]);if(f.type==='checks')ord.sort((a,b)=>b[1]-a[1]);
+  return {f,base:base.length,rows:ord};}
+const titulo=f=>f.l.replace(/\s*\(.*?\)\s*/g,' ').replace(/\?$/,'').trim();
+let GID=0;
+function chDonut(k,t){const {f,base,rows}=contagem(k);if(!rows.length)return '';const id='d'+(GID++);const tot=f.type==='checks'?rows.reduce((s,r)=>s+r[1],0):base;
+  return `<section class="chart"><h3><i class="hi a"></i>${esc(t||titulo(f))}</h3><p class="cs">${base} aluno(s) responderam</p><div class="dwrap">${donutSVG(rows,tot,id)}<div class="legend">${rows.map(([o,n],i)=>`<div class="lg"><i style="background:${PAL[i%PAL.length]}"></i><span title="${esc(o)}">${esc(o)}</span><b>${pctBR(n,tot)}</b><small>${n}</small></div>`).join('')}</div></div></section>`;}
+function chBars(t,rows,base,sub,fmtV){if(!rows.length)return '';const mx=Math.max(...rows.map(r=>r[1]))||1;
+  return `<section class="chart"><h3><i class="hi b"></i>${esc(t)}</h3>${sub?`<p class="cs">${esc(sub)}</p>`:''}<div class="bars">${rows.map(([k,n,cor],i)=>{const col=cor||PAL[i%PAL.length];const txt=fmtV?fmtV(n):pctBR(n,base);
+    return `<div class="bar"><span class="bl" title="${esc(k)}">${esc(k)}</span><span class="bt"><span class="bf" style="width:${Math.max(n/mx*100,9)}%;background:linear-gradient(90deg,${lighten(col,.35)},${col});color:${palText(col)}">${txt}</span></span><span class="bv">${fmtV?'':`${n} aluno${n>1?'s':''}`}</span></div>`;}).join('')}</div></section>`;}
+function chBarsK(k,t){const {f,base,rows}=contagem(k);return chBars(t||titulo(f),rows,base,`${base} aluno(s) responderam · cada aluno pode marcar mais de uma opção`);}
 async function telaGeral(){abas('tabGeral');$('app').innerHTML='<p class="pend">Carregando…</p>';
   try{await carregar();}catch(e){$('app').innerHTML='<p class="pend">Erro: '+esc(e.message)+'</p>';return;}
-  const N=RESP.length,T=LIB.length;
-  if(!N){$('app').innerHTML=`<div class="intro"><h2>Visão geral da turma</h2><p>Nenhum perfil de estudos enviado ainda (0 de ${T} alunos da Assessoria). Os gráficos aparecem aqui assim que os alunos responderem.</p></div>`;return;}
-  const medD=ds=>RESP.reduce((s,r)=>{const h=horasDia(r.respostas);return s+ds.reduce((a,d)=>a+(h[d]||0),0)/ds.length;},0)/N;
-  const mt=k=>{const v=RESP.map(r=>tmin(r.respostas[k])).filter(x=>x!=null);if(!v.length)return null;const ad=v.map(x=>k==='dorme'&&x<720?x+1440:x);return ad.reduce((a,b)=>a+b,0)/ad.length;};
-  const sono=RESP.map(r=>{const a=tmin(r.respostas.acorda),d=tmin(r.respostas.dorme);return a!=null&&d!=null?((a-d+1440)%1440)/60:null;}).filter(x=>x!=null);
-  const kpi=(v,l)=>`<div class="kp"><b>${v}</b><span>${l}</span></div>`;
-  const nivel=AREAS.map(a=>{const v=RESP.map(r=>(r.respostas.nivel||{})[a]).filter(Boolean);const dd=v.filter(x=>x>=3).length;return [a,v.length?v.reduce((x,y)=>x+y,0)/v.length:0,v.length?Math.round(100*dd/v.length):0];}).sort((a,b)=>b[1]-a[1]);
+  const N=RESP.length,T=LIB.length;GID=0;
+  if(!N){$('app').innerHTML=`<div class="intro"><h2>Comportamento da turma</h2><p>Nenhum perfil de estudos enviado ainda (0 de ${T} alunos da Assessoria). Os gráficos aparecem aqui assim que os alunos responderem.</p></div>`;return;}
+  const HDs=RESP.map(r=>horasDia(r.respostas));
+  const medDia=d=>HDs.reduce((s,h)=>s+(h[d]||0),0)/N;const semana=HDs.reduce((s,h)=>s+DS.reduce((a,d)=>a+(h[d]||0),0),0)/N;
+  const segsex=DS.slice(0,5).reduce((a,d)=>a+medDia(d),0)/5;
+  const sonos=RESP.map(r=>{const [a,b]=sono(r.respostas);return ((a-b+1440)%1440)/60;});const sonoM=sonos.reduce((a,b)=>a+b,0)/N;
+  const comChoque=RESP.filter(r=>choques(r.respostas).length);
+  const curtos=RESP.map(r=>{const g=gerar(r.respostas);const B=paraBlocos(g);const f=opcoesMateria(r.respostas).filter(([k])=>GRUPO[k]&&!B.some(b=>b.k===k)).map(o=>o[1]);return {r,f};}).filter(x=>x.f.length);
+  const kpi=(ic,l,v,s,cls='')=>`<div class="kpi ${cls}">${ic}<div><span>${l}</span><b>${v}</b><small>${s}</small></div></div>`;
+  const ico=t=>`<span class="ico">${t}</span>`;
+  const nivel=AREAS.map(a=>{const v=RESP.map(r=>(r.respostas.nivel||{})[a]).filter(Boolean);return [a,v.length?v.filter(x=>x>=3).length:0,v.length?v.reduce((x,y)=>x+y,0)/v.length:0];}).sort((a,b)=>b[1]-a[1]||b[2]-a[2]);
+  const corDif=m=>m>=3.2?'#D33A2C':m>=2.6?'#EB6834':m>=2?'#C9A227':'#1BAF7A';
   const tipos={};RESP.forEach(r=>[...new Set((r.respostas.fixos||[]).map(x=>x.tipo))].forEach(t=>tipos[t]=(tipos[t]||0)+1));
-  const heat=DIAS.map(d=>`<tr><td>${d.slice(0,3)}</td>${TURNOS.map(t=>{const n=RESP.filter(r=>(r.respostas.disp||[]).includes(d+'|'+t)).length,p=n/N;return `<td style="background:rgba(58,140,203,${(.08+p*.85).toFixed(2)})" title="${n} de ${N}">${Math.round(p*100)}%</td>`;}).join('')}</tr>`).join('');
-  const D=k=>{const x=dist(k,N);return card(x.f.l.replace(/\s*\(.*?\)\s*/g,' ').trim(),x.html,x.base!==N?`base: ${x.base} aluno(s)`:'');};
-  $('app').innerHTML=`<div class="intro"><h2>Visão geral da turma</h2><p>${N} de ${T} alunos da Assessoria enviaram o perfil de estudos${T>N?` · faltam ${T-N}`:''}. Percentuais sobre quem respondeu.</p></div>
-  <div class="kps">${kpi(hfmt(medD(DS.slice(0,5))),'estudam por dia (seg–sex)')}${kpi(hfmt(medD(['Sáb'])),'no sábado')}${kpi(hfmt(medD(['Dom'])),'no domingo')}${kpi(hfmt(medD(DS)*7),'por semana')}${kpi(mt('acorda')!=null?mfmt(mt('acorda')):'—','acordam, em média')}${kpi(mt('dorme')!=null?mfmt(mt('dorme')):'—','dormem, em média')}${kpi(sono.length?hfmt(sono.reduce((a,b)=>a+b,0)/sono.length):'—','de sono por noite')}</div>
-  <div class="gg">
-   ${D('cursinho')}${D('aulas_mat')}${D('local_principal')}${D('ufu_exp')}${D('ufu_vezes')}
-   ${card('Dificuldade por matéria',nivel.map(([a,v,pc])=>`<div class="br"><span class="bl">${esc(a)}</span><span class="bt"><i style="width:${v/4*100}%;background:${v>=3?'var(--laranja)':v>=2.3?'var(--amarelo)':'var(--verde)'}"></i></span><b>${pc}%</b><small>${v.toFixed(1)}</small></div>`).join(''),'barra = dificuldade média (1 tranquila – 4 muito difícil) · % = acham difícil ou muito difícil')}
-   ${D('obstaculos')}
-   ${card('Compromissos fixos (% com cada um)',Object.entries(tipos).sort((a,b)=>b[1]-a[1]).map(([t,n])=>bar(t,n,N,COR[t])).join('')||'<p class="pend">—</p>')}
-   ${D('atividade')}${D('atividade_fixo')}${D('trabalha')}${D('situacao')}${D('escola_turno')}
-   ${D('rev_tempo')}${D('simulados')}${D('redacao_freq')}
-   ${D('provas')}${D('universidades')}${D('enem_media')}
-  </div>`;}
+  const pend=LIB.filter(x=>!RESP.some(r=>r.email===x.email));
+  const aten=[...comChoque.map(r=>[r.respostas.nome||r.email,'choque de horário: '+choques(r.respostas)[0].replace(/^Choque de horário na /,'')]),...curtos.map(x=>[x.r.respostas.nome||x.r.email,'tempo insuficiente — faltou '+x.f.join(', ')])];
+  $('app').innerHTML=`<div class="intro"><h2>Comportamento da turma</h2><p>Retrato da turma da Assessoria a partir dos perfis de estudos. Percentuais sobre quem respondeu cada pergunta.</p></div>
+  <div class="kpis">
+   ${kpi(ringSVG(N/Math.max(T,1),'#DDDD24',pctBR(N,T)),'Perfis enviados',`${N} <em class="of">de ${T}</em>`,T>N?`faltam ${T-N} aluno(s)`:'toda a turma respondeu','k-a')}
+   ${kpi(ico('⏱'),'Estudo por dia (seg–sex)',hfmt(segsex),`sábado ${hfmt(medDia('Sáb'))} · domingo ${hfmt(medDia('Dom'))}`)}
+   ${kpi(ico('📅'),'Estudo por semana',hfmt(semana),'média da turma')}
+   ${kpi(ico('🌙'),'Sono por noite',hfmt(sonoM),'média da turma')}
+   ${kpi(ringSVG(comChoque.length/N,'#D33A2C',String(comChoque.length)),'Com choque de horário',`${comChoque.length} aluno(s)`,'compromissos que se sobrepõem')}
+   ${kpi(ringSVG(curtos.length/N,'#EB6834',String(curtos.length)),'Tempo insuficiente',`${curtos.length} aluno(s)`,'alguma matéria não coube no cronograma')}
+  </div>
+  ${aten.length?`<section class="chart aten"><h3><i class="hi c"></i>Alunos que precisam de atenção</h3><div class="atl">${aten.map(([n,t])=>`<div><b>${esc(n)}</b><span>${esc(t)}</span></div>`).join('')}</div></section>`:''}
+  <h3 class="gsec">Tempo e rotina</h3>
+  ${chBars('Horas de estudo por dia da semana',DS.map((d,i)=>[DIAS[i],medDia(d),'#3A8CCB']),N,'média da turma',v=>hfmt(v))}
+  <div class="g2">${chDonut('cursinho')}${chDonut('aulas_mat')}${chDonut('trabalha','Trabalha ou faz estágio')}${chDonut('atividade','Pratica atividade física')}</div>
+  ${chBars('Compromissos fixos da turma',Object.entries(tipos).sort((a,b)=>b[1]-a[1]).map(([t,n])=>[t,n]),N,'% dos alunos com cada tipo de compromisso')}
+  <h3 class="gsec">Como estudam</h3>
+  <div class="g2">${chDonut('local_principal','Onde estudam na maior parte do tempo')}${chDonut('rev_tempo','Tempo de revisão por dia')}${chDonut('simulados','Fazem simulados completos')}${chDonut('redacao_freq','Frequência de redação')}</div>
+  ${chBarsK('obstaculos','O que mais atrapalha os estudos')}
+  <h3 class="gsec">Dificuldades</h3>
+  ${chBars('Matérias que a turma acha difíceis',nivel.map(([a,n,m])=>[a,n,corDif(m)]),N,'% que marcaram "difícil" ou "muito difícil" · cor = dificuldade média')}
+  <h3 class="gsec">Objetivo e prova</h3>
+  <div class="g2">${chDonut('situacao','Situação escolar')}${chDonut('ufu_exp','Experiência com a prova da UFU')}${chDonut('enem_media','Média no último ENEM')}${chDonut('lingua','Língua estrangeira')}</div>
+  ${chBarsK('universidades','Universidades pretendidas')}
+  ${pend.length?`<section class="chart"><h3><i class="hi b"></i>Ainda não enviaram (${pend.length})</h3><p class="cs">${pend.map(x=>esc(x.nome||x.email)).join(' · ')}</p></section>`:''}`;}
 async function telaResp(){abas('tabResp');
   $('app').innerHTML='<div class="adm-top"><input type="search" id="busca" placeholder="procurar aluno"><button class="btn" id="csv">Baixar planilha (CSV)</button></div><div id="lista" style="display:flex;flex-direction:column;gap:10px"><p class="pend">Carregando…</p></div>';
   try{await carregar();}catch(e){$('lista').innerHTML='<p class="pend">Erro: '+esc(e.message)+'</p>';return;}
@@ -449,7 +526,6 @@ function ficha(r){const p=r.respostas;
   const sono=(()=>{const a=tmin(p.acorda),d=tmin(p.dorme);return a!=null&&d!=null?hfmt(((a-d+1440)%1440)/60):'—';})();
   const t=(v,l)=>`<div class="kp"><b>${esc(v||'—')}</b><span>${esc(l)}</span></div>`;
   return `<div class="kps">${(()=>{const h=horasDia(p);return t(DS.map(d=>hfmt(h[d]||0).replace(' h','h')).join(' · '),'horas por dia: seg · ter · qua · qui · sex · sáb · dom')+t(hfmt(DS.reduce((a,d)=>a+(h[d]||0),0)),'de estudo por semana');})()}${t(sono,`de sono (${p.dorme||'?'} → ${p.acorda||'?'})`)}${t(p.cursinho,'cursinho')}${t(p.aulas_mat,'aulas de Matemática')}${t(p.local_principal,'onde estuda')}${t(p.rev_tempo||p.anki,'revisão por dia')}${t(p.ufu_exp+(p.ufu_vezes?' · '+p.ufu_vezes:''),'prova da UFU')}</div>
-  <h4>Semana do aluno</h4>${agenda(p)}
   <h4>Pré-cronograma do aluno</h4><div class="cronoBox"></div>
   <h4>Dificuldade por matéria</h4>${AREAS.map(a=>{const v=(p.nivel||{})[a]||0;return `<div class="br"><span class="bl">${esc(a)}</span><span class="bt"><i style="width:${v*25}%;background:${v>=4?'var(--bad)':v===3?'var(--laranja)':v===2?'var(--amarelo)':'var(--verde)'}"></i></span><b style="grid-column:span 2;text-align:left;font-weight:600">${v?DIFN[v-1]:'—'}</b></div>`;}).join('')}
   ${S.map(s=>{const it=s.f.filter(f=>!['nivel','disp'].includes(f.k)).map(f=>{const v=fmt(f,p[f.k]);return v?`<dt>${esc(f.l)}</dt><dd>${esc(v)}</dd>`:'';}).join('');return it?`<h4>${esc(s.t)}</h4><dl>${it}</dl>`:'';}).join('')}`;}
