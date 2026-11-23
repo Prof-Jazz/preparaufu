@@ -227,6 +227,27 @@ input[type=time]{max-width:160px}input[type=number]{max-width:160px}
 .atl{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px;margin-top:10px}
 .atl div{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 12px;display:flex;flex-direction:column;font-size:14px}
 .atl ul{margin:4px 0 0;padding-left:18px;color:var(--muted);font-size:13px;display:flex;flex-direction:column;gap:3px}
+.selbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px}
+.selbar label{font:700 14px var(--display)}.selbar select{width:auto;min-width:260px;font-weight:600}
+.dhead{display:flex;gap:16px;align-items:center;background:linear-gradient(135deg,#16304F,#0E2238);color:#fff;border-radius:18px;padding:18px 20px;border-bottom:4px solid var(--amarelo)}
+.dav{flex:none;width:64px;height:64px;border-radius:50%;background:var(--amarelo);color:#16304F;display:grid;place-items:center;font:800 24px var(--display)}
+.dinfo h2{margin:0;font:800 24px var(--display)}.dinfo p{margin:2px 0;color:#D6E6F5}.dinfo .dm{font-size:13px;color:#AFC3D8}
+.chips2{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip2{display:inline-block;font:600 12.5px var(--body);padding:4px 10px;border-radius:999px;background:rgba(58,140,203,.18);border:1px solid rgba(58,140,203,.45);color:inherit}
+.chip2.am{background:var(--amarelo);color:#16304F;border:0}.chip2.lj{background:rgba(235,104,52,.15);border-color:rgba(235,104,52,.5)}
+.alist{margin:8px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:5px;font-size:14px}
+.cfx{display:flex;flex-direction:column;gap:7px;margin-top:8px}
+.cfi{border:1px solid var(--line);border-left:5px solid;border-radius:10px;padding:8px 12px;background:var(--bg);display:flex;flex-direction:column}
+.cfi b{font-size:14px}.cfi small{color:var(--muted);font-weight:500}.cfi span{color:var(--muted);font-size:13px}
+.ofx{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;margin-top:8px}
+.ofx div{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px;display:flex;flex-direction:column}
+.ofx span{font:600 11.5px var(--body);text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}.ofx b{font-size:14px}
+.obs{margin:0;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;white-space:pre-wrap;font-size:14px}
+.pendl{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 16px}
+.pendl summary{cursor:pointer;font-weight:700}.pendl p{color:var(--muted);margin:8px 0 0}
+.dlr{display:grid;grid-template-columns:minmax(160px,34%) 1fr;gap:4px 14px;margin:0;font-size:14px}.dlr dt{color:var(--muted)}.dlr dd{margin:0;white-space:pre-wrap}
+.pendl h4{margin:14px 0 6px;font:700 15px var(--display);color:var(--azul)}
+@media (max-width:560px){.dhead{flex-direction:column;align-items:flex-start}.selbar select{min-width:0;flex:1}.dlr{grid-template-columns:1fr}}
 /* login */
 #gate{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px}
 #gate[hidden]{display:none}
@@ -511,9 +532,56 @@ async function telaGeral(){abas('tabGeral');$('app').innerHTML='<p class="pend">
   ${chBarsK('universidades','Universidades pretendidas')}
   ${pend.length?`<section class="chart"><h3><i class="hi b"></i>Ainda não enviaram (${pend.length})</h3><p class="cs">${pend.map(x=>esc(x.nome||x.email)).join(' · ')}</p></section>`:''}`;}
 async function telaResp(){abas('tabResp');
-  $('app').innerHTML='<div class="adm-top"><input type="search" id="busca" placeholder="procurar aluno"><button class="btn" id="csv">Baixar planilha (CSV)</button></div><div id="lista" style="display:flex;flex-direction:column;gap:10px"><p class="pend">Carregando…</p></div>';
-  try{await carregar();}catch(e){$('lista').innerHTML='<p class="pend">Erro: '+esc(e.message)+'</p>';return;}
-  $('busca').oninput=lista;$('csv').onclick=csv;lista();}
+  $('app').innerHTML='<p class="pend">Carregando…</p>';
+  try{await carregar();}catch(e){$('app').innerHTML='<p class="pend">Erro: '+esc(e.message)+'</p>';return;}
+  const nome=r=>(r.respostas.nome||r.email).trim();
+  LST=RESP.slice().sort((a,b)=>nome(a).localeCompare(nome(b),'pt-BR',{sensitivity:'base'}));if(EXR)LST.push(EXR);
+  const pend=LIB.filter(x=>!RESP.some(r=>r.email===x.email));
+  if(!LST.length){$('app').innerHTML='<div class="intro"><h2>Alunos</h2><p>Nenhum perfil de estudos enviado ainda.</p></div>';return;}
+  $('app').innerHTML=`<div class="selbar"><label for="selAluno">Aluno</label><select id="selAluno">${LST.map((r,i)=>`<option value="${i}">${esc(r.email===EXEMPLO?'★ Aluno exemplo':nome(r))}</option>`).join('')}</select>
+    <button class="btn" id="antAl" title="Aluno anterior">‹</button><button class="btn" id="proxAl" title="Próximo aluno">›</button><span class="pend">${RESP.length} perfil(is) enviados${pend.length?` · ${pend.length} ainda não enviaram`:''}</span><button class="btn" id="csv" style="margin-left:auto">Baixar planilha (CSV)</button></div>
+    <div id="dossie"></div>
+    ${pend.length?`<details class="pendl"><summary>Ainda não enviaram (${pend.length})</summary><p>${pend.map(x=>esc(x.nome||x.email)).join(' · ')}</p></details>`:''}`;
+  const sel=$('selAluno');const mostra=()=>{const r=LST[+sel.value];$('dossie').innerHTML=dossie(r);requestAnimationFrame(()=>encaixa($('dossie')));montarCrono($('dossie').querySelector('.cronoBox'),r.respostas,r.email,'prof');};
+  sel.onchange=mostra;$('antAl').onclick=()=>{sel.value=String(Math.max(0,+sel.value-1));mostra();};$('proxAl').onclick=()=>{sel.value=String(Math.min(LST.length-1,+sel.value+1));mostra();};
+  $('csv').onclick=csv;mostra();}
+function dossie(r){const p=r.respostas;GID=0;
+  const h=horasDia(p),sem=DS.reduce((a,d)=>a+(h[d]||0),0);const [W,SL]=sono(p);const sonoH=((W-SL+1440)%1440)/60;
+  const niv=AREAS.map(a=>[a,(p.nivel||{})[a]||0]);const vals=niv.map(x=>x[1]).filter(Boolean);const mediaDif=vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0;
+  const dificeis=niv.filter(x=>x[1]>=3).sort((a,b)=>b[1]-a[1]);
+  const ch=choques(p);const g=gerar(p);const B=paraBlocos(g);const falt=opcoesMateria(p).filter(([k])=>GRUPO[k]&&!B.some(b=>b.k===k)).map(o=>o[1]);
+  const chip=(t,c='')=>`<span class="chip2 ${c}">${esc(t)}</span>`;
+  const kpi=(ic,l,v,s,cls='')=>`<div class="kpi ${cls}">${ic}<div><span>${l}</span><b>${v}</b><small>${s}</small></div></div>`;
+  const ico=t=>`<span class="ico">${t}</span>`;
+  const corDif=v=>v>=4?'#D33A2C':v===3?'#EB6834':v===2?'#C9A227':'#1BAF7A';
+  const tags=[p.situacao,p.escola_turno&&p.escola_turno!=='Não frequento escola'?'Escola: '+p.escola_turno.toLowerCase():null,p.cursinho,p.trabalha==='Sim'?'Trabalha':null,p.atividade==='Sim'?'Atividade física':null,p.lingua?'Língua: '+p.lingua:null].filter(Boolean);
+  const fixos=(p.fixos||[]).slice().sort((a,b)=>DS.indexOf((a.dias||[])[0])-DS.indexOf((b.dias||[])[0])||(tmin(a.ini)||0)-(tmin(b.ini)||0));
+  const alertas=[...ch.map(c=>'⚠ '+c),...(falt.length?['⏳ Tempo insuficiente: não coube '+falt.join(', ')]:[])];
+  return `<section class="dhead">
+    <div class="dav">${esc((p.nome||r.email).trim().split(/\s+/).map(x=>x[0]).slice(0,2).join('').toUpperCase())}</div>
+    <div class="dinfo"><h2>${esc(p.nome||r.email)}${r.email===EXEMPLO?' <span class="chip2 am">aluno exemplo</span>':''}</h2>
+      <p>${esc(p.curso||'curso não informado')}${p.universidades&&p.universidades.length?' · '+esc(p.universidades.join(', ')):''}</p>
+      <p class="dm">${esc(r.email)}${p.whats?' · '+esc(p.whats):''}${p.cidade?' · '+esc(p.cidade):''} · perfil enviado em ${new Date(r.atualizado_em).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}</p>
+      <div class="chips2">${tags.map(t=>chip(t)).join('')}</div></div></section>
+   ${alertas.length?`<section class="chart aten"><h3><i class="hi c"></i>Pontos de atenção</h3><ul class="alist">${alertas.map(a=>`<li>${esc(a)}</li>`).join('')}</ul></section>`:''}
+   <div class="kpis">
+    ${kpi(ico('📅'),'Estudo por semana',hfmt(sem),`seg–sex ${hfmt(DS.slice(0,5).reduce((a,d)=>a+(h[d]||0),0)/5)} por dia`,'k-a')}
+    ${kpi(ico('🌙'),'Sono',hfmt(sonoH),`dorme ${p.dorme||'?'} · acorda ${p.acorda||'?'}`)}
+    ${kpi(ico('🔁'),'Revisão por dia',esc(p.rev_tempo||p.anki||'—'),'Anki, caderno de erros, flashcards…')}
+    ${kpi(ringSVG(mediaDif/4,corDif(Math.round(mediaDif)),mediaDif?mediaDif.toFixed(1):'—'),'Dificuldade média',dificeis.length?`${dificeis.length} matéria(s) difíceis`:'nenhuma difícil','escala de 1 a 4')}
+   </div>
+   <div class="g2">
+    ${chBars('Horas de estudo por dia',DS.map((d,i)=>[DIAS[i],h[d]||0,'#3A8CCB']),1,'o que o aluno marcou no perfil',v=>v?hfmt(v):'—')}
+    <section class="chart"><h3><i class="hi b"></i>Dificuldade por matéria</h3><p class="cs">tranquila · média · difícil · muito difícil</p><div class="bars">${niv.sort((a,b)=>b[1]-a[1]).map(([a,v])=>`<div class="bar"><span class="bl">${esc(a)}</span><span class="bt"><span class="bf" style="width:${Math.max(v*25,9)}%;background:linear-gradient(90deg,${lighten(corDif(v),.35)},${corDif(v)});color:${palText(corDif(v))}">${v?DIFN[v-1]:'—'}</span></span><span class="bv"></span></div>`).join('')}</div></section>
+   </div>
+   <div class="g2">
+    <section class="chart"><h3><i class="hi a"></i>Compromissos fixos</h3><p class="cs">${fixos.length} compromisso(s) + PREPARA UFU (seg e qui, 19:00–20:30)</p><div class="cfx">${fixos.map(x=>`<div class="cfi" style="border-left-color:${COR[x.tipo]||'#8A93A6'}"><b>${esc(x.tipo)}${x.desc?` <small>— ${esc(x.desc)}</small>`:''}</b><span>${esc((x.dias||[]).join(', '))} · ${esc(x.ini||'?')}–${esc(x.fim||'?')}</span></div>`).join('')||'<p class="pend">Nenhum compromisso informado.</p>'}</div>${p.variaveis?`<p class="cs" style="margin-top:8px">Sem dia certo: ${esc(p.variaveis)}</p>`:''}</section>
+    <section class="chart"><h3><i class="hi a"></i>Objetivo e estudo</h3><div class="ofx">
+      ${[['Provas',(p.provas||[]).join(', ')],['Prova da UFU',[p.ufu_exp,p.ufu_vezes].filter(Boolean).join(' · ')],['Média no ENEM',p.enem_media],['Aulas de Matemática',p.aulas_mat],['Onde estuda',p.local_principal],['Simulados',p.simulados],['Redação',p.redacao_freq],['Atividade física',[...(p.atividade_qual||[])].join(', ')||p.atividade]].filter(x=>x[1]).map(([l,v])=>`<div><span>${esc(l)}</span><b>${esc(v)}</b></div>`).join('')}
+      </div>${(p.obstaculos||[]).length?`<p class="cs" style="margin:10px 0 4px">O que mais atrapalha</p><div class="chips2">${p.obstaculos.map(o=>chip(o,'lj')).join('')}</div>`:''}${p.obs?`<p class="cs" style="margin:10px 0 4px">Observações do aluno</p><p class="obs">${esc(p.obs)}</p>`:''}</section>
+   </div>
+   <section class="chart"><h3><i class="hi b"></i>Pré-cronograma</h3><div class="cronoBox"></div></section>
+   <details class="pendl"><summary>Todas as respostas do perfil</summary>${S.map(s=>{const it=s.f.filter(f=>!['disp'].includes(f.k)).map(f=>{const v=fmt(f,p[f.k]);return v?`<dt>${esc(f.l)}</dt><dd>${esc(v)}</dd>`:'';}).join('');return it?`<h4>${esc(s.t)}</h4><dl class="dlr">${it}</dl>`:'';}).join('')}</details>`;}
 function agenda(p){
   const H0=5,H1=24,px=40,top=m=>((m/60-H0)*px);const alt=(H1-H0)*px;
   const ac=tmin(p.acorda),dm=tmin(p.dorme);
