@@ -19,6 +19,7 @@
 *{box-sizing:border-box}
 html,body{margin:0}
 body{background:var(--bg);color:var(--ink);font:16px/1.5 var(--body)}
+body{animation:fadein .25s ease}@keyframes fadein{from{opacity:0}to{opacity:1}}
 header{background:var(--head);padding:14px 22px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;border-bottom:4px solid var(--amarelo)}
 .logos{display:flex;align-items:center;gap:16px}
 .logos img.j{height:46px}.logos img.p{height:34px}.logos img.u{height:42px}
@@ -172,7 +173,7 @@ td.h{font-weight:700}.z{color:var(--line)}
 </style>
 </head>
 <body>
-<div id="gate"><div class="box"><div class="top"><img src="logo/jazz_claro.png" alt="Jazz, Professor de Matemática"><img src="logo/prepara_transp.png" alt="Prepara UFU"></div>
+<div id="gate" hidden><div class="box"><div class="top"><img src="logo/jazz_claro.png" alt="Jazz, Professor de Matemática"><img src="logo/prepara_transp.png" alt="Prepara UFU"></div>
 <form id="gForm" autocomplete="on"><h2 id="gTit">Banco de Questões UFU</h2><p id="gTxt">Acesso exclusivo para alunos liberados pelo Prof. Jazz. Entre com seu e-mail e senha.</p>
 <input id="gEmail" type="email" placeholder="seu e-mail" autocomplete="email" required>
 <input id="gPass" type="password" placeholder="senha (mínimo 6 caracteres)" autocomplete="current-password" minlength="6" required>
@@ -556,10 +557,10 @@ $('gForm').onsubmit=async ev=>{ev.preventDefault();const email=$('gEmail').value
       if(error){if(/invalid/i.test(error.message))throw new Error('E-mail ou senha incorretos. Se é seu primeiro acesso, clique em “Primeiro acesso? Crie sua senha”.');throw error;}}
     gm('');await entrar();
   }catch(e){gm(e.message||'Não foi possível entrar.');}finally{$('gBtn').disabled=false;}};
-async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!session)return;
+async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!session){$('gate').hidden=false;return;}
   const {data:ok}=await SB.rpc('is_allowed');
   if(!ok){await SB.auth.signOut();$('gate').hidden=false;gm('Seu acesso não está liberado. Fale com o Prof. Jazz.');return;}
-  $('gate').hidden=true;$('admBtn').hidden=(session.user.email||'').toLowerCase()!==ADMIN;
+  $('gate').hidden=true;$('admBtn').hidden=true;
   $('ckBtn').hidden=false;
   if(!iniciado){iniciado=true;$('viewQ').innerHTML='<div class="empty">Carregando o banco de questões…</div>';await iniciar();}}
 $('sairBtn').onclick=async()=>{await SB.auth.signOut();location.reload();};
