@@ -226,7 +226,7 @@ input[type=time]{max-width:160px}input[type=number]{max-width:160px}
 .aten{border-color:rgba(211,58,44,.45)}
 .atl{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px;margin-top:10px}
 .atl div{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 12px;display:flex;flex-direction:column;font-size:14px}
-.atl span{color:var(--muted);font-size:13px}
+.atl ul{margin:4px 0 0;padding-left:18px;color:var(--muted);font-size:13px;display:flex;flex-direction:column;gap:3px}
 /* login */
 #gate{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px}
 #gate[hidden]{display:none}
@@ -482,7 +482,10 @@ async function telaGeral(){abas('tabGeral');$('app').innerHTML='<p class="pend">
   const corDif=m=>m>=3.2?'#D33A2C':m>=2.6?'#EB6834':m>=2?'#C9A227':'#1BAF7A';
   const tipos={};RESP.forEach(r=>[...new Set((r.respostas.fixos||[]).map(x=>x.tipo))].forEach(t=>tipos[t]=(tipos[t]||0)+1));
   const pend=LIB.filter(x=>!RESP.some(r=>r.email===x.email));
-  const aten=[...comChoque.map(r=>[r.respostas.nome||r.email,'choque de horário: '+choques(r.respostas)[0].replace(/^Choque de horário na /,'')]),...curtos.map(x=>[x.r.respostas.nome||x.r.email,'tempo insuficiente — faltou '+x.f.join(', ')])];
+  const atM=new Map();const addA=(r,t)=>{const k=r.email;if(!atM.has(k))atM.set(k,{n:r.respostas.nome||r.email,L:[]});atM.get(k).L.push(t);};
+  comChoque.forEach(r=>choques(r.respostas).forEach(c=>addA(r,c.replace(/^Choque de horário na /,'Choque de horário — '))));
+  curtos.forEach(x=>addA(x.r,'Tempo insuficiente — não coube: '+x.f.join(', ')));
+  const aten=[...atM.values()];
   $('app').innerHTML=`<div class="intro"><h2>Comportamento da turma</h2><p>Retrato da turma da Assessoria a partir dos perfis de estudos. Percentuais sobre quem respondeu cada pergunta.</p></div>
   <div class="kpis">
    ${kpi(ringSVG(N/Math.max(T,1),'#DDDD24',pctBR(N,T)),'Perfis enviados',`${N} <em class="of">de ${T}</em>`,T>N?`faltam ${T-N} aluno(s)`:'toda a turma respondeu','k-a')}
@@ -492,7 +495,7 @@ async function telaGeral(){abas('tabGeral');$('app').innerHTML='<p class="pend">
    ${kpi(ringSVG(comChoque.length/N,'#D33A2C',String(comChoque.length)),'Com choque de horário',`${comChoque.length} aluno(s)`,'compromissos que se sobrepõem')}
    ${kpi(ringSVG(curtos.length/N,'#EB6834',String(curtos.length)),'Tempo insuficiente',`${curtos.length} aluno(s)`,'alguma matéria não coube no cronograma')}
   </div>
-  ${aten.length?`<section class="chart aten"><h3><i class="hi c"></i>Alunos que precisam de atenção</h3><div class="atl">${aten.map(([n,t])=>`<div><b>${esc(n)}</b><span>${esc(t)}</span></div>`).join('')}</div></section>`:''}
+  ${aten.length?`<section class="chart aten"><h3><i class="hi c"></i>Alunos que precisam de atenção</h3><div class="atl">${aten.map(a=>`<div><b>${esc(a.n)}</b><ul>${a.L.map(t=>`<li>${esc(t)}</li>`).join('')}</ul></div>`).join('')}</div></section>`:''}
   <h3 class="gsec">Tempo e rotina</h3>
   ${chBars('Horas de estudo por dia da semana',DS.map((d,i)=>[DIAS[i],medDia(d),'#3A8CCB']),N,'média da turma',v=>hfmt(v))}
   <div class="g2">${chDonut('cursinho')}${chDonut('aulas_mat')}${chDonut('trabalha','Trabalha ou faz estágio')}${chDonut('atividade','Pratica atividade física')}</div>
