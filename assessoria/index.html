@@ -273,13 +273,11 @@ const S=[
   {k:'lingua',l:'Língua estrangeira que você vai fazer na UFU',type:'radio',opts:['Inglês','Espanhol','Francês','Ainda não sei'],req:1},
   {k:'ufu_exp',l:'Qual a sua experiência com a prova da UFU?',type:'radio',opts:['Não conheço a prova','Conheço, mas nunca fiz','Já fiz'],req:1},
   {k:'ufu_vezes',l:'Quantas vezes você já fez a prova da UFU?',type:'radio',opts:['1 vez','2 vezes','3 vezes','4 vezes ou mais'],req:1,show:r=>r.ufu_exp==='Já fiz'},
-  {k:'enem_antes',l:'Já fez o ENEM antes?',type:'radio',opts:['Sim','Não'],req:1},
-  {k:'enem_media',l:'Sua média no último ENEM, mais ou menos',type:'radio',opts:['Abaixo de 500','500 a 600','600 a 700','700 a 800','Acima de 800','Não lembro'],show:r=>r.enem_antes==='Sim'},
+  {k:'enem_media',l:'Sua média no último ENEM, mais ou menos',type:'radio',opts:['Até 500','500 a 600','600 a 700','700 a 800','Acima de 800','Não fiz o ENEM'],req:1},
  ]},
  {t:'Sua rotina',f:[
   {k:'acorda',l:'Que horas você costuma acordar? (dias de semana)',type:'time',req:1},
   {k:'dorme',l:'Que horas você costuma dormir? (dias de semana)',type:'time',req:1},
-  {k:'sono_fds',l:'E no fim de semana?',type:'radio',opts:['Mesmo horário da semana','Durmo e acordo mais tarde','Varia muito']},
   {k:'trabalha',l:'Você trabalha ou faz estágio?',type:'radio',opts:['Sim','Não'],req:1},
   {k:'cursinho',l:'Você faz cursinho?',type:'radio',opts:['Sim, presencial','Sim, online','Presencial e online','Não faço cursinho'],req:1,h:'Se faz, coloque os dias e horários das aulas (inclusive as online ao vivo) na lista de compromissos fixos, logo abaixo.'},
   {k:'cursinho_nome',l:'Qual cursinho?',type:'text',show:r=>r.cursinho&&r.cursinho!=='Não faço cursinho'},
@@ -296,15 +294,9 @@ const S=[
   {k:'aulas_mat',l:'Como você vai assistir às aulas do Curso de Matemática?',type:'radio',opts:['Ao vivo','Gravadas','Parte ao vivo, parte gravadas','Ainda não sei'],req:1},
   {k:'horas_dia',l:'Quantas horas você estuda em cada dia da semana?',type:'horasdia',req:1,h:'Conte só o tempo de estudo seu, fora das aulas da escola e do cursinho. É com essas horas que o seu pré-cronograma é montado.'},
   {k:'local_principal',l:'Onde você estuda na maior parte do tempo?',type:'radio',opts:LOCAIS,req:1},
-  {k:'local',l:'Em que outros lugares você também estuda?',type:'checks',opts:LOCAIS},
-  {k:'lugar_fixo',l:'O seu lugar de estudo é fixo e silencioso?',type:'radio',opts:['Sim','Mais ou menos','Não'],req:1},
  ]},
  {t:'Como você revisa',f:[
-  {k:'anki',l:'Você usa o Anki?',type:'radio',opts:['Sim, todos os dias','Sim, de vez em quando','Já usei, mas parei','Nunca usei'],req:1},
-  {k:'anki_min',l:'Quanto tempo por dia você passa no Anki?',type:'radio',opts:['Até 15 min','15 a 30 min','30 min a 1 h','Mais de 1 h'],show:r=>(r.anki||'').startsWith('Sim')},
-  {k:'anki_baralho',l:'Que baralhos você usa?',type:'radio',opts:['Faço os meus','Uso baralhos prontos','Os dois'],show:r=>(r.anki||'').startsWith('Sim')},
-  {k:'revisao',l:'O que mais você usa para revisar?',type:'checks',opts:['Resumos','Mapas mentais','Flashcards de papel','Refazer questões','Caderno de erros','Videoaulas','Não tenho método de revisão'],req:1},
-  {k:'questoes_semana',l:'Quantas questões você resolve por semana, em média?',type:'radio',opts:['Menos de 50','50 a 100','100 a 200','200 a 400','Mais de 400'],req:1},
+  {k:'rev_tempo',l:'Quanto tempo por dia você revisa?',type:'radio',opts:['Não reviso','15 min','30 min','45 min','1 h','Mais de 1 h'],req:1,h:'Revisão com Anki, caderno de erros, flashcards, resumos ou o que você usar.'},
   {k:'simulados',l:'Faz simulados completos?',type:'radio',opts:['Sim, com frequência','Às vezes','Nunca fiz'],req:1},
  ]},
  {t:'Como você se avalia',f:[
@@ -427,13 +419,13 @@ async function telaGeral(){abas('tabGeral');$('app').innerHTML='<p class="pend">
   $('app').innerHTML=`<div class="intro"><h2>Visão geral da turma</h2><p>${N} de ${T} alunos da Assessoria enviaram o perfil de estudos${T>N?` · faltam ${T-N}`:''}. Percentuais sobre quem respondeu.</p></div>
   <div class="kps">${kpi(hfmt(medD(DS.slice(0,5))),'estudam por dia (seg–sex)')}${kpi(hfmt(medD(['Sáb'])),'no sábado')}${kpi(hfmt(medD(['Dom'])),'no domingo')}${kpi(hfmt(medD(DS)*7),'por semana')}${kpi(mt('acorda')!=null?mfmt(mt('acorda')):'—','acordam, em média')}${kpi(mt('dorme')!=null?mfmt(mt('dorme')):'—','dormem, em média')}${kpi(sono.length?hfmt(sono.reduce((a,b)=>a+b,0)/sono.length):'—','de sono por noite')}</div>
   <div class="gg">
-   ${D('cursinho')}${D('aulas_mat')}${D('local_principal')}${D('local')}${D('lugar_fixo')}${D('ufu_exp')}${D('ufu_vezes')}
+   ${D('cursinho')}${D('aulas_mat')}${D('local_principal')}${D('ufu_exp')}${D('ufu_vezes')}
    ${card('Dificuldade por matéria',nivel.map(([a,v,pc])=>`<div class="br"><span class="bl">${esc(a)}</span><span class="bt"><i style="width:${v/4*100}%;background:${v>=3?'var(--laranja)':v>=2.3?'var(--amarelo)':'var(--verde)'}"></i></span><b>${pc}%</b><small>${v.toFixed(1)}</small></div>`).join(''),'barra = dificuldade média (1 tranquila – 4 muito difícil) · % = acham difícil ou muito difícil')}
    ${D('obstaculos')}
    ${card('Compromissos fixos (% com cada um)',Object.entries(tipos).sort((a,b)=>b[1]-a[1]).map(([t,n])=>bar(t,n,N,COR[t])).join('')||'<p class="pend">—</p>')}
    ${D('atividade')}${D('atividade_fixo')}${D('trabalha')}${D('situacao')}${D('escola_turno')}
-   ${D('anki')}${D('anki_min')}${D('revisao')}${D('questoes_semana')}${D('simulados')}${D('redacao_freq')}
-   ${D('sono_fds')}${D('provas')}${D('universidades')}${D('enem_antes')}${D('enem_media')}
+   ${D('rev_tempo')}${D('simulados')}${D('redacao_freq')}
+   ${D('provas')}${D('universidades')}${D('enem_media')}
   </div>`;}
 async function telaResp(){abas('tabResp');
   $('app').innerHTML='<div class="adm-top"><input type="search" id="busca" placeholder="procurar aluno"><button class="btn" id="csv">Baixar planilha (CSV)</button></div><div id="lista" style="display:flex;flex-direction:column;gap:10px"><p class="pend">Carregando…</p></div>';
@@ -454,7 +446,7 @@ function agenda(p){
 function ficha(r){const p=r.respostas;
   const sono=(()=>{const a=tmin(p.acorda),d=tmin(p.dorme);return a!=null&&d!=null?hfmt(((a-d+1440)%1440)/60):'—';})();
   const t=(v,l)=>`<div class="kp"><b>${esc(v||'—')}</b><span>${esc(l)}</span></div>`;
-  return `<div class="kps">${(()=>{const h=horasDia(p);return t(DS.map(d=>hfmt(h[d]||0).replace(' h','h')).join(' · '),'horas por dia: seg · ter · qua · qui · sex · sáb · dom')+t(hfmt(DS.reduce((a,d)=>a+(h[d]||0),0)),'de estudo por semana');})()}${t(sono,`de sono (${p.dorme||'?'} → ${p.acorda||'?'})`)}${t(p.cursinho,'cursinho')}${t(p.aulas_mat,'aulas de Matemática')}${t(p.local_principal,'onde estuda')}${t(p.anki,'Anki')}${t(p.ufu_exp+(p.ufu_vezes?' · '+p.ufu_vezes:''),'prova da UFU')}</div>
+  return `<div class="kps">${(()=>{const h=horasDia(p);return t(DS.map(d=>hfmt(h[d]||0).replace(' h','h')).join(' · '),'horas por dia: seg · ter · qua · qui · sex · sáb · dom')+t(hfmt(DS.reduce((a,d)=>a+(h[d]||0),0)),'de estudo por semana');})()}${t(sono,`de sono (${p.dorme||'?'} → ${p.acorda||'?'})`)}${t(p.cursinho,'cursinho')}${t(p.aulas_mat,'aulas de Matemática')}${t(p.local_principal,'onde estuda')}${t(p.rev_tempo||p.anki,'revisão por dia')}${t(p.ufu_exp+(p.ufu_vezes?' · '+p.ufu_vezes:''),'prova da UFU')}</div>
   <h4>Semana do aluno</h4>${agenda(p)}
   <h4>Pré-cronograma do aluno</h4><div class="cronoBox"></div>
   <h4>Dificuldade por matéria</h4>${AREAS.map(a=>{const v=(p.nivel||{})[a]||0;return `<div class="br"><span class="bl">${esc(a)}</span><span class="bt"><i style="width:${v*25}%;background:${v>=4?'var(--bad)':v===3?'var(--laranja)':v===2?'var(--amarelo)':'var(--verde)'}"></i></span><b style="grid-column:span 2;text-align:left;font-weight:600">${v?DIFN[v-1]:'—'}</b></div>`;}).join('')}
@@ -508,8 +500,9 @@ function gerar(p){
   // revisão (segunda a sábado)
   const ankiOn=(p.anki||'').startsWith('Sim');
   const outros=(p.revisao||[]).filter(x=>!['Videoaulas','Não tenho método de revisão'].includes(x));
-  const revNome='Revisão'+(ankiOn?' — Anki':'')+(outros.length?(ankiOn?' + ':' — ')+outros.join(', ').toLowerCase():'');
-  const revDur=ankiOn?(REVMIN[p.anki_min]||30):30;
+  const REVT={'15 min':15,'30 min':30,'45 min':45,'1 h':60,'Mais de 1 h':60};
+  const revNome='Revisão';
+  const revDur=p.rev_tempo?(REVT[p.rev_tempo]||30):(ankiOn?(REVMIN[p.anki_min]||30):30);
   const totSem=DS.slice(0,6).reduce((t,d)=>t+cap[d],0);const minimo=DISC.reduce((t,x)=>t+x[3],0)+90;
   const enxuto=totSem<minimo+6*revDur;
   DS.slice(0,6).forEach(d=>{if(cap[d]>=revDur+(enxuto?120:60)){out.dias[d].push({tipo:'rev',k:'REV',dur:revDur,label:revNome});usado[d]+=revDur;}});
@@ -668,11 +661,11 @@ function editar(st,b){const novo=!b;const ops=opcoesMateria(st.p);
     DS.forEach(x=>st.B.filter(y=>y.d===x).sort((a,c)=>a.ord-c.ord).forEach((y,i)=>y.ord=i));
     fecha();desenhar(st);salvar(st);};}
 
-const EXEMPLO_RESP={nome:'Aluno Exemplo',whats:'(34) 99999-0000',cidade:'Uberlândia',situacao:'Estou no 3º ano do Ensino Médio',escola_turno:'Manhã',curso:'Medicina',universidades:['UFU','UFTM'],provas:['ENEM','Vestibular UFU'],lingua:'Inglês',ufu_exp:'Já fiz',ufu_vezes:'1 vez',enem_antes:'Sim',enem_media:'600 a 700',
- acorda:'06:00',dorme:'23:00',sono_fds:'Durmo e acordo mais tarde',trabalha:'Não',cursinho:'Sim, online',cursinho_nome:'Cursinho online',atividade:'Sim',atividade_qual:['Academia'],atividade_fixo:'Sim, dias e horários fixos',
+const EXEMPLO_RESP={nome:'Aluno Exemplo',whats:'(34) 99999-0000',cidade:'Uberlândia',situacao:'Estou no 3º ano do Ensino Médio',escola_turno:'Manhã',curso:'Medicina',universidades:['UFU','UFTM'],provas:['ENEM','Vestibular UFU'],lingua:'Inglês',ufu_exp:'Já fiz',ufu_vezes:'1 vez',enem_media:'600 a 700',
+ acorda:'06:00',dorme:'23:00',trabalha:'Não',cursinho:'Sim, online',cursinho_nome:'Cursinho online',atividade:'Sim',atividade_qual:['Academia'],atividade_fixo:'Sim, dias e horários fixos',
  fixos:[{tipo:'Escola',desc:'Ensino médio',dias:['Seg','Ter','Qua','Qui','Sex'],ini:'07:00',fim:'12:20'},{tipo:'Academia / esporte',desc:'musculação',dias:['Ter','Qui'],ini:'17:30',fim:'18:30'},{tipo:'Cursinho',desc:'aula online ao vivo',dias:['Qua'],ini:'19:00',fim:'21:00'},{tipo:'Psicólogo / terapia',desc:'',dias:['Sex'],ini:'15:00',fim:'16:00'}],fixos_ok:['Sim, está tudo aí'],
  aulas_mat:'Ao vivo',horas_dia:{Seg:'4 h 30',Ter:'4 h 30',Qua:'4 h',Qui:'4 h 30',Sex:'4 h 30',Sáb:'4 h',Dom:'3 h'},disp:['Segunda|Tarde','Segunda|Noite','Terça|Tarde','Terça|Noite','Quarta|Tarde','Quinta|Tarde','Quinta|Noite','Sexta|Tarde','Sexta|Noite','Sábado|Manhã','Sábado|Tarde','Domingo|Manhã'],melhor_periodo:['Tarde','Noite'],
- local_principal:'No meu quarto',local:['Biblioteca'],lugar_fixo:'Mais ou menos',anki:'Sim, de vez em quando',anki_min:'15 a 30 min',anki_baralho:'Faço os meus',revisao:['Resumos','Caderno de erros'],questoes_semana:'100 a 200',simulados:'Às vezes',
+ local_principal:'No meu quarto',rev_tempo:'30 min',simulados:'Às vezes',
  nivel:{'Matemática':4,'Física':3,'Química':3,'Biologia':2,'Língua Portuguesa':2,'Literatura':3,'Língua estrangeira':1,'História':2,'Geografia':2,'Filosofia':3,'Sociologia':2,'Redação':3},redacao_freq:'A cada 15 dias',obstaculos:['Celular e redes sociais','Cansaço']};
 async function modoExemplo(on){EXMODO=on;ALVO=on?EXEMPLO:EMAIL;
   ['tabGeral','tabResp','tabExemplo'].forEach(t=>$(t).hidden=on);
