@@ -480,186 +480,237 @@ function pesoCurso(curso){const c=sem(curso);
   return {k:[],g:''};}
 const REVMIN={'Até 15 min':15,'15 a 30 min':30,'30 min a 1 h':45,'Mais de 1 h':60};
 const hm=m=>String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
-/* ---------- Pré-cronograma sem horários: compromissos do dia + estudos com duração ---------- */
-CORD.OUT='#364FC7';
-const SIMLBL='Simulado · provas antigas da UFU · matéria atrasada';
-const durTxt=m=>{m=Math.round(m);const h=Math.floor(m/60),r=m%60;return h?(r?`${h}h${String(r).padStart(2,'0')}`:`${h}h`):`${r} min`;};
-const isPrep=d=>d==='Seg'||d==='Qui';
-function compromissos(p,d){
-  const L=(p.fixos||[]).filter(x=>(x.dias||[]).includes(d)).map(x=>{const a=tmin(x.ini),b=tmin(x.fim);return a==null||b==null?null:{ini:a,dur:(b>a?b:1440)-a,label:x.tipo+(x.desc?' — '+x.desc:''),tipo:'fixo'};}).filter(Boolean);
-  if(isPrep(d))L.push({ini:1140,dur:90,label:'PREPARA UFU — aula ao vivo com o Prof. Jazz',tipo:'prepara'});
-  return L.sort((a,b)=>a.ini-b.ini);}
-function ordenaDia(L){ // revisão primeiro; depois evita matérias da mesma área seguidas
-  const rev=L.filter(b=>b.tipo==='rev'),sim=L.filter(b=>b.tipo==='sim'),R=L.filter(b=>b.tipo!=='rev'&&b.tipo!=='sim').sort((a,b)=>b.dur-a.dur);
-  const out=[...rev,...sim];let last=null;
-  while(R.length){let i=R.findIndex(b=>(b.g||b.k)!==last);if(i<0)i=0;const b=R.splice(i,1)[0];out.push(b);last=b.g||b.k;}
-  return out;}
-function gerar(p){
-  const HD=horasDia(p);const out={dias:{},avisos:[]};DS.forEach(d=>out.dias[d]=[]);
-  const cap={},usado={};DS.forEach(d=>{cap[d]=Math.round((HD[d]||0)*60);usado[d]=0;});
-  // revisão (segunda a sábado)
-  const ankiOn=(p.anki||'').startsWith('Sim');
+function subtrai(L,a,b){const o=[];L.forEach(([x,y])=>{if(b<=x||a>=y)o.push([x,y]);else{if(a>x)o.push([x,a]);if(b<y)o.push([b,y]);}});return o.filter(([x,y])=>y-x>=15);}
+function gerar0(p,aj,enxuto){
+  const W=tmin(p.acorda)??420,SL=tmin(p.dorme)??1380;
+  const iniDia=W+30,fimDia=Math.min(SL<=W+120?1440:SL,1440)-30;
+  const marc=p.disp||[],usaMarc=marc.length>0;
+  const fixosDia=d=>(p.fixos||[]).filter(x=>(x.dias||[]).includes(d)).map(x=>{const a=tmin(x.ini),b=tmin(x.fim);return a==null||b==null?null:{ini:a,fim:b>a?b:1440,label:x.tipo+(x.desc?' — '+x.desc:'')};}).filter(Boolean);
+  const out={dias:{},avisos:[],resumo:[],extra:[]};
+  DS.forEach(d=>out.dias[d]=[]);
+  // blocos fixos exibidos
+  DS.forEach(d=>{fixosDia(d).forEach(f=>out.dias[d].push({tipo:'fixo',ini:f.ini,fim:f.fim,label:f.label}));
+    if(d==='Seg'||d==='Qui')out.dias[d].push({tipo:'prepara',ini:1140,fim:1230,label:'PREPARA UFU — aula ao vivo com o Prof. Jazz'});});
+  // tempo livre por dia (seg a sáb)
+  const cap={},livre={};
+  const HD=horasDia(p);
+  DS.slice(0,6).forEach((d,i)=>{
+    let L=usaMarc?TURNOS.map((t,j)=>marc.includes(DIAS[i]+'|'+t)?[[360,720,1080][j],[720,1080,1440][j]]:null).filter(Boolean):[[0,1440]];
+    L=L.map(([a,b])=>[Math.max(a,iniDia),Math.min(b,fimDia)]).filter(([a,b])=>b>a);
+    L.sort((x,y)=>x[0]-y[0]);const M=[];L.forEach(x=>{const l=M[M.length-1];if(l&&x[0]<=l[1])l[1]=Math.max(l[1],x[1]);else M.push([...x]);});L=M;
+    const F=fixosDia(d);F.forEach(f=>L=subtrai(L,f.ini-15,f.fim+15));
+    if(d==='Seg'||d==='Qui')L=subtrai(L,1125,1245);
+    const almocoBloq=F.find(f=>f.ini<780&&f.fim>720);const alm=almocoBloq&&almocoBloq.fim<=870?[almocoBloq.fim+15,almocoBloq.fim+75]:[720,780];
+    L=subtrai(L,alm[0],alm[1]);L=subtrai(L,1110,1140);
+    livre[d]=L.map(([a,b])=>({a,b,prev:(d==='Seg'||d==='Qui')&&a===1245?'EX':null}));cap[d]=Math.round((HD[d]||0)*60);});
+  const dispTot=DS.slice(0,6).reduce((t,d)=>t+Math.min(cap[d],livre[d].reduce((a,iv)=>a+iv.b-iv.a,0)),0);
+  const usado={};DS.forEach(d=>usado[d]=0);
+  function achaIv(d,dur,grupo,relax){if(usado[d]+dur>cap[d])return null;let m=null;
+    for(const iv of livre[d]){if(iv.b-iv.a<dur)continue;
+      if(!relax&&iv.prev&&iv.prev===grupo&&grupo!=='REV')continue;
+      if(relax&&iv.prev==='EX'&&grupo==='EX')continue;
+      const w=iv.b-iv.a-dur,per=iv.a<720?0:iv.a<1080?1:2;if(!m||per<m.per||(per===m.per&&w<m.w))m={iv,w,per};}
+    return m;}
+  function coloca(d,dur,grupo,relax,first){let m;
+    if(first){if(usado[d]+dur>cap[d])return null;const iv=livre[d].find(iv=>iv.b-iv.a>=dur);m=iv&&{iv};}else m=achaIv(d,dur,grupo,relax);
+    if(!m)return null;const iv=m.iv,s=iv.a;iv.a=s+dur+10;iv.prev=grupo;usado[d]+=dur;return [s,s+dur];}
+  // revisão diária (seg a sáb)
+  const ankiOn=(p.anki||'').startsWith('Sim');const REVT={'15 min':15,'30 min':30,'45 min':45,'1 h':60,'Mais de 1 h':60};
   const outros=(p.revisao||[]).filter(x=>!['Videoaulas','Não tenho método de revisão'].includes(x));
-  const REVT={'15 min':15,'30 min':30,'45 min':45,'1 h':60,'Mais de 1 h':60};
   const revNome='Revisão';
   const revDur=p.rev_tempo?(REVT[p.rev_tempo]||30):(ankiOn?(REVMIN[p.anki_min]||30):30);
-  const totSem=DS.slice(0,6).reduce((t,d)=>t+cap[d],0);const minimo=DISC.reduce((t,x)=>t+x[3],0)+90;
-  const enxuto=totSem<minimo+6*revDur;
-  DS.slice(0,6).forEach(d=>{if(cap[d]>=revDur+(enxuto?120:60)){out.dias[d].push({tipo:'rev',k:'REV',dur:revDur,label:revNome});usado[d]+=revDur;}});
+  DS.slice(0,6).forEach(d=>{if(cap[d]<revDur+(enxuto?120:60))return;const r=coloca(d,revDur,'REV',false,true);if(r)out.dias[d].push({tipo:'rev',ini:r[0],fim:r[1],label:revNome});});
   // quantas vezes cada disciplina
   const MK={'Matemática':'MAT','Física':'FIS','Química':'QUI','Biologia':'BIO','Língua Portuguesa':'LP','Literatura':'LIT','Língua estrangeira':'LE','História':'HIS','Geografia':'GEO','Filosofia':'FIL','Sociologia':'SOC','Redação':'RED'};
   const difn={};Object.entries(p.nivel||{}).forEach(([a,v])=>{if(MK[a])difn[MK[a]]=v||0;});
-  (p.dificuldades||[]).forEach(x=>{const k=DIF2K[x];if(k&&!difn[k])difn[k]=3;});
-  const pc=pesoCurso(p.curso);const LEnome=p.lingua&&p.lingua!=='Ainda não sei'?p.lingua:'Língua Estrangeira';
+  (p.dificuldades||[]).forEach(x=>{const k=DIF2K[x];if(k&&!difn[k])difn[k]=3;});const pc=pesoCurso(p.curso);
+  const LEnome=p.lingua&&p.lingua!=='Ainda não sei'?p.lingua:'Língua Estrangeira';
   const plano=DISC.map(([k,n,g,dur,base])=>{let v=base,why=[];const dv=difn[k]||0;if(dv>=3){v+=dv-2;why.push(DIFN[dv-1].toLowerCase());}if(pc.k.includes(k)){v++;why.push('peso para '+(p.curso||'o seu curso'));}
     v=Math.min(v,g==='EX'?4:3);return {k,n:k==='LE'?LEnome:n,g,dur:enxuto?60:dur,v,why,feito:0,dias:[]};});
+  // Matemática, Física e Química sempre aparecem mais vezes que qualquer outra disciplina
   const maxOutro=Math.max(...plano.filter(x=>x.g!=='EX').map(x=>x.v));
-  plano.filter(x=>x.g==='EX').forEach(x=>{if(x.v<=maxOutro)x.v=Math.min(4,maxOutro+1);});
+  plano.filter(x=>x.g==='EX').forEach(x=>{if(x.v<=maxOutro){x.v=Math.min(4,maxOutro+1);if(!x.why.length)x.why.push('exatas: prioridade do PREPARA');}});
   plano.filter(x=>x.g!=='EX').forEach(x=>{const lim=Math.min(...plano.filter(y=>y.g==='EX').map(y=>y.v))-1;if(x.v>lim)x.v=Math.max(1,lim);});
-  plano.sort((a,b)=>b.v-a.v);
-  const red={k:'RED',n:'Redação',g:'RED',dur:enxuto?60:90,v:1,feito:0,dias:[]};
-  const EXs=plano.filter(x=>x.g==='EX'),OUT=plano.filter(x=>x.g!=='EX');const maxV=Math.max(...plano.map(x=>x.v));
-  const fila=[];for(let r=1;r<=maxV;r++)EXs.filter(x=>x.v>=r).forEach(x=>fila.push(x));
+  plano.forEach(x=>{if(aj[x.k]!=null)x.v=Math.min(x.v,aj[x.k]);});
+  plano.sort((a,b)=>b.v-a.v||(b.g==='EX'||b.g==='BIO')-(a.g==='EX'||a.g==='BIO'));
+  const red={k:'RED',n:'Redação',g:'LIN',dur:enxuto?60:90,v:1,why:(difn.RED||0)>=3?[DIFN[difn.RED-1].toLowerCase()+' (1× por semana)']:[],feito:0,dias:[]};
+  const fila=[];const maxV=Math.max(...plano.map(x=>x.v));
+  // blocos longos (1h30) primeiro, em rodadas; depois os de 1h ocupam os espaços que sobram
+  // 1º: todas as disciplinas uma vez (longas antes das curtas); 2º: repetições, das mais difíceis/pesadas para as demais
+  // 1º: Matemática, Física e Química em todas as repetições; 2º: Biologia e Redação; 3º: as demais uma vez; 4º: repetições das demais
+  const EXs=plano.filter(x=>x.g==='EX'),OUT=plano.filter(x=>x.g!=='EX');
+  for(let r=1;r<=maxV;r++)EXs.filter(x=>x.v>=r).forEach(x=>fila.push(x));
   [90,60].forEach(dur=>{OUT.filter(x=>x.dur===dur).forEach(x=>fila.push(x));if(dur===(enxuto?60:90))fila.push(red);});
   for(let r=2;r<=maxV;r++)[90,60].forEach(dur=>OUT.filter(x=>x.dur===dur&&x.v>=r).forEach(x=>fila.push(x)));
-  const dI=d=>DS.indexOf(d);const exDia=d=>out.dias[d].filter(b=>b.g==='EX').length+(isPrep(d)?1:0);
+  const dIdx=d=>DS.indexOf(d);
+  const exNoDia=d=>out.dias[d].filter(b=>b.g==='EX'||b.tipo==='prepara').length;
   const falta=[];
-  fila.forEach(x=>{
-    if(x.g!=='EX'&&x.k!=='RED'&&x.feito>=1&&x.feito+1>=Math.min(...EXs.map(y=>y.feito))){x.v=x.feito;return;}
-    const c=DS.slice(0,6).filter(d=>!x.dias.includes(d)&&usado[d]+x.dur<=cap[d]&&!(x.g==='EX'&&exDia(d)>=2))
-      .map(d=>({d,dist:x.dias.length?Math.min(...x.dias.map(e=>Math.abs(dI(e)-dI(d)))):6,resto:cap[d]-usado[d]}))
-      .sort((a,b)=>b.dist-a.dist||b.resto-a.resto||dI(a.d)-dI(b.d))[0];
-    if(!c){falta.push(x.n);return;}
-    out.dias[c.d].push({tipo:x.k==='RED'?'red':'estudo',k:x.k,g:x.g,dur:x.dur,label:x.n});usado[c.d]+=x.dur;x.dias.push(c.d);x.feito++;});
-  // garantia: toda matéria aparece pelo menos uma vez — tira uma repetição de quem aparece mais
-  const todas=[...plano,red];const trocas=[],nao=[];
-  const cabeEm=(x,d,livre)=>!out.dias[d].some(b=>b.k===x.k)&&!(x.g==='EX'&&exDia(d)>=2)&&livre>=x.dur;
-  todas.filter(x=>x.feito===0).forEach(x=>{
-    let d=DS.slice(0,6).find(d=>cabeEm(x,d,cap[d]-usado[d]));
-    if(d){out.dias[d].push({tipo:x.k==='RED'?'red':'estudo',k:x.k,g:x.g,dur:x.dur,label:x.n});usado[d]+=x.dur;x.feito=1;x.dias.push(d);return;}
-    const doadores=todas.filter(y=>y.feito>=2).sort((a,b)=>b.feito-a.feito||(a.g==='EX')-(b.g==='EX'));
-    for(const y of doadores){
-      for(const dd of y.dias.slice().reverse()){
-        const i=out.dias[dd].findIndex(b=>b.k===y.k);if(i<0)continue;const bl=out.dias[dd][i];
-        out.dias[dd].splice(i,1);usado[dd]-=bl.dur;
-        let dur=x.dur;if(cap[dd]-usado[dd]<dur&&dur===90&&cap[dd]-usado[dd]>=60)dur=60;
-        if(cabeEm({...x,dur},dd,cap[dd]-usado[dd])){out.dias[dd].push({tipo:x.k==='RED'?'red':'estudo',k:x.k,g:x.g,dur,label:x.n});usado[dd]+=dur;
-          y.feito--;y.dias.splice(y.dias.indexOf(dd),1);x.feito=1;x.dias.push(dd);trocas.push([y.n,y.feito+1,y.feito,x.n]);d=dd;break;}
-        out.dias[dd].splice(i,0,bl);usado[dd]+=bl.dur;}
-      if(d)break;}
-    if(!d)nao.push(x.n);});
-  const vz=n=>n===1?'1 vez':n+' vezes';
+  fila.forEach(x=>{if(x.g!=='EX'&&x.k!=='RED'&&x.feito>=1&&x.feito+1>=Math.min(...EXs.map(y=>y.feito))){x.v=x.feito;return;}let melhor=null;
+    for(const relax of [false,true]){
+      const cands=DS.slice(0,6).filter(d=>!x.dias.includes(d)&&!(x.g==='EX'&&exNoDia(d)>=2)).map(d=>{
+        const dist=x.dias.length?Math.min(...x.dias.map(e=>Math.abs(dIdx(e)-dIdx(d)))):6;
+        const m=achaIv(d,x.dur,x.g,relax);return {d,dist,w:m?m.w:1e9,per:m?m.per:9,resto:cap[d]-usado[d]};}).filter(c=>c.w<1e9)
+        .sort((a,b)=>b.dist-a.dist||a.per-b.per||(x.dur<90?a.w-b.w:b.resto-a.resto)||b.resto-a.resto||dIdx(a.d)-dIdx(b.d));
+      for(const c of cands){const r=coloca(c.d,x.dur,x.g,relax);if(r){melhor={d:c.d,r};break;}}
+      if(melhor)break;}
+    if(melhor){x.dias.push(melhor.d);x.feito++;out.dias[melhor.d].push({tipo:x.k==='RED'?'red':'estudo',k:x.k,g:x.g,ini:melhor.r[0],fim:melhor.r[1],label:x.n});}
+    else falta.push(x.n);});
+  // domingo: só de manhã
+  let dom=[[Math.max(W+30,420),720]];fixosDia('Dom').forEach(f=>dom=subtrai(dom,f.ini-15,f.fim+15));
+  const dm=dom.sort((a,b)=>(b[1]-b[0])-(a[1]-a[0]))[0];
+  const domMin=Math.round((HD['Dom']||0)*60);
+  if(domMin<60)out.avisos.push('Você não estuda no domingo. O domingo de manhã é o momento das provas antigas e dos simulados: converse sobre isso com o seu mentor.');
+  else if(dm&&dm[1]-dm[0]>=60)out.dias['Dom'].push({tipo:'sim',ini:dm[0],fim:Math.min(dm[1],dm[0]+Math.min(240,domMin)),label:'Simulado · provas antigas da UFU · matéria atrasada'});
+  else if(domMin>=60)out.avisos.push('Seus compromissos de domingo de manhã não deixam espaço para o simulado/provas antigas. Vamos ajustar isso no encontro com o mentor.');
+  {const ok=new Set([...plano,red].filter(x=>x.feito>=x.v||x.feito===0).map(x=>x.n));const lst=[...new Set(falta.filter(n=>!ok.has(n)))];
+   if(lst.length)out.avisos.unshift('A quantidade de horas que você estuda é insuficiente para a quantidade de conteúdos que você precisa estudar: algumas matérias apareceriam mais vezes se você tivesse mais tempo ('+lst.join(', ')+'). Vamos rever o seu tempo de estudo no encontro com o mentor.');}
+  out.resumo=[...plano,red].map(x=>({n:x.n,k:x.k,v:x.feito,pedido:x.v,min:x.feito*x.dur,why:x.why}));
+  out.revMin=DS.slice(0,6).reduce((s,d)=>s+out.dias[d].filter(b=>b.tipo==='rev').reduce((a,b)=>a+b.fim-b.ini,0),0);
+  out.curso=pc;return {out,plano,red};}
+function gerar(p){
+  const HD=horasDia(p);const totSem=DS.slice(0,6).reduce((t,d)=>t+Math.round((HD[d]||0)*60),0);
+  const enxuto=totSem<DISC.reduce((t,x)=>t+x[3],0)+90+6*30;
+  const aj={},trocas=[];let res;
+  for(let it=0;it<25;it++){res=gerar0(p,aj,enxuto);const todas=[...res.plano,res.red];const zero=todas.filter(x=>x.feito===0);
+    if(!zero.length)break;
+    const d=todas.filter(x=>x.feito>=2).sort((a,b)=>b.feito-a.feito||(a.v-b.v)||(a.g==='EX')-(b.g==='EX'))[0];if(!d)break;
+    aj[d.k]=d.feito-1;trocas.push([d.n,d.feito,d.feito-1,zero[0].n]);}
+  const out=res.out,todas=[...res.plano,res.red];const vz=n=>n===1?'1 vez':n+' vezes';
+  const fim=todas.filter(x=>x.feito===0).map(x=>x.n);
   const tg={};trocas.forEach(([y,de,para])=>{tg[y]=tg[y]?[tg[y][0],para]:[de,para];});
-  if(trocas.length)out.avisos.push('Precisamos diminuir '+Object.entries(tg).map(([y,[de,para]])=>`${y} (de ${vz(de)} para ${vz(para)})`).join(', ')+', porque faltou tempo para '+[...new Set(trocas.map(t=>t[3]))].join(', ')+'. Toda matéria precisa aparecer pelo menos uma vez na semana.');
-  if(nao.length)out.avisos.push(`Mesmo assim não coube ${nao.join(', ')} nem uma vez na semana. Toda matéria precisa aparecer pelo menos uma vez: aumente as suas horas de estudo no perfil ou fale com o seu mentor.`);
+  const ganharam=[...new Set(trocas.map(t=>t[3]))].filter(n=>!fim.includes(n));
+  if(trocas.length&&ganharam.length)out.avisos.push('Precisamos diminuir '+Object.entries(tg).map(([y,[de,para]])=>`${y} (de ${vz(de)} para ${vz(para)})`).join(', ')+', porque faltou tempo para '+ganharam.join(', ')+'. Toda matéria precisa aparecer pelo menos uma vez na semana.');
+  if(fim.length)out.avisos.push(`Não coube ${fim.join(', ')} nem uma vez na semana. Toda matéria precisa aparecer pelo menos uma vez: aumente as suas horas de estudo no perfil ou fale com o seu mentor.`);
   if(enxuto)out.avisos.push('Como o seu tempo de estudo está curto, os blocos ficaram de 1h para caber todas as matérias.');
-  {const ok=new Set(todas.filter(x=>x.feito>=x.v).map(x=>x.n));const f2=falta.filter(n=>!ok.has(n));falta.splice(0,falta.length,...f2);}
-  // domingo: simulado / provas antigas / matéria atrasada
-  if(cap.Dom>=60)out.dias.Dom.push({tipo:'sim',k:'SIM',dur:Math.min(240,cap.Dom),label:SIMLBL});
-  else out.avisos.push('Você não marcou horas de estudo no domingo. O domingo é o dia das provas antigas e dos simulados: converse sobre isso com o seu mentor.');
-  if(falta.length){const c={};falta.forEach(n=>c[n]=(c[n]||0)+1);
-    out.avisos.unshift('A quantidade de horas que você estuda é insuficiente para a quantidade de conteúdos que você precisa estudar: algumas matérias apareceriam mais vezes se você tivesse mais tempo ('+Object.keys(c).join(', ')+'). Vamos rever o seu tempo de estudo no encontro com o mentor.');}
-  let id=1;out.B=DS.flatMap(d=>ordenaDia(out.dias[d]).map((b,i)=>({id:id++,d,ord:i,tipo:b.tipo,k:b.k,g:b.g,dur:b.dur,label:b.label})));
-  out.curso=pc;return out;}
+  return out;}
+const GRUPO={MAT:'EX',FIS:'EX',QUI:'EX',BIO:'BIO',LP:'LIN',LIT:'LIN',LE:'LIN',HIS:'HUM',GEO:'HUM',FIL:'HUM',SOC:'HUM',RED:'LIN'};
+
+CORD.OUT='#364FC7';
+const SIMLBL='Simulado · provas antigas da UFU · matéria atrasada';
+function paraBlocos(g){let id=1;return DS.flatMap(d=>g.dias[d].filter(b=>!['fixo','prepara'].includes(b.tipo)).map(b=>({id:id++,d,ini:b.ini,fim:b.fim,tipo:b.tipo,k:b.k||(b.tipo==='rev'?'REV':b.tipo==='sim'?'SIM':'OUT'),label:b.label})));}
+function fixosVis(p){const g=gerar(p);return DS.flatMap(d=>g.dias[d].filter(b=>b.tipo==='fixo'||b.tipo==='prepara').map(b=>({...b,d})));}
 function corBloco(b){if(b.tipo==='estudo'||b.tipo==='red')return `background:${CORD[b.k]||CORD.OUT};color:#fff`;return '';}
-const GRUPO={MAT:'EX',FIS:'EX',QUI:'EX',BIO:'BIO',LP:'LIN',LIT:'LIN',LE:'LIN',HIS:'HUM',GEO:'HUM',FIL:'HUM',SOC:'HUM',RED:'RED'};
 function opcoesMateria(p){const LE=p.lingua&&p.lingua!=='Ainda não sei'?p.lingua:'Língua Estrangeira';
   return DISC.map(([k,n])=>[k,k==='LE'?LE:n]).concat([['RED','Redação'],['REV','Revisão'],['SIM','Simulado / provas antigas'],['OUT','Outro (escrever)']]);}
-function migra(B){ // cronogramas salvos no formato antigo (com horário)
-  if(!B.length||B[0].dur!=null)return B;
-  const L=B.filter(b=>b.tipo!=='fixo'&&b.tipo!=='prepara').map(b=>({...b,dur:(b.fim||0)-(b.ini||0)}));
-  DS.forEach(d=>L.filter(b=>b.d===d).sort((a,b)=>a.ini-b.ini).forEach((b,i)=>{b.ord=i;delete b.ini;delete b.fim;}));return L;}
-function reorganizar(B,p){ // se as horas de um dia diminuíram, leva os blocos que sobram para dias com espaço
-  const HD=horasDia(p),cap={};DS.forEach(d=>cap[d]=Math.round((HD[d]||0)*60));
-  const tot=d=>B.filter(b=>b.d===d).reduce((s,b)=>s+b.dur,0);let mov=0;const rem=[];
-  DS.forEach(d=>{while(tot(d)>cap[d]){const L=B.filter(b=>b.d===d).sort((a,b)=>b.ord-a.ord);const cnt=k=>B.filter(o=>o.k===k).length;const b=L.filter(x=>x.tipo!=='rev').sort((a,c)=>cnt(c.k)-cnt(a.k))[0]||L[0];if(!b)break;
-    const alvo=DS.filter(e=>e!==d&&(b.tipo==='sim'?e==='Dom':e!=='Dom')&&tot(e)+b.dur<=cap[e]&&!(b.tipo==='estudo'&&B.some(o=>o.d===e&&o.k===b.k))).sort((x,y)=>(cap[y]-tot(y))-(cap[x]-tot(x)))[0];
-    if(alvo){b.d=alvo;b.ord=99;mov++;}else{B.splice(B.indexOf(b),1);rem.push(b.label.split(' — ')[0]);}}});
-  DS.forEach(d=>B.filter(b=>b.d===d).sort((a,b)=>a.ord-b.ord).forEach((b,i)=>b.ord=i));
-  return {B,mov,rem};}
+function janelasDia(p,d){
+  const W=tmin(p.acorda)??420,SL=tmin(p.dorme)??1380;const iniDia=W+30,fimDia=Math.min(SL<=W+120?1440:SL,1440)-30;
+  const F=(p.fixos||[]).filter(x=>(x.dias||[]).includes(d)).map(x=>{const a=tmin(x.ini),b=tmin(x.fim);return a==null||b==null?null:[a,b>a?b:1440];}).filter(Boolean);
+  if(d==='Dom'){let L=[[Math.max(iniDia,420),720]];F.forEach(([a,b])=>L=subtrai(L,a-15,b+15));return L;}
+  const marc=p.disp||[],i=DS.indexOf(d);
+  let L=marc.length?TURNOS.map((t,j)=>marc.includes(DIAS[i]+'|'+t)?[[360,720,1080][j],[720,1080,1440][j]]:null).filter(Boolean):[[0,1440]];
+  L=L.map(([a,b])=>[Math.max(a,iniDia),Math.min(b,fimDia)]).filter(([a,b])=>b>a);
+  F.forEach(([a,b])=>L=subtrai(L,a-15,b+15));
+  if(d==='Seg'||d==='Qui')L=subtrai(L,1125,1245);
+  const ab=F.find(([a,b])=>a<780&&b>720);L=subtrai(L,...(ab&&ab[1]<=870?[ab[1]+15,ab[1]+75]:[720,780]));L=subtrai(L,1110,1140);
+  return L;}
+function reorganizar(B,p){
+  // só conta como conflito o que é rígido: sono, compromissos fixos e PREPARA (o aluno pode ter movido blocos para fora dos períodos marcados de propósito)
+  const W=tmin(p.acorda)??420,SL=tmin(p.dorme)??1380,fimD=SL<=W+120?1440:SL;
+  const dentro=b=>{if(b.ini<W||b.fim>fimD)return false;
+    if((b.d==='Seg'||b.d==='Qui')&&b.ini<1230&&b.fim>1140)return false;
+    return !(p.fixos||[]).some(x=>(x.dias||[]).includes(b.d)&&tmin(x.ini)!=null&&b.ini<(tmin(x.fim)>tmin(x.ini)?tmin(x.fim):1440)&&b.fim>tmin(x.ini));};
+  const ok=B.filter(dentro),fora=B.filter(b=>!dentro(b));if(!fora.length)return {B,mov:0,rem:[]};
+  const dias=DS;const res=[...ok];let mov=0;const rem=[];
+  const exDia=d=>res.filter(b=>b.d===d&&['MAT','FIS','QUI'].includes(b.k)).length+((d==='Seg'||d==='Qui')?1:0);
+  fora.forEach(b=>{const dur=b.fim-b.ini,i0=dias.indexOf(b.d);
+    const ordem=dias.slice().sort((x,y)=>Math.abs(dias.indexOf(x)-i0)-Math.abs(dias.indexOf(y)-i0)).filter(d=>b.tipo==='sim'?d==='Dom':d!=='Dom');
+    let achou=null;
+    for(const d of ordem){
+      if(b.tipo==='estudo'&&b.d!==d&&res.some(o=>o.d===d&&o.k===b.k))continue;
+      if(['MAT','FIS','QUI'].includes(b.k)&&exDia(d)>=2)continue;
+      let L=janelasDia(p,d);res.filter(o=>o.d===d).forEach(o=>L=subtrai(L,o.ini-10,o.fim+10));
+      const prefer=L.map(([a,c])=>{const s=Math.max(a,Math.min(c-dur,b.ini));return s+dur<=c&&s>=a?s:null;}).filter(s=>s!=null).sort((x,y)=>Math.abs(x-b.ini)-Math.abs(y-b.ini));
+      if(prefer.length){achou={d,ini:prefer[0]};break;}}
+    if(achou){res.push({...b,d:achou.d,ini:achou.ini,fim:achou.ini+dur});mov++;}else rem.push(b.label);});
+  return {B:res,mov,rem};}
 async function montarCrono(el,p,email,quem){
   el.innerHTML='<p class="pend">Carregando cronograma…</p>';
   const {data}=await SB.from('cronograma').select('*').eq('email',email).maybeSingle();
-  const st={el,p,email,quem,avisos:[],B:null,info:data,curso:pesoCurso(p.curso)};
-  if(data&&Array.isArray(data.blocos)){st.B=migra(data.blocos);const conv=st.B!==data.blocos;
+  const st={el,p,email,quem,fix:fixosVis(p),avisos:[],B:null,info:data,curso:pesoCurso(p.curso)};
+  if(data&&Array.isArray(data.blocos)){st.B=data.blocos;
     const r=reorganizar(st.B,p);
-    if(r.mov||r.rem.length)st.avisos.push(`As suas horas de estudo no perfil mudaram, e o cronograma se reorganizou sozinho: ${r.mov} bloco(s) mudaram de dia${r.rem.length?' e '+r.rem.length+' não couberam mais ('+r.rem.join(', ')+')':''}. Confira e ajuste se quiser.`);
-    desenhar(st);if(conv||r.mov||r.rem.length)salvar(st);return;}
-  const g=gerar(p);st.B=g.B;st.avisos=g.avisos;desenhar(st);}
+    if(r.mov||r.rem.length){st.B=r.B;st.avisos.push(`A rotina no perfil de estudos mudou, e o cronograma se reorganizou sozinho: ${r.mov} bloco(s) foram para outro horário${r.rem.length?' e '+r.rem.length+' não couberam mais ('+r.rem.join(', ')+')':''}. Confira e ajuste se quiser.`);desenhar(st);salvar(st);return;}}
+  else{const g=gerar(p);st.B=paraBlocos(g);st.avisos=g.avisos;}
+  desenhar(st);}
 function salvar(st){const s=st.el.querySelector('.cst');if(s){s.textContent='Salvando…';s.className='cst';}
   clearTimeout(st.tm);st.tm=setTimeout(async()=>{const agora=new Date().toISOString();
     const {error}=await SB.from('cronograma').upsert({email:st.email,blocos:st.B,atualizado_em:agora,atualizado_por:EMAIL},{onConflict:'email'});
     const s=st.el.querySelector('.cst');if(!s)return;
     if(error){s.textContent='Não foi possível salvar: '+error.message;s.className='cst err';}
     else{st.info={atualizado_em:agora,atualizado_por:EMAIL};s.textContent='✓ Salvo às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});s.className='cst ok';}},350);}
-const CURTO={'Língua Portuguesa':'Português','Academia / esporte':'Academia','Trabalho / estágio':'Trabalho','Psicólogo / terapia':'Psicólogo','Consulta médica':'Consulta'};
+const sobrepoe=(a,b)=>a.d===b.d&&a.ini<b.fim&&b.ini<a.fim;
+const CURTO={'Língua Portuguesa':'Português','Língua Estrangeira':'Língua estr.','Academia / esporte':'Academia','Trabalho / estágio':'Trabalho','Psicólogo / terapia':'Psicólogo','Consulta médica':'Consulta','Curso de idioma':'Idioma','Música / arte':'Música','Aula particular':'Aula part.','PREPARA UFU':'PREPARA UFU','Simulado · provas antigas da UFU · matéria atrasada':'Simulado e provas antigas'};
 function rotulo(label,hr){const [nm,...r]=String(label).split(' — ');const ds=r.join(' — ');
   return `<b class="nm" data-curto="${esc(CURTO[nm]||'')}">${esc(nm)}</b>${ds?`<i class="ds">${esc(ds)}</i>`:''}<span class="hr">${esc(hr)}</span>`;}
-function encaixa(root){root.querySelectorAll('.ev.fx1').forEach(e=>{
+function encaixa(root){root.querySelectorAll('.cb,.ev.fx1').forEach(e=>{
   const cabe=()=>e.clientHeight===0||(e.scrollHeight<=e.clientHeight+1&&e.scrollWidth<=e.clientWidth+1);
   for(const k of ['f1','f2','curto','f3','f4']){if(cabe())return;
     if(k==='curto'){const n=e.querySelector('.nm');if(n&&n.dataset.curto)n.textContent=n.dataset.curto;}else e.classList.add(k);}});}
 function desenhar(st){
-  const HD=horasDia(st.p);const B=st.B;
-  const card=b=>`<div class="ci ${b.tipo}" draggable="true" data-id="${b.id}" style="${corBloco(b)}" title="Clique para alterar · arraste para outro dia"><b>${esc(b.label)}</b><span>${durTxt(b.dur)}</span></div>`;
-  const col=(d,i)=>{const C=compromissos(st.p,d),E=B.filter(b=>b.d===d).sort((a,b)=>a.ord-b.ord);const usado=E.reduce((s,b)=>s+b.dur,0),cap=Math.round((HD[d]||0)*60);
-    return `<div class="cd" data-d="${d}"><div class="cdh"><b>${DIAS[i]}</b><small class="${usado>cap?'exc':''}">estudo: ${durTxt(usado)}${cap?` de ${durTxt(cap)}`:''}</small></div>
-      ${C.length?`<div class="cdsec">Compromissos</div>${C.map(c=>`<div class="ci ${c.tipo}"><b>${esc(c.label)}</b><span>${hm(c.ini)}–${hm(Math.min(c.ini+c.dur,1440))}</span></div>`).join('')}`:''}
-      <div class="cdsec">Estudos</div><div class="cde" data-d="${d}">${E.map(card).join('')||'<p class="vz">Sem estudo neste dia</p>'}</div></div>`;};
-  const R={};B.forEach(b=>{const k=b.tipo==='rev'?'REV':b.tipo==='sim'?'SIM':(b.k==='OUT'?'OUT:'+b.label:b.k);(R[k]=R[k]||{n:b.tipo==='rev'?'Revisão':b.tipo==='sim'?'Simulado / provas antigas':b.label,k:b.k,v:0,min:0,tipo:b.tipo});R[k].v++;R[k].min+=b.dur;});
+  const B=st.B,F=st.fix,todos=[...B,...F];
+  const H0=Math.min(6,...todos.map(b=>Math.floor(b.ini/60))),H1=24,px=76,top=m=>(m/60-H0)*px,alt=(H1-H0)*px;st.geo={H0,px};
+  const conf=new Set(B.filter(b=>todos.some(o=>o!==b&&sobrepoe(o,b))).map(b=>b.id));
+  const bl=b=>{const mv=b.id!=null,c=mv&&conf.has(b.id)?' conf':'';
+    return `<div class="cb ${b.tipo}${mv?' mov':''}${c}" ${mv?`data-id="${b.id}"`:''} style="top:${top(b.ini)}px;height:${Math.max(top(b.fim)-top(b.ini)-3,34)}px;${corBloco(b)}" title="${esc(b.label)} · ${hm(b.ini)}–${hm(b.fim)}">${rotulo(b.label,hm(b.ini)+'–'+hm(b.fim))}</div>`;};
+  const grade=`<div class="cg"><div></div>${DS.map(d=>`<div class="cgh">${DIAS[DS.indexOf(d)]}</div>`).join('')}
+    <div class="cgt" style="height:${alt}px">${Array.from({length:H1-H0+1},(_,i)=>`<span style="top:${i*px}px">${String(H0+i).padStart(2,'0')}h</span>`).join('')}</div>
+    ${DS.map(d=>`<div class="cgc" data-d="${d}" style="height:${alt}px;background-size:100% ${px}px">${todos.filter(b=>b.d===d).map(bl).join('')}</div>`).join('')}</div>`;
+  const listaM=DS.map(d=>{const L=todos.filter(b=>b.d===d).sort((a,b)=>a.ini-b.ini);return `<div class="cl"><h5>${DIAS[DS.indexOf(d)]}</h5>${L.length?L.map(b=>`<div class="cli ${b.tipo}${b.id!=null?' mov':''}${b.id!=null&&conf.has(b.id)?' conf':''}" ${b.id!=null?`data-id="${b.id}"`:''} style="${corBloco(b)}"><span>${hm(b.ini)}–${hm(b.fim)}</span><b>${esc(b.label)}</b>${b.id!=null?'<em>alterar</em>':''}</div>`).join(''):'<p class="pend">Livre</p>'}</div>`;}).join('');
+  const R={};B.forEach(b=>{const k=b.tipo==='rev'?'REV':b.tipo==='sim'?'SIM':(b.k==='OUT'?'OUT:'+b.label:b.k);(R[k]=R[k]||{n:b.tipo==='rev'?'Revisão':b.tipo==='sim'?'Simulado / provas antigas':b.label,k:b.k,v:0,min:0,tipo:b.tipo});R[k].v++;R[k].min+=b.fim-b.ini;});
   const ordem=Object.values(R).sort((a,b)=>b.min-a.min);const tot=ordem.reduce((s,x)=>s+x.min,0);
   const sw=x=>x.tipo==='rev'?'background:#fff;border:2px solid #868E96':x.tipo==='sim'?'background:#212529;border:2px solid var(--amarelo)':`background:${CORD[x.k]||CORD.OUT}`;
-  const resumo=`<table class="cr"><tr><th>Disciplina</th><th>Vezes na semana</th><th>Horas</th></tr>${ordem.map(x=>`<tr><td><i style="${sw(x)}"></i>${esc(x.n)}</td><td>${x.v}</td><td>${hfmt(x.min/60)}</td></tr>`).join('')}<tr class="tt"><td>Total de estudo na semana</td><td></td><td>${hfmt(tot/60)}</td></tr></table><p class="pend" style="margin:6px 0 0">As aulas ao vivo do PREPARA UFU não contam como tempo de estudo: as suas horas de estudo são além delas.</p>`;
+  const resumo=`<table class="cr"><tr><th>Disciplina</th><th>Blocos na semana</th><th>Horas</th></tr>${ordem.map(x=>`<tr><td><i style="${sw(x)}"></i>${esc(x.n)}</td><td>${x.v}</td><td>${hfmt(x.min/60)}</td></tr>`).join('')}<tr class="tt"><td>Total de estudo na semana</td><td></td><td>${hfmt(tot/60)}</td></tr></table><p class="pend" style="margin:6px 0 0">As aulas ao vivo do PREPARA UFU (segunda e quinta, 19h–20h30) não contam como tempo de estudo: as suas horas de estudo são além delas.</p>`;
   const quem=st.info&&st.info.atualizado_por?(st.info.atualizado_por===ADMIN?(st.email===EXEMPLO?'você':'Prof. Jazz'):(st.info.atualizado_por===st.email?(st.quem==='prof'?'o aluno':'você'):st.info.atualizado_por)):'';
   st.el.innerHTML=`<div class="cbanner">Este é um <b>pré-cronograma</b> para que você comece a estudar. Ele será totalmente validado no seu encontro com o seu mentor.</div>
    ${st.avisos.map(a=>`<div class="caviso">${esc(a)}</div>`).join('')}${(()=>{const L=opcoesMateria(st.p).filter(([k])=>GRUPO[k]&&!B.some(b=>b.k===k)).map(o=>o[1]);return L.length?`<div class="caviso">Atenção: ${esc(L.join(', '))} não aparece${L.length>1?'m':''} no cronograma. Toda matéria precisa aparecer pelo menos uma vez na semana.</div>`:'';})()}
+   ${conf.size?'<div class="caviso">Há blocos se sobrepondo a outros compromissos (contorno vermelho). Arraste-os para outro horário.</div>':''}
    <div class="ctb"><button class="btn pri" data-a="add">+ Adicionar bloco</button><button class="btn" data-a="refazer">Montar de novo pelo perfil de estudos</button><button class="btn" data-a="print">Imprimir / PDF</button><span class="cst">${st.info&&st.info.atualizado_em?`Última alteração: ${new Date(st.info.atualizado_em).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}${quem?' por '+esc(quem):''}`:'Ainda não alterado'}</span></div>
-   <p class="pend chint">Cada dia mostra os seus compromissos, com horário, e embaixo o que estudar, na ordem e com a duração de cada matéria. <span class="sodesk">Arraste um bloco para outro dia ou para mudar a ordem; clique nele para alterar ou excluir.</span><span class="somob">Toque num bloco para mudar o dia, a duração ou excluir.</span></p>
-   <div class="cw">${DS.map(col).join('')}</div>
+   <p class="pend chint"><span class="sodesk">Arraste os blocos coloridos para outro dia ou horário. Clique num bloco para alterar ou excluir.</span><span class="somob">Toque num bloco para mudar o dia, o horário ou excluir.</span> Escola, compromissos fixos e as aulas do PREPARA UFU vêm do perfil de estudos e não se movem.</p>
+   <div class="cgw">${grade}</div><div class="clw">${listaM}</div>
+   <div class="leg cleg"><span><i style="background:#16304F;border:2px solid var(--amarelo)"></i>PREPARA UFU (ao vivo, seg e qui 19h–20h30)</span><span><i class="fx"></i>compromisso fixo</span><span><i style="background:#212529;border:2px solid var(--amarelo)"></i>simulado de domingo</span><span><i style="border:2px solid #868E96"></i>revisão</span></div>
    <h4>Resumo da semana</h4>${resumo}
-   ${st.quem==='prof'&&st.curso.g?`<p class="pend" style="margin-top:8px">Ênfase de curso aplicada na montagem: ${esc(st.curso.g)} (${st.curso.k.map(k=>DISC.find(x=>x[0]===k)[1]).join(', ')}).</p>`:''}`;
+   ${st.quem==='prof'&&st.curso.g?`<p class="pend" style="margin-top:8px">Ênfase de curso aplicada na montagem: ${esc(st.curso.g)} (${st.curso.k.map(k=>DISC.find(x=>x[0]===k)[1]).join(', ')}). Exatas e Biologia em blocos de 1h30; Humanas e Linguagens em 1h; Redação 1h30 por semana.</p>`:''}`;
+  requestAnimationFrame(()=>encaixa(st.el));
   st.el.querySelector('[data-a=add]').onclick=()=>editar(st,null);
   st.el.querySelector('[data-a=print]').onclick=()=>window.print();
-  st.el.querySelector('[data-a=refazer]').onclick=()=>{if(!confirm('Isso apaga todas as mudanças feitas e monta o cronograma de novo a partir do perfil de estudos. Continuar?'))return;const g=gerar(st.p);st.B=g.B;st.avisos=g.avisos;desenhar(st);salvar(st);};
-  st.el.querySelectorAll('.cde .ci').forEach(e=>{e.onclick=()=>editar(st,B.find(b=>b.id==e.dataset.id));
-    e.addEventListener('dragstart',ev=>{ev.dataTransfer.setData('text/plain',e.dataset.id);ev.dataTransfer.effectAllowed='move';setTimeout(()=>e.classList.add('arr'),0);});
-    e.addEventListener('dragend',()=>e.classList.remove('arr'));});
-  st.el.querySelectorAll('.cd').forEach(c=>{
-    c.addEventListener('dragover',ev=>{ev.preventDefault();c.classList.add('alvo');});
-    c.addEventListener('dragleave',ev=>{if(!c.contains(ev.relatedTarget))c.classList.remove('alvo');});
-    c.addEventListener('drop',ev=>{ev.preventDefault();c.classList.remove('alvo');const b=B.find(x=>x.id==ev.dataTransfer.getData('text/plain'));if(!b)return;
-      const d=c.dataset.d;const irm=[...c.querySelectorAll('.cde .ci')].filter(x=>x.dataset.id!=b.id);
-      let pos=irm.findIndex(x=>ev.clientY<x.getBoundingClientRect().top+x.offsetHeight/2);if(pos<0)pos=irm.length;
-      const L=B.filter(x=>x.d===d&&x!==b).sort((a,b2)=>a.ord-b2.ord);L.splice(pos,0,b);b.d=d;L.forEach((x,i)=>x.ord=i);
-      desenhar(st);salvar(st);});});}
+  st.el.querySelector('[data-a=refazer]').onclick=()=>{if(!confirm('Isso apaga todas as mudanças feitas e monta o cronograma de novo a partir do perfil de estudos. Continuar?'))return;const g=gerar(st.p);st.B=paraBlocos(g);st.avisos=g.avisos;desenhar(st);salvar(st);};
+  st.el.querySelectorAll('.cli.mov').forEach(e=>e.onclick=()=>editar(st,B.find(b=>b.id==e.dataset.id)));
+  st.el.querySelectorAll('.cb.mov').forEach(e=>arrastavel(st,e));}
+function arrastavel(st,e){
+  e.addEventListener('pointerdown',ev=>{if(ev.button)return;ev.preventDefault();const b=st.B.find(x=>x.id==e.dataset.id);const r0=e.getBoundingClientRect();
+    const off=ev.clientY-r0.top,x0=ev.clientX,y0=ev.clientY;let mov=false;e.setPointerCapture(ev.pointerId);
+    const mv=m=>{const dx=m.clientX-x0,dy=m.clientY-y0;if(!mov&&Math.hypot(dx,dy)<5)return;mov=true;e.classList.add('arr');e.style.transform=`translate(${dx}px,${dy}px)`;};
+    const up=u=>{e.removeEventListener('pointermove',mv);e.removeEventListener('pointerup',up);e.removeEventListener('pointercancel',up);
+      if(!mov){editar(st,b);return;}
+      e.style.visibility='hidden';const col=document.elementsFromPoint(u.clientX,u.clientY).find(x=>x.classList&&x.classList.contains('cgc'));e.style.visibility='';
+      if(col){const ct=col.getBoundingClientRect().top;const dur=b.fim-b.ini;let ini=Math.round(((u.clientY-off-ct)/st.geo.px*60+st.geo.H0*60)/15)*15;ini=Math.max(0,Math.min(1440-dur,ini));b.d=col.dataset.d;b.ini=ini;b.fim=ini+dur;salvar(st);}
+      desenhar(st);};
+    e.addEventListener('pointermove',mv);e.addEventListener('pointerup',up);e.addEventListener('pointercancel',up);});}
 function editar(st,b){const novo=!b;const ops=opcoesMateria(st.p);
   const k0=b?(b.tipo==='rev'?'REV':b.tipo==='sim'?'SIM':b.k):'MAT';
-  const DUR=[15,30,45,60,75,90,105,120,150,180,210,240];
   const dlg=document.createElement('div');dlg.className='cdlg';
   dlg.innerHTML=`<form class="box"><h3>${novo?'Adicionar bloco':'Alterar bloco'}</h3>
    <label>Matéria / atividade<select name="k">${ops.map(([k,n])=>`<option value="${k}"${k===k0?' selected':''}>${esc(n)}</option>`).join('')}</select></label>
    <label class="outro" ${k0==='OUT'?'':'hidden'}>Nome<input name="nome" type="text" value="${b&&b.k==='OUT'?esc(b.label):''}" placeholder="ex.: Lista de exercícios"></label>
-   <div class="row2"><label>Dia<select name="d">${DS.map((d,i)=>`<option value="${d}"${(b?b.d:'Seg')===d?' selected':''}>${DIAS[i]}</option>`).join('')}</select></label>
-   <label>Duração<select name="dur">${DUR.map(m=>`<option value="${m}"${(b?b.dur:90)===m?' selected':''}>${durTxt(m)}</option>`).join('')}</select></label></div>
-   <p class="cerr" role="status"></p>
+   <label>Dia<select name="d">${DS.map((d,i)=>`<option value="${d}"${(b?b.d:'Seg')===d?' selected':''}>${DIAS[i]}</option>`).join('')}</select></label>
+   <div class="row2"><label>Começa<input name="ini" type="time" step="300" value="${b?hm(b.ini):'14:00'}" required></label><label>Termina<input name="fim" type="time" step="300" value="${b?hm(b.fim):'15:30'}" required></label></div>
+   <p class="pend cdur" style="margin:0"></p><p class="cerr" role="status"></p>
    <div class="btns"><button class="btn pri" type="submit">${novo?'Adicionar':'Salvar'}</button>${novo?'':'<button class="btn del" type="button" data-x="del">Excluir bloco</button>'}<button class="btn" type="button" data-x="cancel">Cancelar</button></div></form>`;
   document.body.appendChild(dlg);const f=dlg.querySelector('form');
-  f.k.onchange=()=>{dlg.querySelector('.outro').hidden=f.k.value!=='OUT';const m={MAT:90,FIS:90,QUI:90,BIO:90,RED:90,REV:30,SIM:240}[f.k.value]||60;f.dur.value=String(m);};
+  f.k.onchange=()=>{dlg.querySelector('.outro').hidden=f.k.value!=='OUT';const dur={MAT:90,FIS:90,QUI:90,BIO:90,RED:90,REV:30,SIM:240}[f.k.value]||60;const i=tmin(f.ini.value);if(i!=null)f.fim.value=hm(Math.min(1439,i+dur));};
+  const durTxt=()=>{const a=tmin(f.ini.value),z=tmin(f.fim.value);dlg.querySelector('.cdur').textContent=a!=null&&z!=null&&z>a?`Duração: ${z-a} min`:'';};f.ini.addEventListener('input',durTxt);f.fim.addEventListener('input',durTxt);durTxt();
   const fecha=()=>dlg.remove();dlg.onclick=ev=>{if(ev.target===dlg)fecha();};
   dlg.querySelector('[data-x=cancel]').onclick=fecha;
   const unica=()=>b&&(GRUPO[b.k])&&st.B.filter(x=>x.k===b.k).length===1;
-  const del=dlg.querySelector('[data-x=del]');if(del)del.onclick=()=>{if(unica()){f.querySelector('.cerr').textContent=`Esta é a única vez que ${b.label} aparece na semana. Toda matéria precisa aparecer pelo menos uma vez: em vez de excluir, mude o dia ou a duração.`;return;}if(!confirm('Excluir este bloco?'))return;st.B=st.B.filter(x=>x!==b);fecha();desenhar(st);salvar(st);};
-  f.onsubmit=ev=>{ev.preventDefault();const k=f.k.value,nome=(ops.find(o=>o[0]===k)||[])[1];
-    if(b&&k!==b.k&&unica()){f.querySelector('.cerr').textContent=`Esta é a única vez que ${b.label} aparece na semana. Para estudar outra matéria aqui, adicione um bloco novo em vez de trocar este.`;return;}
-    if(k==='OUT'&&!f.nome.value.trim()){f.querySelector('.cerr').textContent='Escreva o nome da atividade.';return;}
-    const d=f.d.value,mudouDia=!b||b.d!==d;
-    const nb={id:b?b.id:Math.max(0,...st.B.map(x=>+x.id||0))+1,d,dur:+f.dur.value,
-      tipo:k==='REV'?'rev':k==='SIM'?'sim':k==='RED'?'red':'estudo',k,g:GRUPO[k]||'',
-      label:k==='OUT'?f.nome.value.trim():k==='SIM'?SIMLBL:k==='REV'?(b&&b.tipo==='rev'?b.label:'Revisão'):nome,
-      ord:mudouDia?99:b.ord};
-    if(b)Object.assign(b,nb);else st.B.push(nb);
-    DS.forEach(x=>st.B.filter(y=>y.d===x).sort((a,c)=>a.ord-c.ord).forEach((y,i)=>y.ord=i));
-    fecha();desenhar(st);salvar(st);};}
+  const del=dlg.querySelector('[data-x=del]');if(del)del.onclick=()=>{if(unica()){f.querySelector('.cerr').textContent=`Esta é a única vez que ${b.label} aparece na semana. Toda matéria precisa aparecer pelo menos uma vez: em vez de excluir, mude o dia ou o horário.`;return;}if(!confirm('Excluir este bloco?'))return;st.B=st.B.filter(x=>x!==b);fecha();desenhar(st);salvar(st);};
+  f.onsubmit=ev=>{ev.preventDefault();const ini=tmin(f.ini.value),fim=tmin(f.fim.value);
+    if(b&&f.k.value!==b.k&&unica()){f.querySelector('.cerr').textContent=`Esta é a única vez que ${b.label} aparece na semana. Para estudar outra matéria, adicione um bloco novo em vez de trocar este.`;return;}
+    if(ini==null||fim==null||fim<=ini){f.querySelector('.cerr').textContent='O horário de término precisa ser depois do início.';return;}
+    const k=f.k.value,nome=(ops.find(o=>o[0]===k)||[])[1];if(k==='OUT'&&!f.nome.value.trim()){f.querySelector('.cerr').textContent='Escreva o nome da atividade.';return;}
+    const nb={id:b?b.id:Math.max(0,...st.B.map(x=>+x.id||0))+1,d:f.d.value,ini,fim,
+      tipo:k==='REV'?'rev':k==='SIM'?'sim':k==='RED'?'red':'estudo',k,
+      label:k==='OUT'?f.nome.value.trim():k==='SIM'?SIMLBL:k==='REV'?(b&&b.tipo==='rev'?b.label:'Revisão'):nome};
+    if(b)Object.assign(b,nb);else st.B.push(nb);fecha();desenhar(st);salvar(st);};}
 
 const EXEMPLO_RESP={nome:'Aluno Exemplo',whats:'(34) 99999-0000',cidade:'Uberlândia',situacao:'Estou no 3º ano do Ensino Médio',escola_turno:'Manhã',curso:'Medicina',universidades:['UFU','UFTM'],provas:['ENEM','Vestibular UFU'],lingua:'Inglês',ufu_exp:'Já fiz',ufu_vezes:'1 vez',enem_media:'600 a 700',
  acorda:'06:00',dorme:'23:00',trabalha:'Não',cursinho:'Sim, online',cursinho_nome:'Cursinho online',atividade:'Sim',atividade_qual:['Academia'],atividade_fixo:'Sim, dias e horários fixos',
@@ -683,8 +734,8 @@ async function exemploAcoes(){
 const FAQ=[
  ['Primeiros passos',[
   ['O que é o perfil de estudos?','É o seu raio-x: a sua rotina, os seus compromissos, quantas horas você estuda em cada dia, as suas dificuldades e o seu curso. Com essas respostas o site monta o seu pré-cronograma, e o Prof. Jazz usa tudo isso no seu encontro de mentoria.'],
-  ['O que é o pré-cronograma?','É a sua semana de estudos já organizada: em cada dia aparecem os seus compromissos (com horário) e, embaixo, as matérias que você vai estudar, na ordem e com a duração de cada uma. É um ponto de partida: ele será totalmente validado no seu encontro com o mentor.'],
-  ['As matérias têm horário marcado?','Não. Só os compromissos (escola, cursinho, academia, psicólogo, PREPARA UFU…) aparecem com horário. As matérias aparecem só com a duração: você escolhe o melhor momento do dia para estudar, seguindo a ordem sugerida.'],
+  ['O que é o pré-cronograma?','É a sua semana de estudos já organizada, dia a dia e com horário: os seus compromissos (escola, cursinho, academia, PREPARA UFU…) e, nos horários livres, as matérias que você vai estudar. É um ponto de partida: ele será totalmente validado no seu encontro com o mentor.'],
+  ['Como os horários das matérias são escolhidos?','A partir da hora em que você acorda, nos horários livres do seu dia (fora da escola, do cursinho e dos outros compromissos), de preferência de manhã e à tarde, respeitando as horas de estudo que você marcou para cada dia. Se um horário não funcionar para você, é só mudar o bloco de lugar.'],
   ['Por que umas matérias aparecem mais vezes que outras?','O cronograma dá mais espaço para as matérias que você marcou como difíceis e para as que pesam mais no seu curso. Matemática, Física e Química sempre aparecem mais vezes. Redação entra uma vez por semana, a revisão entra quase todos os dias e o domingo é para simulado, provas antigas da UFU e matéria atrasada.'],
   ['As aulas do PREPARA UFU contam como tempo de estudo?','Não. As aulas ao vivo (segunda e quinta, 19h–20h30) aparecem como compromisso e não entram nas suas horas de estudo: o seu tempo de estudo é além delas.']]],
  ['Mudar a rotina e as horas',[
@@ -693,11 +744,11 @@ const FAQ=[
   ['Como coloco o cursinho?','Coloque só o horário das aulas do cursinho. O tempo em que você fica lá estudando sozinho é tempo de estudo: conte nas horas de cada dia.'],
   ['Mudei de curso ou de dificuldade em alguma matéria. Como atualizo?','Altere no perfil (curso e grau de dificuldade por matéria), clique em "Atualizar perfil de estudos" e, no cronograma, clique em "Montar de novo pelo perfil de estudos" para redistribuir as matérias.']]],
  ['Mexer no cronograma',[
-  ['Como mudo um bloco de dia ou de lugar?','No computador, clique e arraste o bloco da matéria para outro dia ou para cima/baixo no mesmo dia, para mudar a ordem. No celular, toque no bloco, escolha o novo dia e clique em "Salvar".'],
-  ['Como mudo a duração de um bloco?','Clique (ou toque) no bloco, escolha a nova duração e clique em "Salvar".'],
+  ['Como mudo um bloco de dia ou de lugar?','No computador, clique e arraste o bloco para outro dia ou outro horário. No celular, toque no bloco, escolha o novo dia e o novo horário e clique em "Salvar".'],
+  ['Como mudo a duração de um bloco?','Clique (ou toque) no bloco, mude o horário de início ou de término e clique em "Salvar". A duração aparece embaixo dos horários.'],
   ['Como troco a matéria de um bloco?','Clique no bloco, escolha outra matéria em "Matéria / atividade" e clique em "Salvar".'],
-  ['Como acrescento um bloco?','Clique em "+ Adicionar bloco", escolha a matéria (ou "Outro" para escrever o nome, como "Lista de exercícios"), o dia e a duração, e clique em "Adicionar".'],
-  ['Como excluo um bloco?','Clique no bloco e depois em "Excluir bloco". Só não dá para excluir (nem trocar) o último bloco de uma matéria: toda matéria precisa aparecer pelo menos uma vez na semana. Nesse caso, mude o dia ou a duração.'],
+  ['Como acrescento um bloco?','Clique em "+ Adicionar bloco", escolha a matéria (ou "Outro" para escrever o nome, como "Lista de exercícios"), o dia e os horários de início e término, e clique em "Adicionar".'],
+  ['Como excluo um bloco?','Clique no bloco e depois em "Excluir bloco". Só não dá para excluir (nem trocar) o último bloco de uma matéria: toda matéria precisa aparecer pelo menos uma vez na semana. Nesse caso, mude o dia ou o horário.'],
   ['Por que apareceu "Precisamos diminuir…"?','Quando o seu tempo é curto, o cronograma tira uma repetição da matéria que mais aparece para caber as que estavam faltando, porque toda matéria precisa aparecer pelo menos uma vez na semana. Com mais horas de estudo no perfil, as repetições voltam.'],
   ['Posso mudar os compromissos direto no cronograma?','Não. Compromissos vêm do seu perfil de estudos: para mudar, altere o perfil (veja "Mudou um compromisso").'],
   ['Como refaço o cronograma do zero?','Clique em "Montar de novo pelo perfil de estudos". Atenção: isso apaga todas as mudanças que você fez e monta tudo de novo a partir do seu perfil.'],
