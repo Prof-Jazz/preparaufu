@@ -191,6 +191,7 @@ input[type=time]{max-width:160px}input[type=number]{max-width:160px}
 .faq summary{cursor:pointer;font-weight:600;font-size:15px;list-style:none;display:flex;gap:8px}.faq summary::-webkit-details-marker{display:none}
 .faq summary::before{content:"+";color:var(--azul);font-weight:800;width:14px;flex:none}.faq details[open] summary::before{content:"–"}
 .faq p{margin:8px 0 2px 22px;color:var(--muted);line-height:1.55}
+.caviso.choque{background:rgba(211,58,44,.12);border-color:var(--bad);font-weight:600}
 /* login */
 #gate{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px}
 #gate[hidden]{display:none}
@@ -316,7 +317,7 @@ function campo(f){
   else if(f.type==='radio'||f.type==='checks')inner=`<div class="opts" role="${f.type==='radio'?'radiogroup':'group'}">${f.opts.map(o=>`<label><input type="${f.type==='radio'?'radio':'checkbox'}" name="${f.k}" value="${esc(o)}"> ${esc(o)}</label>`).join('')}</div>`;
   else if(f.type==='grid')inner=`<div style="overflow-x:auto"><table class="grid"><tr><th></th>${TURNOS.map(t=>`<th>${t}</th>`).join('')}</tr>${DIAS.map(d=>`<tr><td>${d}</td>${TURNOS.map(t=>`<td><input type="checkbox" name="disp" value="${d}|${t}" aria-label="${d} — ${t}"></td>`).join('')}</tr>`).join('')}</table></div>`;
   else if(f.type==='horasdia')inner=`<div class="hdia">${DS.map((d,i)=>`<label><span>${DIAS[i]}</span><select name="hd_${d}"><option value="">Escolha…</option><option>Não estudo</option>${HORAS.map(o=>`<option>${o}</option>`).join('')}</select></label>`).join('')}</div>`;
-  else if(f.type==='fixos')inner=`<div class="fx" id="fx"></div><button type="button" class="btn" id="fxAdd" style="align-self:flex-start">+ Adicionar compromisso</button>`;
+  else if(f.type==='fixos')inner=`<div class="fx" id="fx"></div><button type="button" class="btn" id="fxAdd" style="align-self:flex-start">+ Adicionar compromisso</button><div id="choqueBox" class="caviso choque" hidden></div>`;
   else if(f.type==='scale')inner=`<div class="scale"><span></span>${DIFN.map(n=>`<span class="hd">${n}</span>`).join('')}${AREAS.map((a,i)=>`<span>${esc(a)}</span>${[1,2,3,4].map(n=>`<label><input type="radio" name="nivel_${i}" value="${n}" aria-label="${esc(a)}: ${DIFN[n-1]}"></label>`).join('')}`).join('')}</div>`;
   const lab=['radio','checks','grid','scale'].includes(f.type)?`<div class="q">${esc(f.l)}${rq}</div>`:`<label class="q" for="${id}">${esc(f.l)}${rq}</label>`;
   return `<div class="f" data-k="${f.k}">${lab}${h}${inner}</div>`;
@@ -328,7 +329,7 @@ function fxLinha(v={}){const d=document.createElement('div');d.className='fxl';
   d.innerHTML=`<div class="fxt"><select class="fx-tipo" aria-label="Tipo de compromisso"><option value="">Tipo…</option>${TIPOS.map(t=>`<option${v.tipo===t?' selected':''}>${t}</option>`).join('')}</select><input type="text" class="fx-desc" placeholder="Detalhe (ex.: Colégio X, natação, Dra. Ana)" value="${esc(v.desc||'')}"><button type="button" class="fx-del" aria-label="Remover compromisso" title="Remover">✕</button></div>
   <div class="fxd">${DS.map(x=>`<label><input type="checkbox" value="${x}"${(v.dias||[]).includes(x)?' checked':''}> ${x}</label>`).join('')}</div>
   <div class="fxh"><span>das</span><input type="time" class="fx-ini" value="${esc(v.ini||'')}" aria-label="Início"><span>às</span><input type="time" class="fx-fim" value="${esc(v.fim||'')}" aria-label="Fim"></div>`;
-  d.querySelector('.fx-del').onclick=()=>{d.remove();if(!$('fx').children.length)fxLinha();};
+  d.querySelector('.fx-del').onclick=()=>{d.remove();if(!$('fx').children.length)fxLinha();visiveis();};
   $('fx').appendChild(d);}
 function fxLer(){return [...document.querySelectorAll('.fxl')].map(d=>({tipo:d.querySelector('.fx-tipo').value,desc:d.querySelector('.fx-desc').value.trim(),dias:[...d.querySelectorAll('.fxd input:checked')].map(i=>i.value),ini:d.querySelector('.fx-ini').value,fim:d.querySelector('.fx-fim').value})).filter(x=>x.tipo||x.desc||x.dias.length||x.ini);}
 function fxIncompleto(L){return L.find(x=>!x.tipo||!x.dias.length||!x.ini||!x.fim);}
@@ -350,7 +351,7 @@ function preencher(r){const fm=$('ck');
     else if(f.type==='fixos'){$('fx').innerHTML='';(v.length?v:[{}]).forEach(fxLinha);}
     else if(f.type==='scale')AREAS.forEach((a,i)=>fm.querySelectorAll(`input[name="nivel_${i}"]`).forEach(x=>x.checked=+x.value===(v||{})[a]));
     else fm.querySelector(`[name="${f.k}"]`).value=v;});}
-function visiveis(){const r=ler();CAMPOS.forEach(f=>{if(f.show){const el=document.querySelector(`.f[data-k="${f.k}"]`);el.hidden=!f.show(r);}});}
+function visiveis(){const r=ler();const cx=document.getElementById('choqueBox');if(cx){const c=choques(r);cx.hidden=!c.length;cx.innerHTML=c.map(t=>'⚠ '+esc(t)).join('<br>')+(c.length?'<br>Não dá para estar nos dois ao mesmo tempo: ajuste o horário de um deles.':'');}CAMPOS.forEach(f=>{if(f.show){const el=document.querySelector(`.f[data-k="${f.k}"]`);el.hidden=!f.show(r);}});}
 function faltando(r){const L=[];CAMPOS.forEach(f=>{if(!f.req)return;if(f.show&&!f.show(r))return;
   const v=r[f.k];const vazio=f.type==='horasdia'?DS.some(d=>!(v||{})[d]):f.type==='scale'?AREAS.some(a=>!(v||{})[a]):Array.isArray(v)?!v.length:!v;if(vazio)L.push(f);});return L;}
 
@@ -368,6 +369,7 @@ async function telaForm(){
   fm.onsubmit=async ev=>{ev.preventDefault();const r=ler();CAMPOS.forEach(f=>{if(f.show&&!f.show(r))delete r[f.k];});const f=faltando(r),m=$('msg');
     if(f.length){m.className='err';m.textContent='Falta responder: '+f.map(x=>x.l.replace(/\?.*$/,'?')).slice(0,3).join(' · ')+(f.length>3?` (e mais ${f.length-3})`:'');
       document.querySelector(`.f[data-k="${f[0].k}"]`).scrollIntoView({behavior:'smooth',block:'center'});return;}
+    const ch=choques(r);if(ch.length&&!confirm(ch.join('\n')+'\n\nHá compromissos com choque de horário. Quer enviar assim mesmo?')){document.getElementById('choqueBox').scrollIntoView({behavior:'smooth',block:'center'});return;}
     const inc=fxIncompleto(r.fixos||[]);
     if(inc){m.className='err';m.textContent='Complete cada compromisso fixo: tipo, dias e horário de início e fim (ou remova a linha vazia com ✕).';document.querySelector('.f[data-k="fixos"]').scrollIntoView({behavior:'smooth',block:'center'});return;}
     $('enviar').disabled=true;m.className='';m.textContent='Enviando…';
@@ -481,8 +483,17 @@ function pesoCurso(curso){const c=sem(curso);
 const REVMIN={'Até 15 min':15,'15 a 30 min':30,'30 min a 1 h':45,'Mais de 1 h':60};
 const hm=m=>String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
 function subtrai(L,a,b){const o=[];L.forEach(([x,y])=>{if(b<=x||a>=y)o.push([x,y]);else{if(a>x)o.push([x,a]);if(b<y)o.push([b,y]);}});return o.filter(([x,y])=>y-x>=15);}
+function sono(p){const W=tmin(p.acorda)??420;let SL=tmin(p.dorme)??1380;
+  if(SL>W&&SL-W<8*60)SL=Math.min(SL+720,1440); // "12:00" = meia-noite
+  return [W,SL];}
+function choques(p){const L=[];DS.forEach((d,i)=>{
+  const ev=(p.fixos||[]).filter(x=>(x.dias||[]).includes(d)).map(x=>{const a=tmin(x.ini),b=tmin(x.fim);return a==null||b==null?null:{n:x.tipo.split(' / ')[0]+(x.desc?' ('+x.desc+')':''),a,b:b>a?b:1440};}).filter(Boolean);
+  if(d==='Seg'||d==='Qui')ev.push({n:'a aula do PREPARA UFU',a:1140,b:1230});
+  for(let x=0;x<ev.length;x++)for(let y=x+1;y<ev.length;y++){const A=ev[x],B=ev[y];if(A.a<B.b&&B.a<A.b)
+    L.push(`Choque de horário na ${DIAS[i].toLowerCase()}: ${A.n} (${hm(A.a)}–${hm(A.b)}) bate com ${B.n} (${hm(B.a)}–${hm(B.b)}).`);}});
+  return L;}
 function gerar0(p,aj,enxuto){
-  const W=tmin(p.acorda)??420,SL=tmin(p.dorme)??1380;
+  const [W,SL]=sono(p);
   const iniDia=W+30,fimDia=Math.min(SL<=W+120?1440:SL,1440)-30;
   const marc=p.disp||[],usaMarc=marc.length>0;
   const fixosDia=d=>(p.fixos||[]).filter(x=>(x.dias||[]).includes(d)).map(x=>{const a=tmin(x.ini),b=tmin(x.fim);return a==null||b==null?null:{ini:a,fim:b>a?b:1440,label:x.tipo+(x.desc?' — '+x.desc:'')};}).filter(Boolean);
@@ -593,7 +604,7 @@ function corBloco(b){if(b.tipo==='estudo'||b.tipo==='red')return `background:${C
 function opcoesMateria(p){const LE=p.lingua&&p.lingua!=='Ainda não sei'?p.lingua:'Língua Estrangeira';
   return DISC.map(([k,n])=>[k,k==='LE'?LE:n]).concat([['RED','Redação'],['REV','Revisão'],['SIM','Simulado / provas antigas'],['OUT','Outro (escrever)']]);}
 function janelasDia(p,d){
-  const W=tmin(p.acorda)??420,SL=tmin(p.dorme)??1380;const iniDia=W+30,fimDia=Math.min(SL<=W+120?1440:SL,1440)-30;
+  const [W,SL]=sono(p);const iniDia=W+30,fimDia=Math.min(SL<=W+120?1440:SL,1440)-30;
   const F=(p.fixos||[]).filter(x=>(x.dias||[]).includes(d)).map(x=>{const a=tmin(x.ini),b=tmin(x.fim);return a==null||b==null?null:[a,b>a?b:1440];}).filter(Boolean);
   if(d==='Dom'){let L=[[Math.max(iniDia,420),720]];F.forEach(([a,b])=>L=subtrai(L,a-15,b+15));return L;}
   const marc=p.disp||[],i=DS.indexOf(d);
@@ -662,7 +673,7 @@ function desenhar(st){
   const resumo=`<table class="cr"><tr><th>Disciplina</th><th>Blocos na semana</th><th>Horas</th></tr>${ordem.map(x=>`<tr><td><i style="${sw(x)}"></i>${esc(x.n)}</td><td>${x.v}</td><td>${hfmt(x.min/60)}</td></tr>`).join('')}<tr class="tt"><td>Total de estudo na semana</td><td></td><td>${hfmt(tot/60)}</td></tr></table><p class="pend" style="margin:6px 0 0">As aulas ao vivo do PREPARA UFU (segunda e quinta, 19h–20h30) não contam como tempo de estudo: as suas horas de estudo são além delas.</p>`;
   const quem=st.info&&st.info.atualizado_por?(st.info.atualizado_por===ADMIN?(st.email===EXEMPLO?'você':'Prof. Jazz'):(st.info.atualizado_por===st.email?(st.quem==='prof'?'o aluno':'você'):st.info.atualizado_por)):'';
   st.el.innerHTML=`<div class="cbanner">Este é um <b>pré-cronograma</b> para que você comece a estudar. Ele será totalmente validado no seu encontro com o seu mentor.</div>
-   ${st.avisos.map(a=>`<div class="caviso">${esc(a)}</div>`).join('')}${(()=>{const L=opcoesMateria(st.p).filter(([k])=>GRUPO[k]&&!B.some(b=>b.k===k)).map(o=>o[1]);return L.length?`<div class="caviso">Atenção: ${esc(L.join(', '))} não aparece${L.length>1?'m':''} no cronograma. Toda matéria precisa aparecer pelo menos uma vez na semana.</div>`:'';})()}
+   ${choques(st.p).map(a=>`<div class="caviso choque">⚠ ${esc(a)} Não dá para estar nos dois ao mesmo tempo: corrija os compromissos no seu perfil de estudos.</div>`).join('')}${st.avisos.map(a=>`<div class="caviso">${esc(a)}</div>`).join('')}${(()=>{const L=opcoesMateria(st.p).filter(([k])=>GRUPO[k]&&!B.some(b=>b.k===k)).map(o=>o[1]);return L.length?`<div class="caviso">Atenção: ${esc(L.join(', '))} não aparece${L.length>1?'m':''} no cronograma. Toda matéria precisa aparecer pelo menos uma vez na semana.</div>`:'';})()}
    ${conf.size?'<div class="caviso">Há blocos se sobrepondo a outros compromissos (contorno vermelho). Arraste-os para outro horário.</div>':''}
    <div class="ctb"><button class="btn pri" data-a="add">+ Adicionar bloco</button><button class="btn" data-a="refazer">Montar de novo pelo perfil de estudos</button><button class="btn" data-a="print">Imprimir / PDF</button><span class="cst">${st.info&&st.info.atualizado_em?`Última alteração: ${new Date(st.info.atualizado_em).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}${quem?' por '+esc(quem):''}`:'Ainda não alterado'}</span></div>
    <p class="pend chint"><span class="sodesk">Arraste os blocos coloridos para outro dia ou horário. Clique num bloco para alterar ou excluir.</span><span class="somob">Toque num bloco para mudar o dia, o horário ou excluir.</span> Escola, compromissos fixos e as aulas do PREPARA UFU vêm do perfil de estudos e não se movem.</p>
