@@ -320,13 +320,13 @@ body{animation:fadein .25s ease}@keyframes fadein{from{opacity:0}to{opacity:1}}
 
 <header>
   <a class="logos" href="/" title="Início da plataforma PREPARA UFU" style="text-decoration:none"><img class="j" src="../bancodequestoes/logo/jazz_claro.png" alt="Jazz, Professor de Matemática"><span class="sep"></span><img class="p" src="../bancodequestoes/logo/prepara_transp.png" alt="Prepara UFU"></a>
-  <div class="ttl"><h1>Assessoria ENEM</h1><p>Perfil de estudos e pré-cronograma</p></div>
-  <nav class="tabs"><button class="theme" id="theme" aria-label="Alternar modo diurno e noturno" title="Modo diurno / noturno"><span class="sun">☀</span><span class="moon">☾</span></button><a href="../bancodequestoes/">Banco de Questões</a><a href="../aulas/#agenda">Agenda</a><a href="../aulas/#materiais">Materiais</a><button id="tabGeral" hidden>Comportamento da turma</button><button id="tabResp" hidden>Alunos</button><button id="tabCad" hidden>Cadastro de alunos</button><button id="tabExemplo" hidden>Ver como aluno</button><button id="tabCrono" hidden>Meu pré-cronograma</button><button class="on" id="tabForm" hidden>Meu perfil de estudos</button><button id="tabFaq" hidden>Dúvidas</button><button id="sair">Sair</button></nav>
+  <div class="ttl"><h1>Assessoria ENEM</h1><p>Perfil de estudos e Cronograma Semanal</p></div>
+  <nav class="tabs"><button class="theme" id="theme" aria-label="Alternar modo diurno e noturno" title="Modo diurno / noturno"><span class="sun">☀</span><span class="moon">☾</span></button><a href="../bancodequestoes/">Banco de Questões</a><a href="../aulas/#agenda">Agenda</a><a href="../aulas/#materiais">Materiais</a><button id="tabGeral" hidden>Comportamento da turma</button><button id="tabResp" hidden>Alunos</button><button id="tabCad" hidden>Cadastro de alunos</button><button id="tabExemplo" hidden>Ver como aluno</button><button id="tabCrono" hidden>Meu Cronograma Semanal</button><button class="on" id="tabForm" hidden>Meu perfil de estudos</button><button id="tabFaq" hidden>Dúvidas</button><button id="sair">Sair</button></nav>
 </header>
 <div id="exBar" hidden>Modo aluno exemplo — é assim que o aluno vê. Nada aqui entra nas estatísticas da turma. <button type="button" id="exSair">Sair do modo exemplo</button></div>
 <main id="app"></main>
 
-<script>(function(){var V='1795487040';fetch('/assessoria/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(t&&t!==V){var k='bqufu-recarga-'+t;try{if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1')}catch(e){}var u=new URL(location.href);u.searchParams.set('v',t);location.replace(u.toString());}}).catch(function(){});})();</script>
+<script>(function(){var V='1795487146';fetch('/assessoria/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(t&&t!==V){var k='bqufu-recarga-'+t;try{if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1')}catch(e){}var u=new URL(location.href);u.searchParams.set('v',t);location.replace(u.toString());}}).catch(function(){});})();</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>
 const $=id=>document.getElementById(id);
@@ -381,7 +381,7 @@ const S=[
  ]},
  {t:'Seu tempo e lugar de estudo',f:[
   {k:'aulas_mat',l:'Como você vai assistir às aulas do Curso de Matemática?',type:'radio',opts:['Ao vivo','Gravadas','Parte ao vivo, parte gravadas','Ainda não sei'],req:1},
-  {k:'horas_dia',l:'Quantas horas você estuda em cada dia da semana?',type:'horasdia',req:1,h:'Conte só o tempo de estudo seu, fora das aulas da escola e do cursinho. É com essas horas que o seu pré-cronograma é montado.'},
+  {k:'horas_dia',l:'Quantas horas você estuda em cada dia da semana?',type:'horasdia',req:1,h:'Conte só o tempo de estudo seu, fora das aulas da escola e do cursinho. É com essas horas que o seu Cronograma Semanal é montado.'},
   {k:'local_principal',l:'Onde você estuda na maior parte do tempo?',type:'radio',opts:LOCAIS,req:1},
  ]},
  {t:'Como você revisa',f:[
@@ -465,7 +465,7 @@ async function telaForm(){
     const {error}=await SB.from('checkup').upsert({email:ALVO,respostas:r,atualizado_em:agora},{onConflict:'email'});
     $('enviar').disabled=false;
     if(error){m.className='err';m.textContent='Não foi possível enviar: '+error.message;return;}
-    m.className='ok';m.innerHTML='✓ Perfil de estudos salvo! Se você mudou a rotina, o seu pré-cronograma se reorganiza sozinho ao abrir. <button type="button" class="btn pri" id="verCrono" style="margin-left:8px">Ver meu pré-cronograma</button>';$('tabCrono').hidden=false;$('verCrono').onclick=telaCrono;$('enviar').textContent='Atualizar perfil de estudos';};
+    m.className='ok';m.innerHTML='✓ Perfil de estudos salvo! Se você mudou a rotina, o seu Cronograma Semanal se reorganiza sozinho ao abrir. <button type="button" class="btn pri" id="verCrono" style="margin-left:8px">Ver meu Cronograma Semanal</button>';$('tabCrono').hidden=false;$('verCrono').onclick=telaCrono;$('enviar').textContent='Atualizar perfil de estudos';};
 }
 
 /* ===== Área do professor ===== */
@@ -612,7 +612,7 @@ function dossie(r){const p=r.respostas;GID=0;
       ${[['Provas',(p.provas||[]).join(', ')],['Prova da UFU',[p.ufu_exp,p.ufu_vezes].filter(Boolean).join(' · ')],['Média no ENEM',p.enem_media],['Aulas de Matemática',p.aulas_mat],['Onde estuda',p.local_principal],['Simulados',p.simulados],['Redação',p.redacao_freq],['Atividade física',[...(p.atividade_qual||[])].join(', ')||p.atividade]].filter(x=>x[1]).map(([l,v])=>`<div><span>${esc(l)}</span><b>${esc(v)}</b></div>`).join('')}
       </div>${(p.obstaculos||[]).length?`<p class="cs" style="margin:10px 0 4px">O que mais atrapalha</p><div class="chips2">${p.obstaculos.map(o=>chip(o,'lj')).join('')}</div>`:''}${p.obs?`<p class="cs" style="margin:10px 0 4px">Observações do aluno</p><p class="obs">${esc(p.obs)}</p>`:''}</section>
    </div>
-   <section class="chart"><h3><i class="hi b"></i>Pré-cronograma</h3><div class="cronoBox"></div></section>
+   <section class="chart"><h3><i class="hi b"></i>Cronograma Semanal</h3><div class="cronoBox"></div></section>
    <details class="pendl"><summary>Todas as respostas do perfil</summary>${S.map(s=>{const it=s.f.filter(f=>!['disp'].includes(f.k)).map(f=>{const v=fmt(f,p[f.k]);return v?`<dt>${esc(f.l)}</dt><dd>${esc(v)}</dd>`:'';}).join('');return it?`<h4>${esc(s.t)}</h4><dl class="dlr">${it}</dl>`:'';}).join('')}</details>`;}
 function agenda(p){
   const H0=5,H1=24,px=40,top=m=>((m/60-H0)*px);const alt=(H1-H0)*px;
@@ -630,7 +630,7 @@ function ficha(r){const p=r.respostas;
   const sono=(()=>{const a=tmin(p.acorda),d=tmin(p.dorme);return a!=null&&d!=null?hfmt(((a-d+1440)%1440)/60):'—';})();
   const t=(v,l)=>`<div class="kp"><b>${esc(v||'—')}</b><span>${esc(l)}</span></div>`;
   return `<div class="kps">${(()=>{const h=horasDia(p);return t(DS.map(d=>hfmt(h[d]||0).replace(' h','h')).join(' · '),'horas por dia: seg · ter · qua · qui · sex · sáb · dom')+t(hfmt(DS.reduce((a,d)=>a+(h[d]||0),0)),'de estudo por semana');})()}${t(sono,`de sono (${p.dorme||'?'} → ${p.acorda||'?'})`)}${t(p.cursinho,'cursinho')}${t(p.aulas_mat,'aulas de Matemática')}${t(p.local_principal,'onde estuda')}${t(p.rev_tempo||p.anki,'revisão por dia')}${t(p.ufu_exp+(p.ufu_vezes?' · '+p.ufu_vezes:''),'prova da UFU')}</div>
-  <h4>Pré-cronograma do aluno</h4><div class="cronoBox"></div>
+  <h4>Cronograma Semanal do aluno</h4><div class="cronoBox"></div>
   <h4>Dificuldade por matéria</h4>${AREAS.map(a=>{const v=(p.nivel||{})[a]||0;return `<div class="br"><span class="bl">${esc(a)}</span><span class="bt"><i style="width:${v*25}%;background:${v>=4?'var(--bad)':v===3?'var(--laranja)':v===2?'var(--amarelo)':'var(--verde)'}"></i></span><b style="grid-column:span 2;text-align:left;font-weight:600">${v?DIFN[v-1]:'—'}</b></div>`;}).join('')}
   ${S.map(s=>{const it=s.f.filter(f=>!['nivel','disp'].includes(f.k)).map(f=>{const v=fmt(f,p[f.k]);return v?`<dt>${esc(f.l)}</dt><dd>${esc(v)}</dd>`:'';}).join('');return it?`<h4>${esc(s.t)}</h4><dl>${it}</dl>`:'';}).join('')}`;}
 function lista(){const q=($('busca').value||'').toLowerCase();
@@ -645,7 +645,7 @@ function csv(){const cols=[['email','E-mail'],['atualizado_em','Enviado em'],...
   const linhas=[cols.map(c=>q(c[1])).join(';')].concat(RESP.map(r=>cols.map(([k])=>{if(k==='email')return q(r.email);if(k==='atualizado_em')return q(new Date(r.atualizado_em).toLocaleString('pt-BR'));const f=CAMPOS.find(x=>x.k===k);return q(fmt(f,r.respostas[k]).replace(/\n/g,' | '));}).join(';')));
   const b=new Blob(['﻿'+linhas.join('\r\n')],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='checkup-assessoria.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);}
 
-/* ===== Pré-cronograma ===== */
+/* ===== Cronograma Semanal ===== */
 const DISC=[ // chave, nome, grupo, minutos por bloco, vezes base na semana
  ['MAT','Matemática','EX',90,2],['FIS','Física','EX',90,2],['QUI','Química','EX',90,2],['BIO','Biologia','BIO',90,1],
  ['LP','Língua Portuguesa','LIN',60,1],['LIT','Literatura','LIN',60,1],['LE','Língua Estrangeira','LIN',60,1],
@@ -865,7 +865,7 @@ function imprimir(st){
   const px=Math.floor(620/Math.max(1,H1-H0));
   const nm=(st.p&&st.p.nome)||'';
   const pa=document.createElement('div');pa.id='printArea';
-  pa.innerHTML=`<div class="phead"><b>Pré-cronograma de estudos${nm?' — '+esc(nm):''}</b><span>PREPARA UFU · Prof. Jazz</span></div><div class="cgw">${gradeHTML(todos,conf,H0,H1,px)}</div>`;
+  pa.innerHTML=`<div class="phead"><b>Cronograma Semanal${nm?' — '+esc(nm):''}</b><span>PREPARA UFU · Prof. Jazz</span></div><div class="cgw">${gradeHTML(todos,conf,H0,H1,px)}</div>`;
   raiz.setAttribute('data-theme','light');document.body.appendChild(pa);document.body.classList.add('imprimindo');
   const fim=()=>{window.removeEventListener('afterprint',fim);pa.remove();document.body.classList.remove('imprimindo');raiz.setAttribute('data-theme',tema||'dark');};
   window.addEventListener('afterprint',fim);
@@ -954,8 +954,8 @@ async function exemploAcoes(){
     await SB.from('cronograma').delete().eq('email',EXEMPLO);await SB.from('checkup').delete().eq('email',EXEMPLO);$('tabCrono').hidden=true;telaForm();};}
 const FAQ=[
  ['Primeiros passos',[
-  ['O que é o perfil de estudos?','É o seu raio-x: a sua rotina, os seus compromissos, quantas horas você estuda em cada dia, as suas dificuldades e o seu curso. Com essas respostas o site monta o seu pré-cronograma, e o Prof. Jazz usa tudo isso no seu encontro de mentoria.'],
-  ['O que é o pré-cronograma?','É a sua semana de estudos já organizada, dia a dia e com horário: os seus compromissos (escola, cursinho, academia, PREPARA UFU…) e, nos horários livres, as matérias que você vai estudar. É um ponto de partida: ele será totalmente validado no seu encontro com o mentor.'],
+  ['O que é o perfil de estudos?','É o seu raio-x: a sua rotina, os seus compromissos, quantas horas você estuda em cada dia, as suas dificuldades e o seu curso. Com essas respostas o site monta o seu Cronograma Semanal, e o Prof. Jazz usa tudo isso no seu encontro de mentoria.'],
+  ['O que é o Cronograma Semanal?','É a sua semana de estudos já organizada, dia a dia e com horário: os seus compromissos (escola, cursinho, academia, PREPARA UFU…) e, nos horários livres, as matérias que você vai estudar. É um ponto de partida: ele será totalmente validado no seu encontro com o mentor.'],
   ['Como os horários das matérias são escolhidos?','A partir da hora em que você acorda, nos horários livres do seu dia (fora da escola, do cursinho e dos outros compromissos), de preferência de manhã e à tarde, respeitando as horas de estudo que você marcou para cada dia. Se um horário não funcionar para você, é só mudar o bloco de lugar.'],
   ['Por que umas matérias aparecem mais vezes que outras?','O cronograma dá mais espaço para as matérias que você marcou como difíceis e para as que pesam mais no seu curso. Matemática, Física e Química sempre aparecem mais vezes. Redação entra uma vez por semana, a revisão entra quase todos os dias e o domingo é para simulado, provas antigas da UFU e matéria atrasada.'],
   ['As aulas do PREPARA UFU contam como tempo de estudo?','Não. As aulas ao vivo (segunda e quinta, 19h–20h30) aparecem como compromisso e não entram nas suas horas de estudo: o seu tempo de estudo é além delas.']]],
@@ -1015,12 +1015,12 @@ function cadDraw(msg){const busca=($('cadBusca')||{}).value||'';
   $('app').querySelectorAll('button[data-z]').forEach(b=>b.onclick=async()=>{const e=b.dataset.z;if(!confirm('Zerar a senha de '+e+'? O aluno vai criar uma nova em “Primeiro acesso”.'))return;const {error}=await SB.rpc('admin_zerar_senha',{e});await cadLoad(error?error.message:'Senha zerada: '+e);});
   $('app').querySelectorAll('button[data-r]').forEach(b=>b.onclick=async()=>{const e=b.dataset.r;if(!confirm('Remover o acesso de '+e+'? Ele perde o Banco de Questões e a Assessoria.'))return;await SB.rpc('admin_zerar_senha',{e});const {error}=await SB.from('allowed_emails').delete().eq('email',e);await cadLoad(error?error.message:'Acesso removido: '+e);});}
 function telaFaq(){abas('tabFaq');
-  $('app').innerHTML=`<div class="intro"><h2>Dúvidas</h2><p>Perguntas e respostas sobre o perfil de estudos e o pré-cronograma. Não achou a sua dúvida? Fale com o Prof. Jazz.</p></div>
+  $('app').innerHTML=`<div class="intro"><h2>Dúvidas</h2><p>Perguntas e respostas sobre o perfil de estudos e o Cronograma Semanal. Não achou a sua dúvida? Fale com o Prof. Jazz.</p></div>
   ${FAQ.map(([t,L])=>`<section class="sec faq"><h3>${esc(t)}</h3>${L.map(([q,a])=>`<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join('')}</section>`).join('')}`;}
 async function telaCrono(){abas('tabCrono');
   const {data}=await SB.from('checkup').select('respostas').eq('email',ALVO).maybeSingle();
-  if(!data){$('app').innerHTML='<div class="aviso"><h2>Preencha o seu perfil de estudos primeiro</h2><p>O seu pré-cronograma é montado a partir das suas respostas.</p></div>';return;}
-  $('app').innerHTML=`<div class="intro"><h2>Meu pré-cronograma</h2><p>Montado a partir do seu perfil de estudos. Você pode arrastar, alterar, excluir e adicionar blocos: as mudanças ficam salvas, e o Prof. Jazz vê e ajusta com você no encontro.</p></div><div class="sec" id="cronoBox"></div>`;
+  if(!data){$('app').innerHTML='<div class="aviso"><h2>Preencha o seu perfil de estudos primeiro</h2><p>O seu Cronograma Semanal é montado a partir das suas respostas.</p></div>';return;}
+  $('app').innerHTML=`<div class="intro"><h2>Meu Cronograma Semanal</h2><p>Montado a partir do seu perfil de estudos. Você pode arrastar, alterar, excluir e adicionar blocos: as mudanças ficam salvas, e o Prof. Jazz vê e ajusta com você no encontro.</p></div><div class="sec" id="cronoBox"></div>`;
   montarCrono($('cronoBox'),data.respostas,ALVO,'aluno');}
 
 /* ===== Login (mesma conta do Banco de Questões) ===== */
@@ -1045,7 +1045,7 @@ async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!se
   EMAIL=(session.user.email||'').toLowerCase();IS_ADMIN=EMAIL===ADMIN;
   const {data:ok}=await SB.rpc('is_assessoria');
   $('gate').hidden=true;
-  if(!ok){$('app').innerHTML=`<div class="aviso"><h2>Área exclusiva da Assessoria PREPARA UFU</h2><p>Aqui os alunos da Assessoria preenchem o perfil de estudos e recebem um pré-cronograma personalizado, montado a partir da rotina, das dificuldades e do curso de cada um, e ajustado nos encontros com o Prof. Jazz.</p><p>O seu acesso hoje é ao Banco de Questões. Quer fazer parte da Assessoria? Fale com o Prof. Jazz. Se você já é aluno da Assessoria e está vendo esta mensagem, avise o Prof. Jazz para liberar o seu e-mail.</p><a href="../bancodequestoes/">Ir para o Banco de Questões</a></div>`;return;}
+  if(!ok){$('app').innerHTML=`<div class="aviso"><h2>Área exclusiva da Assessoria PREPARA UFU</h2><p>Aqui os alunos da Assessoria preenchem o perfil de estudos e recebem um Cronograma Semanal personalizado, montado a partir da rotina, das dificuldades e do curso de cada um, e ajustado nos encontros com o Prof. Jazz.</p><p>O seu acesso hoje é ao Banco de Questões. Quer fazer parte da Assessoria? Fale com o Prof. Jazz. Se você já é aluno da Assessoria e está vendo esta mensagem, avise o Prof. Jazz para liberar o seu e-mail.</p><a href="../bancodequestoes/">Ir para o Banco de Questões</a></div>`;return;}
   $('tabForm').hidden=false;$('tabResp').hidden=!IS_ADMIN;$('tabGeral').hidden=!IS_ADMIN;
   ALVO=EMAIL;$('tabForm').onclick=telaForm;$('tabResp').onclick=telaResp;$('tabGeral').onclick=telaGeral;$('tabCrono').onclick=telaCrono;$('tabFaq').onclick=telaFaq;$('tabFaq').hidden=false;
   $('tabExemplo').hidden=!IS_ADMIN;$('tabCad').hidden=!IS_ADMIN;$('tabCad').onclick=telaCad;$('tabExemplo').onclick=()=>modoExemplo(true);$('exSair').onclick=()=>modoExemplo(false);
