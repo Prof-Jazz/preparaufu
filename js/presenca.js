@@ -28,6 +28,22 @@
     }catch(e){}
   }
   setTimeout(navArea,1200);
+  function modoAlunoMentoria(){
+    try{
+      if(/^\/mentoria\//.test(location.pathname))return;
+      var pu=sessionStorage.getItem('bqufu-mentoria-puro'),v=JSON.parse(sessionStorage.getItem('bqufu-mentoria-ver')||'null');
+      if(!pu||!v||!v.email)return;
+      document.querySelectorAll('header nav').forEach(function(nav){
+        nav.querySelectorAll('a').forEach(function(l){var h=l.getAttribute('href')||'';if(/aulas\/|assessoria|area=escolher/.test(h))l.style.display='none';});
+        var c=nav.querySelector('a');var sair=nav.querySelector('#sair,button:last-child');
+        var m=document.createElement('a');m.href='/mentoria/';m.textContent='Minha Mentoria';if(c)m.className=c.className;
+        var b=document.createElement('a');b.href='/mentoria/';b.textContent='Sair do modo aluno';if(c)b.className=c.className;b.style.borderColor='#DDDD24';b.style.color='#DDDD24';
+        b.onclick=function(){try{sessionStorage.removeItem('bqufu-mentoria-puro');}catch(e){}};
+        if(sair&&sair.parentNode===nav){nav.insertBefore(m,sair);nav.insertBefore(b,sair);}else{nav.appendChild(m);nav.appendChild(b);}
+      });
+    }catch(e){}
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',modoAlunoMentoria);else modoAlunoMentoria();
   setTimeout(ping,2500);
   setInterval(function(){if(!document.hidden)ping();},60000);
   document.addEventListener('visibilitychange',function(){if(!document.hidden)ping();});
