@@ -381,13 +381,13 @@ body{animation:fadein .25s ease}@keyframes fadein{from{opacity:0}to{opacity:1}}
 
 <header>
   <a class="logos" href="/" title="Início da plataforma PREPARA UFU" style="text-decoration:none"><img class="j" src="../bancodequestoes/logo/jazz_claro.png" alt="Jazz, Professor de Matemática"><span class="sep"></span><img class="p" src="../bancodequestoes/logo/prepara_transp.png" alt="Prepara UFU"></a>
-  <nav class="tabs"><button class="theme" id="theme" aria-label="Alternar modo diurno e noturno" title="Modo diurno / noturno"><span class="sun">☀</span><span class="moon">☾</span></button><a href="../bancodequestoes/">Banco de Questões</a><a href="../estudos/">Sala de Estudos</a><a href="/?area=escolher" id="lkAreas" hidden>Trocar de área</a><button id="sair">Sair</button></nav>
+  <nav class="tabs"><button class="theme" id="theme" aria-label="Alternar modo diurno e noturno" title="Modo diurno / noturno"><span class="sun">☀</span><span class="moon">☾</span></button><a href="../bancodequestoes/">Banco de Questões</a><a href="../estudos/">Sala de Estudos</a><button type="button" id="hdVolta" class="hdp" hidden>‹ Mentorados</button><button type="button" id="hdPuro" class="hdp am" hidden>Ver como aluno</button><a href="/?area=escolher" id="lkAreas" hidden>Trocar de área</a><button id="sair">Sair</button></nav>
 </header>
-<nav class="subnav" aria-label="Mentoria"><div class="in"><button id="tabResp" hidden>Mentorados</button><button id="tabCad" hidden>Cadastro</button><button id="tabGerais" hidden>Materiais para todos</button><button id="tabInicio" hidden>Início</button><button id="tabDash" hidden>Meu Dashboard</button><button id="tabRaio" hidden>Raio-x do aluno</button><button id="tabPlano" hidden>Plano de Estudos</button><button id="tabCrono" hidden>Cronograma Semanal</button><button id="tabEnc" hidden>Encontros</button><button id="tabMat" hidden>Materiais</button><button id="tabForm" hidden>Perfil de estudos</button><button id="tabFaq" hidden>Dúvidas</button><button id="tabGeral" hidden></button><button id="tabExemplo" hidden></button></div></nav>
+<nav class="subnav" aria-label="Mentoria"><div class="in"><span id="snNome" hidden></span><button id="tabResp" hidden>Mentorados</button><button id="tabCad" hidden>Cadastro</button><button id="tabGerais" hidden>Materiais para todos</button><button id="tabInicio" hidden>Início</button><button id="tabDash" hidden>Meu Dashboard</button><button id="tabRaio" hidden>Raio-x do aluno</button><button id="tabPlano" hidden>Plano de Estudos</button><button id="tabCrono" hidden>Cronograma Semanal</button><button id="tabEnc" hidden>Encontros</button><button id="tabMat" hidden>Materiais</button><button id="tabForm" hidden>Perfil de estudos</button><button id="tabFaq" hidden>Dúvidas</button><button id="tabGeral" hidden></button><button id="tabExemplo" hidden></button></div></nav>
 <div id="exBar" hidden><span id="exTxt"></span> <button type="button" id="exPuro"></button> <button type="button" id="exSair">Voltar aos mentorados</button><button type="button" id="exTroca" hidden></button></div>
 <main id="app"></main>
 
-<script>(function(){var V='1795549915';var K='bqufu-recarga-';
+<script>(function(){var V='1795550572';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -1291,6 +1291,7 @@ function menuM(){const adm=IS_ADMIN&&!EXMODO,aluno=!IS_ADMIN||EXMODO;
   ['tabResp','tabCad','tabGerais'].forEach(t=>$(t).hidden=!adm);
   ['tabInicio','tabPlano','tabCrono','tabEnc','tabMat','tabForm','tabFaq'].forEach(t=>$(t).hidden=!aluno);
   $('tabDash').hidden=!aluno;$('tabDash').textContent=IS_ADMIN?'Dashboard do aluno':'Meu Dashboard';$('tabRaio').hidden=!(IS_ADMIN&&EXMODO);$('exBar').hidden=!EXMODO;
+  $('exBar').hidden=true;$('snNome').hidden=!(EXMODO&&!PURO);$('snNome').textContent=ANOME||'';$('hdVolta').hidden=!EXMODO||PURO;$('hdPuro').hidden=!EXMODO;$('hdPuro').textContent=PURO?'Sair do modo aluno':'Ver como aluno';$('hdPuro').title=PURO?'Voltar a gerenciar '+(ANOME||''):'Ver exatamente o que '+(ANOME||'o aluno')+' vê';
   if(EXMODO){$('exTxt').innerHTML=PURO?`Modo aluno: é exatamente o que <b>${esc(ANOME||ALVO)}</b> vê.`:`Você está gerenciando a área de <b>${esc(ANOME||ALVO)}</b>, com os seus botões de professor.`;$('exPuro').textContent=PURO?'Sair do modo aluno':'Ver como o aluno vê';$('exSair').hidden=PURO;}
   document.body.classList.toggle('mprof',IS_ADMIN);$('lkAreas').hidden=PURO||!window.AMBAS;}
 function telaGeral(){telaMentorados();}
@@ -1535,6 +1536,7 @@ async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!se
   ALVO=EMAIL;
   $('tabResp').onclick=telaMentorados;$('tabCad').onclick=telaCad;$('tabGerais').onclick=telaGerais;$('tabInicio').onclick=telaInicio;$('tabRaio').onclick=telaRaio;$('tabDash').onclick=telaDash;$('tabPlano').onclick=()=>telaPlano();$('tabCrono').onclick=telaCrono;$('tabEnc').onclick=telaEnc;$('tabMat').onclick=telaMat;$('tabForm').onclick=telaForm;$('tabFaq').onclick=telaFaq;
   $('exSair').onclick=saiAluno;$('exTroca').onclick=saiAluno;
+  $('hdVolta').onclick=saiAluno;$('hdPuro').onclick=()=>$('exPuro').click();
   $('exPuro').onclick=()=>{const atual=MTABS.find(t=>$(t).classList.contains('on'));PURO=!PURO;IS_ADMIN=!PURO;try{PURO?sessionStorage.setItem('bqufu-mentoria-puro','1'):sessionStorage.removeItem('bqufu-mentoria-puro');}catch(e){}menuM();const mapa={tabInicio:telaInicio,tabDash:telaDash,tabPlano:()=>telaPlano(),tabCrono:telaCrono,tabEnc:telaEnc,tabMat:telaMat,tabForm:telaForm,tabFaq:telaFaq};(mapa[atual]||telaInicio)();window.scrollTo(0,0);};
   if(IS_ADMIN){let v=null;try{v=JSON.parse(sessionStorage.getItem('bqufu-mentoria-ver')||'null');}catch(e){}if(v&&v.email){let pu=null;try{pu=sessionStorage.getItem('bqufu-mentoria-puro');}catch(e){}if(pu){PURO=true;IS_ADMIN=false;}entraAluno(v.email,v.nome);return;}menuM();telaMentorados();}
   else{const {data:me}=await SB.from('mentorados').select('nome').eq('email',EMAIL).maybeSingle();ANOME=me?me.nome:'';menuM();telaInicio();}}
@@ -1698,6 +1700,8 @@ label.btn{display:inline-flex;align-items:center;cursor:pointer}
 .dashm .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 20px;box-shadow:var(--shadow)}
 @media (max-width:860px){.dashm .duo{grid-template-columns:1fr}}
 .raiox{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 18px}.raiox summary{cursor:pointer;font:700 16px var(--display)}.raiox summary small{font-weight:500;color:var(--muted)}.rxb{display:flex;flex-direction:column;gap:16px;margin-top:14px}
+.tabs .hdp.am{border-color:var(--amarelo);color:var(--amarelo)}
+#snNome{flex:none;align-self:center;font:800 14px var(--display);color:#16304F;background:var(--amarelo);padding:6px 12px;border-radius:999px;margin-right:6px;white-space:nowrap}
 </style>
 
 <script src="../js/presenca.js" defer></script>
