@@ -90,6 +90,34 @@ select,input[type=number],input[type=text]{font:500 16px var(--body);padding:11p
 @media (max-width:860px){.sala{grid-template-columns:1fr}}
 @media (max-width:520px){.cron .tipo small{display:none}.cron .tipo{padding:16px 10px 16px 50px}.cron .tipo .ic{left:12px;font-size:24px}}
 .hstat{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.hstat div{background:var(--soft);border-radius:12px;padding:10px 8px;text-align:center}.hstat b{display:block;font:800 20px var(--display)}.hstat span{font-size:12px;color:var(--muted,#8a94a6)}
+.lado{display:flex;flex-direction:column;gap:16px;min-width:0}
+#vivoBox .vh{display:flex;align-items:center;gap:10px;margin-bottom:4px}#vivoBox .vh h3{margin:0;font:800 18px var(--display)}
+.vcount{display:inline-flex;align-items:center;gap:6px;font:800 14px var(--body);background:color-mix(in srgb,#1BAF7A 18%,transparent);color:#1BAF7A;padding:3px 10px;border-radius:999px}
+.vcount i{width:8px;height:8px;border-radius:50%;background:#1BAF7A;animation:vpulse 1.6s infinite}
+@keyframes vpulse{0%{box-shadow:0 0 0 0 rgba(27,175,122,.6)}70%{box-shadow:0 0 0 7px rgba(27,175,122,0)}100%{box-shadow:0 0 0 0 rgba(27,175,122,0)}}
+#vivoBox .vh .btn.sm,.btn.sm{margin-left:auto;padding:6px 12px;font-size:13px}
+.bdg{display:inline-grid;place-items:center;min-width:19px;height:19px;padding:0 5px;border-radius:999px;background:#E5484D;color:#fff;font:800 11px var(--body);font-style:normal;margin-left:4px}
+.vsubt{margin:0 0 10px;color:var(--muted);font-size:13.5px;line-height:1.4}
+.vsub{margin:12px 0 6px;font:700 12px var(--body);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.viv{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:transparent;border:1px solid transparent;border-radius:14px;padding:8px 10px;color:var(--ink);font:inherit;cursor:pointer}
+.viv:hover,.viv:focus-visible{background:var(--soft);border-color:var(--line);outline:none}
+.viv .tx{flex:1;min-width:0;display:flex;flex-direction:column}.viv .tx b{font-weight:700;font-size:15px}.viv .tx small{color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.viv .mi{opacity:0;transition:opacity .15s}.viv:hover .mi{opacity:.8}
+.viv .qd{display:flex;flex-direction:column;align-items:flex-end;gap:3px;color:var(--muted);font-size:12px;white-space:nowrap}
+.av{position:relative;flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--c);color:#fff;font:800 14px var(--display)}
+.av i{position:absolute;right:-1px;bottom:-1px;width:12px;height:12px;border-radius:50%;border:2px solid var(--card)}.av i.on{background:#1BAF7A;animation:vpulse 1.6s infinite}.av i.idle{background:#C9A227}
+.vopt{display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line);font-size:13.5px;color:var(--muted);cursor:pointer}
+.dlg.chat .box{max-width:440px;display:flex;flex-direction:column}
+.dlg.chat .top{position:relative;padding-right:52px}.dlg.chat .x{position:absolute;right:12px;top:12px;width:32px;height:32px;border-radius:50%;border:0;background:rgba(255,255,255,.16);color:#fff;font:700 15px var(--body);cursor:pointer}
+.cht{display:flex;align-items:center;gap:12px}.cht h3{font-size:19px!important}
+.dlg.chat .lst{padding:10px;max-height:60vh;overflow:auto}
+.msgs{display:flex;flex-direction:column;gap:6px;padding:14px;height:min(52vh,420px);overflow:auto;background:var(--bg)}
+.bal{max-width:80%;align-self:flex-start;background:var(--card);border:1px solid var(--line);border-radius:16px 16px 16px 4px;padding:8px 12px;display:flex;flex-direction:column;gap:2px}
+.bal span{white-space:pre-wrap;word-wrap:break-word;font-size:15px;line-height:1.35}.bal small{font-size:11px;color:var(--muted);align-self:flex-end}
+.bal.eu{align-self:flex-end;background:#3A8CCB;border-color:#3A8CCB;color:#fff;border-radius:16px 16px 4px 16px}.bal.eu small{color:rgba(255,255,255,.8)}
+.cin{display:flex;gap:8px;padding:12px 14px 6px;border-top:1px solid var(--line)}.cin input{flex:1;min-width:0;font:inherit;font-size:15px;padding:10px 14px;border-radius:999px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.cin .btn{border-radius:999px}
+.dlg.chat .regra{margin:0;padding:2px 16px 4px;font-size:12px;color:var(--muted);text-align:center}.dlg.chat .msg{padding:0 16px 10px;text-align:center}
 /* cronômetro */
 .relogio{display:flex;flex-direction:column;align-items:center;gap:16px;padding:26px 18px;border-radius:24px;background:radial-gradient(600px 300px at 50% 0%,color-mix(in srgb,var(--c) 22%,transparent),transparent 70%),var(--card);border:1px solid var(--line)}
 .chip{display:inline-flex;align-items:center;gap:7px;background:var(--c);color:#fff;font:800 14px var(--body);padding:6px 14px;border-radius:999px}
@@ -173,7 +201,7 @@ select,input[type=number],input[type=text]{font:500 16px var(--body);padding:11p
 <div id="exBar" hidden>Modo aluno exemplo — é assim que o aluno vê. <button type="button" id="exSair">Sair do modo exemplo</button></div>
 <main id="app"><p class="pend">Carregando…</p></main>
 
-<script>(function(){var V='1795534525';var K='bqufu-recarga-';
+<script>(function(){var V='1795534884';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -234,7 +262,7 @@ async function carregaPlano(){if(PLANO)return;const [p,c]=await Promise.all([SB.
 const semanas=()=>[...new Set(PLANO.map(x=>x.semana))].sort();
 const semAtual=()=>{const s=semanas(),h=iso(new Date());let i=s.findIndex((x,k)=>h>=x&&(k===s.length-1||h<s[k+1]));return i<0?(h<s[0]?0:s.length-1):i;};
 const lerS=()=>{try{const s=JSON.parse(localStorage.getItem(KEY)||'null');return s&&s.email===ALVO?s:null;}catch(e){return null;}};
-const gravaS=s=>{try{s?localStorage.setItem(KEY,JSON.stringify(s)):localStorage.removeItem(KEY);}catch(e){}};
+const gravaS=s=>{try{s?localStorage.setItem(KEY,JSON.stringify(s)):localStorage.removeItem(KEY);}catch(e){}if(window.pingPresenca)setTimeout(pingPresenca,300);};
 const decorrido=s=>(s.acum||0)+(s.rodando?Date.now()-s.desde:0);
 let TICK=null;
 
@@ -261,7 +289,8 @@ function desenhaSala(s){abas('tabSala');clearInterval(TICK);
        <label id="lOutro" class="outro" hidden>Qual assunto?<input type="text" id="sOutro" placeholder="ex.: lista de exercícios de funções" maxlength="140"></label>
        <button class="comecar" id="go" disabled>▶ Iniciar</button>`}
    </section>
-   <aside class="card" id="hojeBox"><h3 style="margin:0 0 10px;font:800 18px var(--display)">Hoje</h3><p class="pend" style="margin:0">Carregando…</p></aside></div>`;
+   <div class="lado"><aside class="card" id="hojeBox"><h3 style="margin:0 0 10px;font:800 18px var(--display)">Hoje</h3><p class="pend" style="margin:0">Carregando…</p></aside>
+   <aside class="card" id="vivoBox"><div class="vh"><h3>Estudando agora</h3></div><p class="pend" style="margin:0">Carregando…</p></aside></div></div>`;
   if(s){
     const atual=()=>{const t=decorrido(s)/1000;$('tempo').textContent=hms(t);$('vbar').style.width=(100*(t%3600)/3600).toFixed(1)+'%';
       $('estado').textContent=s.rodando?'Estudando…':'Pausado';$('estado').className=s.rodando?'pulse':'';$('visor').classList.toggle('pausa',!s.rodando);
@@ -285,7 +314,7 @@ function desenhaSala(s){abas('tabSala');clearInterval(TICK);
     $('go').onclick=()=>{const it=esc_.item!=='__outro'?PLANO.find(x=>String(x.id)===esc_.item):null;
       const n={email:ALVO,tipo:esc_.tipos.join(','),materia:esc_.materia,assunto:it?it.assunto:$('sOutro').value.trim(),item:it?it.id:null,inicio:Date.now(),desde:Date.now(),acum:0,rodando:true};
       gravaS(n);desenhaSala(n);};}
-  desenhaHoje();}
+  desenhaHoje();desenhaVivo();}
 function desenhaRelogio(s){desenhaSala(s);}
 function encerrar(s){const seg=Math.round(decorrido(s)/1000);if(s.rodando){s.acum=decorrido(s);s.rodando=false;gravaS(s);}
   const [n,ic,,c]=TI(s.tipo);const pedeQ=tlist(s.tipo).some(k=>k==='questoes'||k==='correcao');
@@ -379,7 +408,50 @@ async function telaAlunos(email){abas('tabAlunos');
   const cab=`<div class="card dtop"><h2>Dashboard do aluno</h2><select id="selAl">${LALUNOS.map(a=>`<option value="${esc(a.email)}"${a.email===al?' selected':''}>${esc(a.nome||a.email)}${a.assessoria?'':' (Curso de Matemática)'}</option>`).join('')}</select><button class="btn" id="alAnt">‹</button><button class="btn" id="alProx">›</button></div>`;
   history.replaceState(null,'','?aluno='+encodeURIComponent(al)+'#alunos');
   telaPainel(al,cab);}
+
+/* ===== Estudando agora + mensagens ===== */
+const iniN=n=>String(n||'?').trim().split(/\s+/).map(w=>w[0]||'').slice(0,2).join('').toUpperCase();
+const quandoMsg=t=>{const d=new Date(t),h=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');return iso(d)===iso(new Date())?h:dm(d)+' '+h;};
+let CHAT=null;
+setInterval(()=>{if(!document.hidden&&$('vivoBox')&&!CHAT)desenhaVivo();},30000);
+async function desenhaVivo(){const box=$('vivoBox');if(!box)return;
+  const [a,b,c]=await Promise.all([SB.rpc('quem_online'),SB.rpc('nao_lidas'),SB.rpc('meu_estado')]);
+  if(!$('vivoBox'))return;
+  if(a.error){box.innerHTML='<div class="vh"><h3>Estudando agora</h3></div><p class="pend">Não deu para carregar agora.</p>';return;}
+  const L=a.data||[],nl=b.data||0,oc=!!(c.data&&c.data[0]&&c.data[0].oculto);
+  const outros=L.filter(x=>!x.eu),est=outros.filter(x=>x.estudando),on=outros.filter(x=>!x.estudando);
+  const euEst=L.some(x=>x.eu&&x.estudando);
+  const pessoa=x=>{const t=x.tipo?TI(x.tipo):null;const min=x.desde?Math.max(1,Math.round((Date.now()-new Date(x.desde))/60000)):0;
+    return `<button class="viv" data-u="${x.uid}" data-n="${esc(x.nome)}" title="Mandar mensagem para ${esc(x.nome)}"><span class="av" style="--c:${x.estudando&&t?t[3]:'#6B7393'}">${esc(iniN(x.nome))}<i class="${x.estudando?'on':'idle'}"></i></span><span class="tx"><b>${esc(x.nome)}</b><small>${x.estudando?`${esc(x.materia||'')}${t?' · '+esc(t[0]):''} · há ${min<60?min+' min':hfmt(min*60)}`:'online no site'}</small></span><span class="mi">💬</span></button>`;};
+  box.innerHTML=`<div class="vh"><h3>Estudando agora</h3><span class="vcount" title="estudando agora"><i></i>${est.length+(euEst?1:0)}</span><button class="btn sm" id="caixa">💬 Mensagens${nl?` <em class="bdg">${nl}</em>`:''}</button></div>
+    <p class="vsubt">${euEst?(est.length?`Você e mais ${est.length} ${est.length>1?'colegas estão':'colega está'} estudando agora.`:'Só você por enquanto: os colegas que começarem aparecem aqui.'):(est.length?'Os colegas que estão com o cronômetro ligado agora. Toque em alguém para mandar uma mensagem.':'Ninguém com o cronômetro ligado agora. Comece a sua sessão!')}</p>
+    ${est.map(pessoa).join('')}
+    ${on.length?`<div class="vsub">Online no site · ${on.length}</div>${on.map(pessoa).join('')}`:''}
+    <label class="vopt"><input type="checkbox" id="vOc" ${oc?'':'checked'}> Aparecer para os colegas</label>`;
+  box.querySelectorAll('.viv').forEach(x=>x.onclick=()=>abreChat(x.dataset.u,x.dataset.n));
+  $('caixa').onclick=abreCaixa;
+  $('vOc').onchange=async()=>{await SB.rpc('set_oculto',{p:!$('vOc').checked});desenhaVivo();};}
+function fechaChat(){if(CHAT){clearInterval(CHAT.t);CHAT.d.remove();CHAT=null;}desenhaVivo();}
+async function abreCaixa(){if(CHAT)fechaChat();
+  const d=document.createElement('div');d.className='dlg chat';d.innerHTML=`<div class="box" style="--c:#3A8CCB"><div class="top"><button class="x" data-x aria-label="Fechar">✕</button><h3>💬 Mensagens</h3><p>Suas conversas com os colegas</p></div><div class="lst" id="cxL"><p class="pend">Carregando…</p></div></div>`;
+  document.body.appendChild(d);CHAT={d,t:null};d.onclick=e=>{if(e.target===d||e.target.closest('[data-x]'))fechaChat();};
+  const {data}=await SB.rpc('minhas_conversas');const L=data||[];
+  $('cxL').innerHTML=L.length?L.map(x=>`<button class="viv" data-u="${x.uid}" data-n="${esc(x.nome)}"><span class="av" style="--c:${x.estudando?'#1BAF7A':'#6B7393'}">${esc(iniN(x.nome))}${x.online?`<i class="${x.estudando?'on':'idle'}"></i>`:''}</span><span class="tx"><b>${esc(x.nome)}</b><small>${esc(x.ultima||'')}</small></span><span class="qd">${quandoMsg(x.quando)}${x.nao_lidas?`<em class="bdg">${x.nao_lidas}</em>`:''}</span></button>`).join(''):'<p class="pend" style="padding:6px 4px">Nenhuma conversa ainda. Em “Estudando agora”, toque num colega para mandar um oi.</p>';
+  $('cxL').querySelectorAll('.viv').forEach(x=>x.onclick=()=>abreChat(x.dataset.u,x.dataset.n));}
+async function abreChat(uid,nome){if(CHAT){clearInterval(CHAT.t);CHAT.d.remove();CHAT=null;}
+  const d=document.createElement('div');d.className='dlg chat';d.innerHTML=`<div class="box" style="--c:#16304F"><div class="top"><button class="x" data-x aria-label="Fechar">✕</button><div class="cht"><span class="av" style="--c:#3A8CCB">${esc(iniN(nome))}</span><div><h3>${esc(nome)}</h3><p>${nome==='Prof. Jazz'?'Professor do PREPARA UFU':'Colega do PREPARA UFU'}</p></div></div></div>
+    <div class="msgs" id="msgs"><p class="pend" style="text-align:center">Carregando…</p></div>
+    <form class="cin"><input name="t" maxlength="500" placeholder="Escreva uma mensagem…" autocomplete="off" aria-label="Mensagem"><button class="btn pri" type="submit">Enviar</button></form>
+    <p class="regra">Seja gentil e respeitoso. As conversas ficam registradas e podem ser vistas pelo Prof. Jazz.</p><p class="msg" id="chErr"></p></div>`;
+  document.body.appendChild(d);d.onclick=e=>{if(e.target===d||e.target.closest('[data-x]'))fechaChat();};
+  let ult='';const carrega=async()=>{const {data}=await SB.rpc('conversa',{p_com:uid});if(!$('msgs'))return;const L=(data||[]).slice().reverse();const k=L.length+':'+(L.length?L[L.length-1].id:'');if(k===ult)return;ult=k;
+    const m=$('msgs');m.innerHTML=L.length?L.map(x=>`<div class="bal${x.minha?' eu':''}"><span>${esc(x.texto)}</span><small>${quandoMsg(x.criada)}</small></div>`).join(''):'<p class="pend" style="text-align:center;margin:auto">Diga um oi! 👋</p>';m.scrollTop=m.scrollHeight;};
+  CHAT={d,t:setInterval(carrega,4000)};carrega();
+  const f=d.querySelector('form');setTimeout(()=>f.t.focus(),50);
+  f.onsubmit=async e=>{e.preventDefault();const t=f.t.value.trim();if(!t)return;f.t.value='';$('chErr').textContent='';
+    const {error}=await SB.rpc('enviar_msg',{p_para:uid,p_texto:t});if(error){$('chErr').textContent=/muitas/.test(error.message)?'Muitas mensagens seguidas: espere um pouco.':'Não deu para enviar. Tente de novo.';f.t.value=t;return;}ult='';carrega();};}
 entrar();
 </script>
+<script src="../js/presenca.js" defer></script>
 </body>
 </html>
