@@ -368,6 +368,17 @@ body{animation:fadein .25s ease}@keyframes fadein{from{opacity:0}to{opacity:1}}
 .pend{font-size:14px;color:var(--muted)}
 .tag{font-size:12px;padding:2px 9px;border-radius:99px;background:var(--soft);color:var(--muted)}
 .send .recalc{flex-basis:100%;margin:0;font-size:13.5px;color:var(--muted)}
+.aovc{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 0 2px}.aovf{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px}
+.aovf button{font:600 13.5px var(--body);border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 8px;border-radius:10px;cursor:pointer;white-space:nowrap}.aovf button.on{background:var(--azul);border-color:var(--azul);color:#fff}
+.aovd{display:grid;grid-template-columns:repeat(14,minmax(0,1fr));gap:6px;align-items:end;margin-top:12px}.aovdi{display:flex;flex-direction:column;align-items:center;gap:6px}.aovdi span{font-size:11px;color:var(--muted)}.aovdi.hj span{color:var(--ink);font-weight:800}
+.aovb{display:flex;gap:3px;align-items:flex-end;height:132px}.aovb i{position:relative;display:block;width:12px;min-height:2px;border-radius:5px 5px 2px 2px;background:linear-gradient(#3A8CCB,#16304F)}.aovb i.e{background:linear-gradient(#1BAF7A,#0E7A55)}
+.aovb i b{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);font:700 10px var(--body);color:var(--muted);padding-bottom:2px}
+.aovleg{display:flex;gap:16px;margin-top:10px;font-size:12.5px;color:var(--muted)}.aovleg i{display:inline-block;width:10px;height:10px;border-radius:3px;background:#3A8CCB;margin-right:6px}.aovleg i.e{background:#1BAF7A}
+.aovr{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}.aovr li{display:grid;grid-template-columns:30px 1fr auto;grid-template-rows:auto auto;column-gap:10px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:12px}
+.aovr .pos{grid-row:span 2;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--soft);font:800 13px var(--display)}.aovr li:nth-child(1) .pos{background:#DDDD24;color:#16304F}.aovr li:nth-child(2) .pos{background:#C0C7D6;color:#16304F}.aovr li:nth-child(3) .pos{background:#D9A066;color:#16304F}
+.aovr .hrs{font:800 15px var(--display)}.aovr small{grid-column:2/4;color:var(--muted);font-size:12.5px}
+.aovp{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}.aovp div{border:1px solid var(--line);border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;min-width:0}.aovp b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.aovp small{color:var(--muted);font-size:12px}
+@media (max-width:760px){.aovc{grid-template-columns:1fr}.aovd{gap:2px}.aovb i{width:7px}.aovp{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -388,7 +399,7 @@ body{animation:fadein .25s ease}@keyframes fadein{from{opacity:0}to{opacity:1}}
 <div id="exBar" hidden>Modo aluno exemplo — é assim que o aluno vê. Nada aqui entra nas estatísticas da turma. <button type="button" id="exSair">Sair do modo exemplo</button></div>
 <main id="app"></main>
 
-<script>(function(){var V='1795556755';var K='bqufu-recarga-';
+<script>(function(){var V='1795557243';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -597,7 +608,7 @@ function chBarsK(k,t){const {f,base,rows}=contagem(k);return chBars(t||titulo(f)
 async function telaGeral(){abas('tabGeral');$('app').innerHTML='<p class="pend">Carregando…</p>';
   try{await carregar();}catch(e){$('app').innerHTML='<p class="pend">Erro: '+esc(e.message)+'</p>';return;}
   const N=RESP.length,T=LIB.length;GID=0;
-  if(!N){$('app').innerHTML=`<div class="intro"><h2>Comportamento da turma</h2><p>Nenhum perfil de estudos enviado ainda (0 de ${T} alunos da Assessoria). Os gráficos aparecem aqui assim que os alunos responderem.</p></div>`;return;}
+  if(!N){$('app').innerHTML=`<div class="intro"><h2>Comportamento da turma</h2><p>Nenhum perfil de estudos enviado ainda (0 de ${T} alunos da Assessoria). Os gráficos do perfil aparecem aqui assim que os alunos responderem.</p></div><div id="aoVivo"></div>`;turmaAoVivo($('aoVivo'));return;}
   const HDs=RESP.map(r=>horasDia(r.respostas));
   const medDia=d=>HDs.reduce((s,h)=>s+(h[d]||0),0)/N;const semana=HDs.reduce((s,h)=>s+DS.reduce((a,d)=>a+(h[d]||0),0),0)/N;
   const segsex=DS.slice(0,5).reduce((a,d)=>a+medDia(d),0)/5;
@@ -615,7 +626,7 @@ async function telaGeral(){abas('tabGeral');$('app').innerHTML='<p class="pend">
     g.forEach((dias,txt)=>addA(r,`Choque de horário (${dias.join(', ')}): ${txt}`));});
   curtos.forEach(x=>addA(x.r,'Tempo insuficiente — não coube: '+x.f.join(', ')));
   const aten=[...atM.values()];
-  $('app').innerHTML=`<div class="intro"><h2>Comportamento da turma</h2><p>Retrato da turma da Assessoria a partir dos perfis de estudos. Percentuais sobre quem respondeu cada pergunta.</p></div>
+  $('app').innerHTML=`<div class="intro"><h2>Comportamento da turma</h2><p>Em tempo real: o que a turma está estudando, a partir da Sala de Estudos e dos acessos. Mais abaixo, o retrato da turma a partir dos perfis de estudos.</p></div><div id="aoVivo"></div><h3 class="gsec" style="margin-top:14px">Perfil de estudos da turma</h3>
   <div class="kpis">
    ${kpi(ringSVG(N/Math.max(T,1),'#DDDD24',pctBR(N,T)),'Perfis enviados',`${N} <em class="of">de ${T}</em>`,T>N?`faltam ${T-N} aluno(s)`:'toda a turma respondeu','k-a')}
    ${kpi(ico('⏱'),'Estudo por dia (seg–sex)',hfmt(segsex),`sábado ${hfmt(medDia('Sáb'))} · domingo ${hfmt(medDia('Dom'))}`)}
@@ -637,7 +648,70 @@ async function telaGeral(){abas('tabGeral');$('app').innerHTML='<p class="pend">
   <h3 class="gsec">Objetivo e prova</h3>
   <div class="g2">${chDonut('situacao','Situação escolar')}${chDonut('ufu_exp','Experiência com a prova da UFU')}${chDonut('enem_media','Média no último ENEM')}${chDonut('lingua','Língua estrangeira')}</div>
   ${chBarsK('universidades','Universidades pretendidas')}
-  ${pend.length?`<section class="chart"><h3><i class="hi b"></i>Ainda não enviaram (${pend.length})</h3><p class="cs">${pend.map(x=>esc(x.nome||x.email)).join(' · ')}</p></section>`:''}`;}
+  ${pend.length?`<section class="chart"><h3><i class="hi b"></i>Ainda não enviaram (${pend.length})</h3><p class="cs">${pend.map(x=>esc(x.nome||x.email)).join(' · ')}</p></section>`:''}`;turmaAoVivo($('aoVivo'));}
+/* ===== Turma em tempo real (Sala de Estudos + acessos) ===== */
+let AOV={dias:7,grupo:'ass'};
+const CORMAT={'Matemática':'#D9480F','Física':'#1864AB','Química':'#5F3DC4','Biologia':'#2B8A3E','Português':'#C92A2A','Literatura':'#A61E4D','Redação':'#C2255C','História':'#7F4F24','Geografia':'#5C7A0A','Filosofia':'#495057','Sociologia':'#8C6500','Inglês':'#0B7285','Espanhol':'#0B7285','Francês':'#0B7285'};
+async function todasLinhas(mk){let out=[],i=0;for(;;){const {data,error}=await mk().range(i,i+999);if(error)throw error;out=out.concat(data||[]);if(!data||data.length<1000)break;i+=1000;}return out;}
+const isoL=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+async function turmaAoVivo(el){if(!el)return;el.innerHTML='<p class="pend">Carregando os dados de estudo da turma…</p>';
+  let alunos,S,A;
+  try{const {data,error}=await SB.rpc('admin_lista');if(error)throw error;
+    alunos=(data||[]).filter(a=>a.email!==ADMIN&&a.email!==EXEMPLO&&(AOV.grupo==='todos'||(AOV.grupo==='ass'?a.assessoria:!a.assessoria)));
+    const hoje=new Date();hoje.setHours(0,0,0,0);const ini=AOV.dias?new Date(hoje.getTime()-(AOV.dias-1)*864e5):new Date(2026,0,1);const ini14=new Date(hoje.getTime()-13*864e5);
+    const desde=new Date(Math.min(ini,ini14));
+    [S,A]=await Promise.all([todasLinhas(()=>SB.from('sessoes').select('email,inicio,segundos,tipo,materia,questoes,acertos').gte('inicio',desde.toISOString()).order('inicio')),todasLinhas(()=>SB.from('acessos').select('email,dia').gte('dia',isoL(desde)))]);
+  }catch(e){el.innerHTML=`<div class="chart"><p class="pend">Não foi possível carregar: ${esc(e.message)}</p></div>`;return;}
+  if(!document.body.contains(el))return;
+  const E=new Set(alunos.map(a=>a.email)),nome=e=>{const a=alunos.find(x=>x.email===e);return (a&&a.nome)||e;};
+  const hoje=new Date();hoje.setHours(0,0,0,0);const hj=isoL(hoje);const ini=AOV.dias?new Date(hoje.getTime()-(AOV.dias-1)*864e5):new Date(2026,0,1);
+  const Sall=S.filter(x=>E.has(x.email)),Aall=A.filter(x=>E.has(x.email));
+  const SP=Sall.filter(x=>new Date(x.inicio)>=ini);
+  const N=alunos.length||1;const dPer=AOV.dias||Math.max(1,Math.round((hoje-new Date(Math.min(...Sall.map(x=>+new Date(x.inicio)),+hoje)))/864e5)+1);
+  const tot=SP.reduce((t,x)=>t+x.segundos,0);const ativos=new Set(SP.map(x=>x.email));
+  const Q=SP.reduce((t,x)=>t+(x.questoes||0),0),Ac=SP.reduce((t,x)=>t+(x.acertos||0),0);
+  const acHoje=new Set(Aall.filter(x=>x.dia===hj).map(x=>x.email)),estHoje=new Set(Sall.filter(x=>isoL(new Date(x.inicio))===hj).map(x=>x.email));
+  const medDia=tot/3600/N/dPer,medAtivo=ativos.size?tot/3600/ativos.size/dPer:0;
+  // dias
+  const D=[];for(let i=13;i>=0;i--){const d=new Date(hoje.getTime()-i*864e5),k=isoL(d);D.push({k,d,a:new Set(Aall.filter(x=>x.dia===k).map(x=>x.email)).size,e:new Set(Sall.filter(x=>isoL(new Date(x.inicio))===k).map(x=>x.email)).size});}
+  const dmx=Math.max(1,...D.map(x=>x.a),...D.map(x=>x.e));
+  // matérias
+  const M={};SP.forEach(x=>{const m=M[x.materia]=M[x.materia]||{s:0,q:0,a:0,al:new Set()};m.s+=x.segundos;m.q+=x.questoes||0;m.a+=x.acertos||0;m.al.add(x.email);});
+  const ML=Object.entries(M).sort((a,b)=>b[1].s-a[1].s);
+  const QL=ML.filter(([,m])=>m.q).sort((a,b)=>b[1].q-a[1].q);
+  // alunos
+  const porAl={};SP.forEach(x=>{const o=porAl[x.email]=porAl[x.email]||{s:0,q:0,a:0,d:new Set()};o.s+=x.segundos;o.q+=x.questoes||0;o.a+=x.acertos||0;o.d.add(isoL(new Date(x.inicio)));});
+  const rank=Object.entries(porAl).sort((a,b)=>b[1].s-a[1].s).slice(0,10);
+  const ultEst={};Sall.forEach(x=>{const k=isoL(new Date(x.inicio));if(!ultEst[x.email]||k>ultEst[x.email])ultEst[x.email]=k;});
+  const ultAc={};Aall.forEach(x=>{if(!ultAc[x.email]||x.dia>ultAc[x.email])ultAc[x.email]=x.dia;});
+  const diasDe=k=>Math.round((hoje-new Date(k+'T00:00:00'))/864e5);
+  const parados=alunos.filter(a=>!ativos.has(a.email)).map(a=>({n:a.nome||a.email,ue:ultEst[a.email],ua:ultAc[a.email]||(a.ultimo_acesso?isoL(new Date(a.ultimo_acesso)):null),entrou:a.cadastrado})).sort((x,y)=>(x.ue||'')<(y.ue||'')?-1:1);
+  const semQ=alunos.filter(a=>!SP.some(x=>x.email===a.email&&x.questoes>0)).length;
+  const kpi=(ic,l,v,sub,cls='')=>`<div class="kpi ${cls}">${ic}<div><span>${l}</span><b>${v}</b><small>${sub}</small></div></div>`;const ico=t=>`<span class="ico">${t}</span>`;
+  const per=AOV.dias===1?'hoje':AOV.dias?`nos últimos ${AOV.dias} dias`:'desde o início';
+  const pct=Q?Math.round(100*Ac/Q):null;
+  el.innerHTML=`<div class="aovc"><div class="aovf">${[[1,'Hoje'],[7,'7 dias'],[30,'30 dias'],[0,'Desde o início']].map(([d,t])=>`<button data-d="${d}" class="${AOV.dias===d?'on':''}">${t}</button>`).join('')}</div>
+     <div class="aovf">${[['ass','Assessoria'],['mat','Curso de Matemática'],['todos','Todas as turmas']].map(([g,t])=>`<button data-g="${g}" class="${AOV.grupo===g?'on':''}">${t}</button>`).join('')}</div></div>
+   <div class="kpis">
+    ${kpi(ringSVG(ativos.size/N,'#1BAF7A',Math.round(100*ativos.size/N)+'%'),'Alunos estudando',`${ativos.size} <em class="of">de ${alunos.length}</em>`,`registraram estudo ${per}`,'k-a')}
+    ${kpi(ico('⏱'),'Estudo médio por aluno',hfmt(medDia)+' <em class="of">/dia</em>',`entre quem estudou: ${hfmt(medAtivo)} por dia`)}
+    ${kpi(ico('📅'),'Acessaram hoje',`${acHoje.size} <em class="of">de ${alunos.length}</em>`,`${estHoje.size} estudaram hoje com o cronômetro`)}
+    ${kpi(ico('✏️'),'Questões da turma',String(Q),`${pct==null?'sem questões registradas':pct+'% de acerto'} · ${semQ} aluno(s) sem questões ${per}`)}
+    ${kpi(ico('📚'),'Horas estudadas',hfmt(tot/3600),`${SP.length} sessões ${per}`)}
+   </div>
+   <section class="chart"><h3><i class="hi a"></i>Acessos e estudo nos últimos 14 dias</h3><p class="cs">Quantos alunos entraram na plataforma (azul) e quantos estudaram com o cronômetro (verde) em cada dia.</p>
+     <div class="aovd">${D.map(x=>`<div class="aovdi${x.k===hj?' hj':''}"><div class="aovb"><i style="height:${Math.round(120*x.a/dmx)}px" title="${x.a} acessaram"><b>${x.a||''}</b></i><i class="e" style="height:${Math.round(120*x.e/dmx)}px" title="${x.e} estudaram"><b>${x.e||''}</b></i></div><span>${String(x.d.getDate()).padStart(2,'0')}/${String(x.d.getMonth()+1).padStart(2,'0')}</span></div>`).join('')}</div>
+     <div class="aovleg"><span><i></i>acessaram</span><span><i class="e"></i>estudaram</span></div></section>
+   <div class="g2">
+    ${ML.length?chBars('Ranking das disciplinas mais estudadas',ML.map(([m,o])=>[m,o.s/3600,CORMAT[m]||'#3A8CCB']),N,`horas de estudo ${per} · todos os alunos somados`,v=>hfmt(v)):`<section class="chart"><h3><i class="hi b"></i>Ranking das disciplinas mais estudadas</h3><p class="pend">Nenhuma sessão de estudo registrada ${per}.</p></section>`}
+    ${QL.length?chBars('Questões por disciplina',QL.map(([m,o])=>[`${m} · ${Math.round(100*o.a/o.q)}% de acerto`,o.q,CORMAT[m]||'#3A8CCB']),N,`questões feitas ${per} e o aproveitamento da turma`,v=>String(v)):`<section class="chart"><h3><i class="hi b"></i>Questões por disciplina</h3><p class="pend">Nenhuma questão registrada ${per}.</p></section>`}
+   </div>
+   <div class="g2">
+    <section class="chart"><h3><i class="hi c"></i>Quem mais estudou ${per}</h3>${rank.length?`<ol class="aovr">${rank.map(([e,o],i)=>`<li><span class="pos">${i+1}</span><b>${esc(nome(e))}</b><span class="hrs">${hfmt(o.s/3600)}</span><small>${o.d.size} dia${o.d.size>1?'s':''} · ${o.q} questões${o.q?` · ${Math.round(100*o.a/o.q)}%`:''}</small></li>`).join('')}</ol>`:'<p class="pend">Ninguém registrou estudo ainda.</p>'}</section>
+    <section class="chart aten"><h3><i class="hi b"></i>Sem estudar ${per} (${parados.length})</h3><p class="cs">Alunos que não registraram nenhuma sessão no cronômetro ${per}.</p>${parados.length?`<div class="aovp">${parados.map(p=>`<div><b>${esc(p.n)}</b><small>${p.ue?`último estudo há ${diasDe(p.ue)} dia(s)`:'nunca usou o cronômetro'} · ${!p.entrou?'ainda não entrou na plataforma':p.ua?(diasDe(p.ua)===0?'acessou hoje':`último acesso há ${diasDe(p.ua)} dia(s)`):'sem acesso registrado'}</small></div>`).join('')}</div>`:'<p class="pend">Todos estudaram.</p>'}</section>
+   </div>`;
+  el.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{AOV.dias=+b.dataset.d;turmaAoVivo(el);});
+  el.querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>{AOV.grupo=b.dataset.g;turmaAoVivo(el);});}
 async function telaResp(){abas('tabResp');
   $('app').innerHTML='<p class="pend">Carregando…</p>';
   try{await carregar();}catch(e){$('app').innerHTML='<p class="pend">Erro: '+esc(e.message)+'</p>';return;}
@@ -1210,6 +1284,6 @@ async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!se
 $('sair').onclick=async()=>{await SB.auth.signOut();location.href='/';};
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795556755" defer></script>
+<script src="../js/presenca.js?v=1795557243" defer></script>
 </body>
 </html>
