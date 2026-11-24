@@ -263,6 +263,62 @@ body.imprimindo #printArea{display:block;width:1040px;margin:0 auto;padding:4px;
 .sw input::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.15s}.sw input:checked{background:#E0A800;border-color:#E0A800}.sw input:checked::after{left:18px}
 @media (max-width:700px){.cadf{grid-template-columns:1fr}.cadt .em{display:none}}
 body{animation:fadein .25s ease}@keyframes fadein{from{opacity:0}to{opacity:1}}
+
+/* sub-menu da Assessoria */
+.subnav:not(:has(button:not([hidden]))){display:none}
+.subnav{position:sticky;top:0;z-index:25;background:var(--card);border-bottom:1px solid var(--line);box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.subnav .in{max-width:1280px;margin:0 auto;padding:8px 16px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.subnav .in::-webkit-scrollbar{display:none}
+.subnav button{flex:none;font:600 14px var(--body);border:0;background:transparent;color:var(--muted);padding:9px 14px;border-radius:999px;cursor:pointer;white-space:nowrap;transition:background .15s,color .15s}
+.subnav button:hover{color:var(--ink);background:var(--soft)}
+.subnav button.on{background:var(--azul);color:#fff}
+.subnav .sep{flex:none;width:1px;background:var(--line);margin:6px 4px}
+#exBar{top:52px}
+/* plano de estudos */
+.phero{display:flex;gap:22px;align-items:center;flex-wrap:wrap;background:linear-gradient(135deg,#16304F,#0E2238);color:#fff;border-radius:22px;padding:22px 24px;border-bottom:4px solid var(--amarelo);position:relative;overflow:hidden}
+.phero::after{content:'';position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;border:22px solid rgba(58,140,203,.18)}
+.phx{flex:1;min-width:220px;position:relative;z-index:1}.phx .pk{font:700 12.5px var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--amarelo)}
+.phx h2{margin:2px 0 0;font:800 32px var(--display)}.phx h2 small{font:600 17px var(--body);color:#AFC3D8}.phx p{margin:2px 0 8px;color:#D6E6F5}
+.pobs{display:inline-block;background:var(--amarelo);color:#16304F;font:700 13px var(--body);border-radius:999px;padding:5px 12px;margin:4px 6px 0 0}
+.pring{position:relative;width:96px;height:96px;flex:none;z-index:1}.pring svg{width:96px;height:96px}
+.pring div{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.05}.pring b{font:800 22px var(--display)}.pring span{font-size:11.5px;color:#D6E6F5}
+.pstat{display:flex;gap:12px;z-index:1}.pstat div{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:10px 14px;min-width:118px}
+.pstat b{display:block;font:800 24px var(--display)}.pstat b small{font-size:14px;color:#AFC3D8}.pstat span{font-size:12.5px;color:#D6E6F5;line-height:1.25;display:block}
+.pweeks{display:flex;align-items:center;gap:8px}
+.pnav{flex:none;width:38px;height:62px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:22px;cursor:pointer}.pnav:disabled{opacity:.35;cursor:default}
+.pstrip{flex:1;display:flex;gap:8px;overflow-x:auto;scroll-behavior:smooth;padding:4px 2px 8px;scrollbar-width:thin}
+.pw{flex:none;width:72px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:14px;padding:8px 6px 7px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;position:relative}
+.pw b{font:800 15px var(--display)}.pw span{font-size:11.5px;color:var(--muted)}
+.pw i{display:block;width:44px;height:5px;border-radius:9px;background:var(--soft);overflow:hidden}.pw i em{display:block;height:100%;background:var(--verde)}
+.pw small{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--amarelo);color:#16304F;font:800 9.5px var(--body);text-transform:uppercase;letter-spacing:.04em;padding:1px 6px;border-radius:99px}
+.pw.cur{border-color:var(--amarelo)}.pw.on{background:var(--azul);border-color:var(--azul);color:#fff}.pw.on span{color:#DCEBF8}.pw.on i{background:rgba(255,255,255,.3)}.pw.on i em{background:#fff}
+.pw.ok:not(.on) b::after{content:' ✓';color:var(--verde)}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;align-items:start}
+.pcard{position:relative;overflow:hidden;background:var(--card);border:1px solid var(--line);border-top:5px solid var(--c);border-radius:18px;padding:16px 16px 14px;box-shadow:var(--shadow)}
+.pcard::before{content:'';position:absolute;inset:0;background:linear-gradient(160deg,color-mix(in srgb,var(--c) 9%,transparent),transparent 55%);pointer-events:none}
+.pdec{position:absolute;right:-26px;bottom:-30px;width:190px;height:190px;color:var(--c);opacity:.13;pointer-events:none}
+:root[data-theme="dark"] .pdec{opacity:.2}
+.pcard header{position:relative;display:flex;align-items:center;gap:11px;margin-bottom:10px}
+.pic{flex:none;width:40px;height:40px;border-radius:12px;background:var(--c);color:#fff;display:grid;place-items:center;font:700 19px Georgia,serif}
+.pcard h3{margin:0;font:800 18px var(--display);color:var(--ink)}.pcard header small{color:var(--muted);font-size:12.5px}
+.pbar{margin-left:auto;width:64px;height:7px;border-radius:9px;background:var(--soft);overflow:hidden;flex:none}.pbar em{display:block;height:100%;background:var(--c,var(--verde));border-radius:9px;transition:width .3s}
+.pcard ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;position:relative}
+.pit{display:flex;gap:11px;align-items:flex-start;padding:9px 10px;border-radius:12px;background:color-mix(in srgb,var(--bg) 70%,transparent);border:1px solid var(--line);cursor:pointer;transition:background .15s,border-color .15s}
+.pit:hover{border-color:var(--c)}
+.pit input{position:absolute;opacity:0;pointer-events:none}
+.pck{flex:none;width:22px;height:22px;border-radius:7px;border:2px solid var(--c);margin-top:1px;display:grid;place-items:center;transition:background .15s}
+.pit.feito .pck{background:var(--c)}.pit.feito .pck::after{content:'✓';color:#fff;font:800 14px var(--body)}
+.pit input:focus-visible+.pck{outline:3px solid color-mix(in srgb,var(--c) 40%,transparent);outline-offset:2px}
+.ptx{display:flex;flex-direction:column;gap:1px;min-width:0}.ptx em{font:700 10.5px var(--body);font-style:normal;text-transform:uppercase;letter-spacing:.05em;color:var(--c)}
+.ptx b{font:600 14.5px/1.3 var(--body);color:var(--ink)}
+.pit.feito{background:color-mix(in srgb,var(--c) 10%,transparent)}.pit.feito .ptx b{color:var(--muted);text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--c) 60%,transparent)}
+.pcard footer{position:relative;margin-top:10px;font-size:12.5px;color:var(--muted)}
+.pcard.done header h3::after{content:' ✓';color:var(--verde)}
+.presumo{display:flex;gap:16px;align-items:center;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 18px}
+.presumo>div:not(.pbar){display:flex;flex-direction:column}.presumo b{font:800 24px var(--display)}.presumo small{color:var(--muted);font-size:12.5px}
+.pk2{font:700 11.5px var(--body);text-transform:uppercase;letter-spacing:.06em;color:var(--azul)}
+.pbar.big{flex:1;min-width:160px;height:10px;margin:0;--c:var(--verde)}
+@media (max-width:640px){.phero{padding:18px}.phx h2{font-size:26px}.pstat{width:100%}.pstat div{flex:1;min-width:0}.pgrid{grid-template-columns:1fr}.pnav{display:none}}
 .selbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px}
 .selbar label{font:700 14px var(--display)}.selbar select{width:auto;min-width:260px;font-weight:600}
 .dhead{display:flex;gap:16px;align-items:center;background:linear-gradient(135deg,#16304F,#0E2238);color:#fff;border-radius:18px;padding:18px 20px;border-bottom:4px solid var(--amarelo)}
@@ -326,12 +382,13 @@ body{animation:fadein .25s ease}@keyframes fadein{from{opacity:0}to{opacity:1}}
 <header>
   <a class="logos" href="/" title="Início da plataforma PREPARA UFU" style="text-decoration:none"><img class="j" src="../bancodequestoes/logo/jazz_claro.png" alt="Jazz, Professor de Matemática"><span class="sep"></span><img class="p" src="../bancodequestoes/logo/prepara_transp.png" alt="Prepara UFU"></a>
   <div class="ttl"><h1>Assessoria ENEM</h1><p>Perfil de estudos e Cronograma Semanal</p></div>
-  <nav class="tabs"><button class="theme" id="theme" aria-label="Alternar modo diurno e noturno" title="Modo diurno / noturno"><span class="sun">☀</span><span class="moon">☾</span></button><a href="../bancodequestoes/">Banco de Questões</a><a href="../aulas/#agenda">Agenda</a><a href="../aulas/#materiais">Materiais</a><button id="tabGeral" hidden>Comportamento da turma</button><button id="tabResp" hidden>Alunos</button><button id="tabCad" hidden>Cadastro de alunos</button><button id="tabExemplo" hidden>Ver como aluno</button><button id="tabCrono" hidden>Meu Cronograma Semanal</button><button class="on" id="tabForm" hidden>Meu perfil de estudos</button><button id="tabFaq" hidden>Dúvidas</button><button id="sair">Sair</button></nav>
+  <nav class="tabs"><button class="theme" id="theme" aria-label="Alternar modo diurno e noturno" title="Modo diurno / noturno"><span class="sun">☀</span><span class="moon">☾</span></button><a href="../bancodequestoes/">Banco de Questões</a><a href="../aulas/#agenda">Agenda</a><a href="../aulas/#materiais">Materiais</a><button id="sair">Sair</button></nav>
 </header>
+<nav class="subnav" aria-label="Assessoria"><div class="in"><button id="tabGeral" hidden>Comportamento da turma</button><button id="tabResp" hidden>Alunos</button><button id="tabCad" hidden>Cadastro de alunos</button><button id="tabExemplo" hidden>Ver como aluno</button><button id="tabCrono" hidden>Cronograma Semanal</button><button id="tabPlano" hidden>Plano de Estudos</button><button class="on" id="tabForm" hidden>Perfil de estudos</button><button id="tabFaq" hidden>Dúvidas</button></div></nav>
 <div id="exBar" hidden>Modo aluno exemplo — é assim que o aluno vê. Nada aqui entra nas estatísticas da turma. <button type="button" id="exSair">Sair do modo exemplo</button></div>
 <main id="app"></main>
 
-<script>(function(){var V='1795489819';var K='bqufu-recarga-';
+<script>(function(){var V='1795490833';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -498,7 +555,7 @@ function fmt(f,v){
   if(f.type==='scale')return AREAS.map(a=>a+': '+(v[a]?DIFN[v[a]-1]:'—')).join('\n');
   return Array.isArray(v)?v.join(', '):String(v);}
 let RESP=[],LIB=[],EXR=null,LST=[];
-function abas(on){$('app').classList.toggle('largo',!['tabForm','tabFaq'].includes(on));['tabGeral','tabResp','tabCad','tabForm','tabCrono','tabFaq'].forEach(t=>$(t).classList.toggle('on',t===on));}
+function abas(on){$('app').classList.toggle('largo',!['tabForm','tabFaq'].includes(on));['tabGeral','tabResp','tabCad','tabForm','tabCrono','tabPlano','tabFaq'].forEach(t=>$(t).classList.toggle('on',t===on));}
 async function carregar(){
   const [a,b]=await Promise.all([SB.from('checkup').select('*').order('atualizado_em',{ascending:false}),SB.rpc('admin_lista')]);
   if(a.error)throw a.error;RESP=(a.data||[]).filter(r=>r.email!==ADMIN&&r.email!==EXEMPLO);EXR=(a.data||[]).find(r=>r.email===EXEMPLO)||null;LIB=(b.data||[]).filter(x=>x.assessoria&&x.email!==ADMIN);}
@@ -588,7 +645,7 @@ async function telaResp(){abas('tabResp');
     <button class="btn" id="antAl" title="Aluno anterior">‹</button><button class="btn" id="proxAl" title="Próximo aluno">›</button><span class="pend">${RESP.length} perfil(is) enviados${pend.length?` · ${pend.length} ainda não enviaram`:''}</span><button class="btn" id="csv" style="margin-left:auto">Baixar planilha (CSV)</button></div>
     <div id="dossie"></div>
     ${pend.length?`<details class="pendl"><summary>Ainda não enviaram (${pend.length})</summary><p>${pend.map(x=>esc(x.nome||x.email)).join(' · ')}</p></details>`:''}`;
-  const sel=$('selAluno');const mostra=()=>{const r=LST[+sel.value];$('dossie').innerHTML=dossie(r);requestAnimationFrame(()=>encaixa($('dossie')));montarCrono($('dossie').querySelector('.cronoBox'),r.respostas,r.email,'prof');};
+  const sel=$('selAluno');const mostra=()=>{const r=LST[+sel.value];$('dossie').innerHTML=dossie(r);requestAnimationFrame(()=>encaixa($('dossie')));montarCrono($('dossie').querySelector('.cronoBox'),r.respostas,r.email,'prof');const em=r.email;planoResumo(em).then(h=>{if(h&&LST[+sel.value]&&LST[+sel.value].email===em){const d=document.createElement('div');d.innerHTML=h;const alvo=$('dossie').querySelector('.dhead');(alvo?alvo.after(d.firstChild):$('dossie').prepend(d.firstChild));}});};
   sel.onchange=mostra;$('antAl').onclick=()=>{sel.value=String(Math.max(0,+sel.value-1));mostra();};$('proxAl').onclick=()=>{sel.value=String(Math.min(LST.length-1,+sel.value+1));mostra();};
   $('csv').onclick=csv;mostra();}
 function dossie(r){const p=r.respostas;GID=0;
@@ -955,7 +1012,7 @@ const EXEMPLO_RESP={nome:'Aluno Exemplo',whats:'(34) 99999-0000',cidade:'Uberlâ
  nivel:{'Matemática':4,'Física':3,'Química':3,'Biologia':2,'Língua Portuguesa':2,'Literatura':3,'Língua estrangeira':1,'História':2,'Geografia':2,'Filosofia':3,'Sociologia':2,'Redação':3},redacao_freq:'A cada 15 dias',obstaculos:['Celular e redes sociais','Cansaço']};
 async function modoExemplo(on){EXMODO=on;ALVO=on?EXEMPLO:EMAIL;try{on?sessionStorage.setItem('bqufu-exemplo','assessoria'):sessionStorage.removeItem('bqufu-exemplo');}catch(e){}
   ['tabGeral','tabResp','tabCad','tabExemplo'].forEach(t=>$(t).hidden=on);
-  $('tabForm').textContent=on?'Meu perfil de estudos':'Ver formulário';
+  $('tabForm').textContent=on?'Perfil de estudos':'Ver formulário';
   $('exBar').hidden=!on;
   if(on){const {data:ex}=await SB.from('checkup').select('email').eq('email',EXEMPLO).maybeSingle();$('tabCrono').hidden=!ex;if(ex)telaCrono();else telaForm();}
   else{$('tabCrono').hidden=true;telaGeral();}}
@@ -974,8 +1031,11 @@ const FAQ=[
   ['Por que umas matérias aparecem mais vezes que outras?','O cronograma dá mais espaço para as matérias que você marcou como difíceis e para as que pesam mais no seu curso. Matemática, Física e Química sempre aparecem mais vezes. Redação entra uma vez por semana, a revisão entra quase todos os dias e o domingo é para simulado, provas antigas da UFU e matéria atrasada.'],
   ['As aulas do PREPARA UFU contam como tempo de estudo?','Não. As aulas ao vivo (segunda e quinta, 19h–20h30) aparecem como compromisso e não entram nas suas horas de estudo: o seu tempo de estudo é além delas.']]],
  ['Mudar a rotina e as horas',[
-  ['Como mudo a quantidade de horas que estudo por dia?','Abra "Meu perfil de estudos", vá até "Quantas horas você estuda em cada dia da semana?", escolha as novas horas de cada dia e clique em "Atualizar perfil de estudos". Se você ainda não tinha mexido no cronograma, ele se monta de novo com as novas horas. Se já tinha mexido, os blocos que passarem do novo total vão sozinhos para dias com espaço. Para montar tudo de novo, use "Montar de novo pelo perfil de estudos".'],
-  ['Mudou um compromisso (academia, escola, cursinho, trabalho). O que faço?','Em "Meu perfil de estudos", na parte "Seus compromissos fixos", altere a linha do compromisso (dias e horário), exclua com o ✕ ou adicione um novo em "+ Adicionar compromisso". Depois clique em "Atualizar perfil de estudos". O compromisso aparece atualizado no seu cronograma.'],
+  ['O que é o Plano de Estudos?','É o que estudar em cada semana até a prova da UFU, matéria por matéria. Ele abre sempre na semana atual; use as setas ou os botões S1, S2… para ver as outras semanas.'],
+  ['Como marco o que já estudei?','No Plano de Estudos, toque no quadradinho ao lado do assunto. Ele fica marcado e salvo, e o Prof. Jazz acompanha o seu progresso. Se marcar sem querer, é só tocar de novo.'],
+  ['Qual a diferença entre o Cronograma Semanal e o Plano de Estudos?','O Cronograma Semanal diz QUANDO você estuda (os dias e horários de cada matéria). O Plano de Estudos diz O QUE estudar em cada matéria naquela semana. Use os dois juntos: no horário de Física do cronograma, estude os assuntos de Física do plano.'],
+  ['Como mudo a quantidade de horas que estudo por dia?','Abra "Perfil de estudos", vá até "Quantas horas você estuda em cada dia da semana?", escolha as novas horas de cada dia e clique em "Atualizar perfil de estudos". Se você ainda não tinha mexido no cronograma, ele se monta de novo com as novas horas. Se já tinha mexido, os blocos que passarem do novo total vão sozinhos para dias com espaço. Para montar tudo de novo, use "Montar de novo pelo perfil de estudos".'],
+  ['Mudou um compromisso (academia, escola, cursinho, trabalho). O que faço?','Em "Perfil de estudos", na parte "Seus compromissos fixos", altere a linha do compromisso (dias e horário), exclua com o ✕ ou adicione um novo em "+ Adicionar compromisso". Depois clique em "Atualizar perfil de estudos". O compromisso aparece atualizado no seu cronograma.'],
   ['Como coloco o cursinho?','Coloque só o horário das aulas do cursinho. O tempo em que você fica lá estudando sozinho é tempo de estudo: conte nas horas de cada dia.'],
   ['Mudei de curso ou de dificuldade em alguma matéria. Como atualizo?','Altere no perfil (curso e grau de dificuldade por matéria), clique em "Atualizar perfil de estudos" e, no cronograma, clique em "Montar de novo pelo perfil de estudos" para redistribuir as matérias.']]],
  ['Mexer no cronograma',[
@@ -1028,6 +1088,70 @@ function cadDraw(msg){const busca=($('cadBusca')||{}).value||'';
   $('app').querySelectorAll('input[data-a]').forEach(c=>c.onchange=async()=>{const e=c.dataset.a,v=c.checked;const {error}=await SB.from('allowed_emails').update({assessoria:v}).eq('email',e);await cadLoad(error?error.message:(v?'Assessoria ativada: ':'Assessoria desativada: ')+e);});
   $('app').querySelectorAll('button[data-z]').forEach(b=>b.onclick=async()=>{const e=b.dataset.z;if(!confirm('Zerar a senha de '+e+'? O aluno vai criar uma nova em “Primeiro acesso”.'))return;const {error}=await SB.rpc('admin_zerar_senha',{e});await cadLoad(error?error.message:'Senha zerada: '+e);});
   $('app').querySelectorAll('button[data-r]').forEach(b=>b.onclick=async()=>{const e=b.dataset.r;if(!confirm('Remover o acesso de '+e+'? Ele perde o Banco de Questões e a Assessoria.'))return;await SB.rpc('admin_zerar_senha',{e});const {error}=await SB.from('allowed_emails').delete().eq('email',e);await cadLoad(error?error.message:'Acesso removido: '+e);});}
+
+/* ===== Plano de Estudos (planejamento semanal) ===== */
+let PLANO=null;
+const PMAT=[['Matemática','MAT'],['Física','FIS'],['Química','QUI'],['Biologia','BIO'],['Português','LP'],['História','HIS'],['Geografia','GEO'],['Filosofia','FIL'],['Sociologia','SOC'],['Inglês','LE'],['Espanhol','LE']];
+const PKEYS={MAT:['MAT'],FIS:['FIS'],QUI:['QUI'],BIO:['BIO'],LP:['LP','LIT','RED'],HIS:['HIS'],GEO:['GEO'],FIL:['FIL'],SOC:['SOC'],LE:['LE']};
+const PDEC={
+ MAT:`<text x="18" y="70" font-size="54" font-family="Georgia,serif" font-style="italic">π</text><text x="120" y="56" font-size="30" font-family="Georgia,serif">√x</text><text x="78" y="128" font-size="26" font-family="Georgia,serif" font-style="italic">f(x)</text><text x="166" y="128" font-size="40" font-family="Georgia,serif">∑</text><path d="M20 190 Q 70 100 120 190" fill="none" stroke-width="3"/><path d="M150 190 L190 150 L215 190 Z" fill="none" stroke-width="3"/><text x="28" y="160" font-size="20" font-family="Georgia,serif">x²</text>`,
+ FIS:`<ellipse cx="110" cy="100" rx="78" ry="28" fill="none" stroke-width="3"/><ellipse cx="110" cy="100" rx="78" ry="28" fill="none" stroke-width="3" transform="rotate(60 110 100)"/><ellipse cx="110" cy="100" rx="78" ry="28" fill="none" stroke-width="3" transform="rotate(-60 110 100)"/><circle cx="110" cy="100" r="9"/><path d="M10 205 q 15 -22 30 0 t 30 0 t 30 0 t 30 0 t 30 0 t 30 0" fill="none" stroke-width="3"/><text x="160" y="40" font-size="24" font-family="Georgia,serif" font-style="italic">E=mc²</text>`,
+ QUI:`<path d="M70 30 h40 M78 30 v48 L42 160 q-6 16 12 16 h72 q18 0 12 -16 L102 78 V30" fill="none" stroke-width="3.5" stroke-linejoin="round"/><path d="M52 138 h76" stroke-width="3"/><circle cx="76" cy="152" r="5"/><circle cx="98" cy="146" r="4"/><circle cx="88" cy="118" r="3"/><polygon points="180,48 206,63 206,93 180,108 154,93 154,63" fill="none" stroke-width="3.5"/><circle cx="180" cy="78" r="12" fill="none" stroke-width="2.5"/><text x="150" y="160" font-size="26" font-family="Georgia,serif">H₂O</text><circle cx="40" cy="200" r="6" fill="none" stroke-width="2.5"/><circle cx="200" cy="200" r="9" fill="none" stroke-width="2.5"/>`,
+ BIO:`<path d="M60 10 C 140 50, -20 90, 60 130 S 140 210, 60 250" fill="none" stroke-width="3.5"/><path d="M60 10 C -20 50, 140 90, 60 130 S -20 210, 60 250" fill="none" stroke-width="3.5"/><path d="M34 40 h52 M30 70 h60 M40 100 h40 M34 160 h52 M30 190 h60" stroke-width="2.5"/><path d="M150 150 q 40 -70 80 -20 q -40 60 -80 20 z" fill="none" stroke-width="3"/><path d="M150 150 L205 120" stroke-width="2.5"/><circle cx="185" cy="55" r="26" fill="none" stroke-width="3"/><circle cx="190" cy="52" r="8"/>`,
+ LP:`<path d="M20 70 q 50 -22 95 0 v110 q -45 -22 -95 0 z" fill="none" stroke-width="3.5" stroke-linejoin="round"/><path d="M115 70 q 45 -22 95 0 v110 q -50 -22 -95 0" fill="none" stroke-width="3.5" stroke-linejoin="round"/><path d="M38 95 h58 M38 115 h58 M38 135 h46 M133 95 h58 M133 115 h58 M133 135 h40" stroke-width="2.2"/><text x="150" y="44" font-size="44" font-family="Georgia,serif">“A”</text>`,
+ HIS:`<path d="M30 60 h90 l-10 -22 h-70 z" fill="none" stroke-width="3"/><path d="M40 60 v120 M60 60 v120 M90 60 v120 M110 60 v120" stroke-width="3"/><path d="M25 180 h100 v12 h-100 z" fill="none" stroke-width="3"/><path d="M160 40 h50 M160 120 h50 M165 40 q 0 30 20 40 q -20 10 -20 40 M205 40 q 0 30 -20 40 q 20 10 20 40" fill="none" stroke-width="3"/><path d="M170 110 q 15 -14 30 0" fill="none" stroke-width="2.5"/>`,
+ GEO:`<circle cx="100" cy="100" r="72" fill="none" stroke-width="3.5"/><ellipse cx="100" cy="100" rx="32" ry="72" fill="none" stroke-width="2.5"/><path d="M28 100 h144 M40 62 h120 M40 138 h120" stroke-width="2.2"/><path d="M190 175 l10 -30 l10 30 l-10 -8 z" stroke-width="2"/><path d="M180 205 l22 -38 l14 22 l10 -12 l18 28 z" fill="none" stroke-width="2.5" stroke-linejoin="round"/>`,
+ FIL:`<path d="M40 120 q -30 -10 -10 -40 q -10 -40 40 -40 q 20 -30 60 -10 q 50 -10 50 30 q 30 20 0 50 q 0 30 -50 20 q -30 25 -60 0 q -40 10 -30 -10 z" fill="none" stroke-width="3"/><text x="88" y="112" font-size="54" font-family="Georgia,serif">?</text><circle cx="40" cy="170" r="10" fill="none" stroke-width="3"/><circle cx="22" cy="198" r="6" fill="none" stroke-width="3"/><path d="M160 190 q 30 -10 50 10 M168 176 q 20 -22 46 -4" fill="none" stroke-width="2.5"/>`,
+ SOC:`<circle cx="60" cy="70" r="16" fill="none" stroke-width="3"/><path d="M30 130 q 30 -50 60 0" fill="none" stroke-width="3"/><circle cx="120" cy="56" r="18" fill="none" stroke-width="3"/><path d="M86 124 q 34 -56 68 0" fill="none" stroke-width="3"/><circle cx="180" cy="70" r="16" fill="none" stroke-width="3"/><path d="M150 130 q 30 -50 60 0" fill="none" stroke-width="3"/><circle cx="50" cy="190" r="6"/><circle cx="120" cy="170" r="6"/><circle cx="190" cy="195" r="6"/><path d="M50 190 L120 170 L190 195 L50 190" fill="none" stroke-width="2"/>`,
+ LE:`<path d="M20 40 h110 a14 14 0 0 1 14 14 v40 a14 14 0 0 1 -14 14 h-70 l-22 20 v-20 h-18 a14 14 0 0 1 -14 -14 v-40 a14 14 0 0 1 14 -14 z" fill="none" stroke-width="3"/><text x="38" y="84" font-size="26" font-family="Georgia,serif">Hello!</text><path d="M100 130 h110 a14 14 0 0 1 14 14 v40 a14 14 0 0 1 -14 14 h-18 v20 l-22 -20 h-70 a14 14 0 0 1 -14 -14 v-40 a14 14 0 0 1 14 -14 z" fill="none" stroke-width="3"/><text x="118" y="174" font-size="26" font-family="Georgia,serif">¡Hola!</text>`};
+const PICO={MAT:'π',FIS:'⚛',QUI:'⚗',BIO:'🧬',LP:'✎',HIS:'⏳',GEO:'🌎',FIL:'💭',SOC:'👥',LE:'💬'};
+const isoD=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const pData=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d);};
+const MESX=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+const MESL=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+const dm=d=>String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0');
+async function carregaPlano(email){
+  if(!PLANO){const {data,error}=await SB.from('plano_itens').select('*').order('id');if(error)throw error;PLANO=data||[];}
+  const [f,c,k]=await Promise.all([SB.from('plano_feito').select('item').eq('email',email),SB.from('cronograma').select('blocos').eq('email',email).maybeSingle(),SB.from('checkup').select('respostas').eq('email',email).maybeSingle()]);
+  const lingua=(k.data&&k.data.respostas&&k.data.respostas.lingua)||'';
+  const itens=PLANO.filter(x=>!(x.materia==='Inglês'&&lingua==='Espanhol')&&!(x.materia==='Espanhol'&&lingua==='Inglês'));
+  const sem=[...new Set(itens.map(x=>x.semana))].sort();
+  const hoje=isoD(new Date());let cur=sem.findIndex((s,i)=>hoje>=s&&(i===sem.length-1||hoje<sem[i+1]));if(cur<0)cur=hoje<sem[0]?0:sem.length-1;
+  return {itens,sem,cur,feito:new Set((f.data||[]).map(x=>x.item)),blocos:(c.data&&c.data.blocos)||[],lingua};}
+async function telaPlano(){abas('tabPlano');$('app').innerHTML='<p class="pend">Carregando o plano de estudos…</p>';
+  let P;try{P=await carregaPlano(ALVO);}catch(e){$('app').innerHTML=`<div class="aviso"><h2>Não foi possível carregar o plano</h2><p>${esc(e.message)}</p></div>`;return;}
+  P.sel=P.cur;desenhaPlano(P);}
+function desenhaPlano(P){
+  const s=P.sem[P.sel],ini=pData(s),fim=new Date(ini.getFullYear(),ini.getMonth(),ini.getDate()+6);
+  const W=P.itens.filter(x=>x.semana===s),feitosW=W.filter(x=>P.feito.has(x.id)).length;
+  const tot=P.itens.length,feitosT=P.itens.filter(x=>P.feito.has(x.id)).length;
+  const prova=new Date(2027,3,4),hojeD=new Date();hojeD.setHours(0,0,0,0);const dias=Math.max(0,Math.round((prova-hojeD)/864e5));
+  const obs=[...new Set(W.map(x=>x.obs).filter(Boolean))];
+  const pct=W.length?Math.round(100*feitosW/W.length):0,R=34,C=2*Math.PI*R;
+  const grupos=PMAT.map(([n,k])=>({n,k,L:W.filter(x=>x.materia===n)})).filter(g=>g.L.length);
+  const nBlocos=k=>P.blocos.filter(b=>PKEYS[k].includes(b.k)).length;
+  const fmtIni=`${String(ini.getDate()).padStart(2,'0')} de ${MESL[ini.getMonth()]}`,fmtFim=`${String(fim.getDate()).padStart(2,'0')} de ${MESL[fim.getMonth()]}`;
+  $('app').innerHTML=`<div class="phero"><div class="phx"><div class="pk">${P.sel===P.cur?'Esta semana':P.sel<P.cur?'Semana anterior':'Próxima semana'}</div><h2>Semana ${P.sel+1} <small>de ${P.sem.length}</small></h2><p>${fmtIni} a ${fmtFim}</p>${obs.map(o=>`<span class="pobs">${esc(o)}</span>`).join('')}</div>
+     <div class="pring"><svg viewBox="0 0 84 84"><circle cx="42" cy="42" r="${R}" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="9"/><circle cx="42" cy="42" r="${R}" fill="none" stroke="var(--amarelo)" stroke-width="9" stroke-linecap="round" stroke-dasharray="${(C*pct/100).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 42 42)"/></svg><div><b>${pct}%</b><span>${feitosW} de ${W.length}</span></div></div>
+     <div class="pstat"><div><b>${dias}</b><span>dias para a 1ª fase da UFU</span></div><div><b>${feitosT}<small>/${tot}</small></b><span>assuntos estudados no total</span></div></div></div>
+   <div class="pweeks"><button class="pnav" id="pAnt" aria-label="Semana anterior" ${P.sel===0?'disabled':''}>‹</button><div class="pstrip" id="pStrip">${P.sem.map((x,i)=>{const L=P.itens.filter(y=>y.semana===x),f=L.filter(y=>P.feito.has(y.id)).length,p=L.length?Math.round(100*f/L.length):0;
+      return `<button class="pw${i===P.sel?' on':''}${i===P.cur?' cur':''}${p===100?' ok':''}" data-i="${i}"><b>S${i+1}</b><span>${dm(pData(x))}</span><i><em style="width:${p}%"></em></i>${i===P.cur?'<small>agora</small>':''}</button>`;}).join('')}</div><button class="pnav" id="pProx" aria-label="Próxima semana" ${P.sel===P.sem.length-1?'disabled':''}>›</button></div>
+   ${P.lingua==='Francês'?'<p class="pend" style="margin:0">Francês: use os assuntos de leitura de Inglês e Espanhol como guia de estratégias; o Prof. Jazz orienta o material no encontro.</p>':''}
+   <div class="pgrid">${grupos.map(g=>{const f=g.L.filter(x=>P.feito.has(x.id)).length,cor=CORD[g.k==='LE'?'LE':g.k],nb=nBlocos(g.k);
+      return `<section class="pcard${f===g.L.length?' done':''}" style="--c:${cor}"><svg class="pdec" viewBox="0 0 240 240" aria-hidden="true" stroke="currentColor" fill="currentColor">${PDEC[g.k]}</svg>
+        <header><span class="pic">${PICO[g.k]}</span><div><h3>${esc(g.n)}</h3><small>${f} de ${g.L.length} estudado${g.L.length>1?'s':''}</small></div><span class="pbar"><em style="width:${Math.round(100*f/g.L.length)}%"></em></span></header>
+        <ul>${g.L.map(x=>`<li><label class="pit${P.feito.has(x.id)?' feito':''}"><input type="checkbox" data-id="${x.id}" ${P.feito.has(x.id)?'checked':''}><span class="pck"></span><span class="ptx">${x.frente?`<em>${esc(x.frente)}</em>`:''}<b>${esc(x.assunto)}</b></span></label></li>`).join('')}</ul>
+        ${nb?`<footer>📅 ${nb} bloco${nb>1?'s':''} de ${esc(g.n)} no seu Cronograma Semanal</footer>`:''}</section>`;}).join('')}</div>
+   <p class="pend" style="text-align:center;margin:4px 0 0">Marque cada assunto quando terminar de estudar. O Prof. Jazz acompanha o seu progresso.</p>`;
+  const st=$('pStrip'),on=st.querySelector('.on');if(on)st.scrollLeft=on.offsetLeft-st.clientWidth/2+on.clientWidth/2;
+  st.querySelectorAll('.pw').forEach(b=>b.onclick=()=>{P.sel=+b.dataset.i;desenhaPlano(P);});
+  $('pAnt').onclick=()=>{if(P.sel>0){P.sel--;desenhaPlano(P);}};$('pProx').onclick=()=>{if(P.sel<P.sem.length-1){P.sel++;desenhaPlano(P);}};
+  $('app').querySelectorAll('.pit input').forEach(c=>c.onchange=async()=>{const id=+c.dataset.id;
+    if(c.checked){P.feito.add(id);desenhaPlano(P);const {error}=await SB.from('plano_feito').insert({email:ALVO,item:id});if(error&&!/duplicate/i.test(error.message)){P.feito.delete(id);desenhaPlano(P);alert('Não foi possível salvar: '+error.message);}}
+    else{P.feito.delete(id);desenhaPlano(P);const {error}=await SB.from('plano_feito').delete().eq('email',ALVO).eq('item',id);if(error){P.feito.add(id);desenhaPlano(P);alert('Não foi possível salvar: '+error.message);}}});}
+async function planoResumo(email){try{const P=await carregaPlano(email);const ate=P.itens.filter(x=>x.semana<=P.sem[P.cur]),f=ate.filter(x=>P.feito.has(x.id)).length;
+  const W=P.itens.filter(x=>x.semana===P.sem[P.cur]),fw=W.filter(x=>P.feito.has(x.id)).length;const pct=ate.length?Math.round(100*f/ate.length):0;
+  return `<div class="presumo"><div><span class="pk2">Plano de Estudos</span><b>${pct}%</b><small>${f} de ${ate.length} assuntos previstos até a semana ${P.cur+1}</small></div><div class="pbar big"><em style="width:${pct}%"></em></div><div><span class="pk2">Esta semana</span><b>${fw}/${W.length}</b><small>assuntos marcados</small></div></div>`;}catch(e){return '';}}
 function telaFaq(){abas('tabFaq');
   $('app').innerHTML=`<div class="intro"><h2>Dúvidas</h2><p>Perguntas e respostas sobre o perfil de estudos e o Cronograma Semanal. Não achou a sua dúvida? Fale com o Prof. Jazz.</p></div>
   ${FAQ.map(([t,L])=>`<section class="sec faq"><h3>${esc(t)}</h3>${L.map(([q,a])=>`<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join('')}</section>`).join('')}`;}
@@ -1061,7 +1185,7 @@ async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!se
   $('gate').hidden=true;
   if(!ok){$('app').innerHTML=`<div class="aviso"><h2>Área exclusiva da Assessoria PREPARA UFU</h2><p>Aqui os alunos da Assessoria preenchem o perfil de estudos e recebem um Cronograma Semanal personalizado, montado a partir da rotina, das dificuldades e do curso de cada um, e ajustado nos encontros com o Prof. Jazz.</p><p>O seu acesso hoje é ao Banco de Questões. Quer fazer parte da Assessoria? Fale com o Prof. Jazz. Se você já é aluno da Assessoria e está vendo esta mensagem, avise o Prof. Jazz para liberar o seu e-mail.</p><a href="../bancodequestoes/">Ir para o Banco de Questões</a></div>`;return;}
   $('tabForm').hidden=false;$('tabResp').hidden=!IS_ADMIN;$('tabGeral').hidden=!IS_ADMIN;
-  ALVO=EMAIL;$('tabForm').onclick=telaForm;$('tabResp').onclick=telaResp;$('tabGeral').onclick=telaGeral;$('tabCrono').onclick=telaCrono;$('tabFaq').onclick=telaFaq;$('tabFaq').hidden=false;
+  ALVO=EMAIL;$('tabForm').onclick=telaForm;$('tabResp').onclick=telaResp;$('tabGeral').onclick=telaGeral;$('tabCrono').onclick=telaCrono;$('tabFaq').onclick=telaFaq;$('tabFaq').hidden=false;$('tabPlano').onclick=telaPlano;$('tabPlano').hidden=false;
   $('tabExemplo').hidden=!IS_ADMIN;$('tabCad').hidden=!IS_ADMIN;$('tabCad').onclick=telaCad;$('tabExemplo').onclick=()=>modoExemplo(true);$('exSair').onclick=()=>modoExemplo(false);
   if(!IS_ADMIN){const {data:ex}=await SB.from('checkup').select('email').eq('email',EMAIL).maybeSingle();$('tabCrono').hidden=!ex;}
   if(IS_ADMIN){$('tabForm').textContent='Ver formulário';let ex=null;try{ex=sessionStorage.getItem('bqufu-exemplo');}catch(e){}if(ex)modoExemplo(true);else telaGeral();}else if(!$('tabCrono').hidden)telaCrono();else telaForm();}
