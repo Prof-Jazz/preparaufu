@@ -387,7 +387,7 @@ body{animation:fadein .25s ease}@keyframes fadein{from{opacity:0}to{opacity:1}}
 <div id="exBar" hidden>Você está na área de <b id="exNome"></b>: é assim que o aluno vê, com os seus botões de professor. <button type="button" id="exTroca">Trocar aluno</button> <button type="button" id="exSair">Voltar aos mentorados</button></div>
 <main id="app"></main>
 
-<script>(function(){var V='1795548682';var K='bqufu-recarga-';
+<script>(function(){var V='1795549190';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -1349,22 +1349,54 @@ async function telaRaio(){abas('tabRaio');$('app').innerHTML='<p class="pend">Ca
   const h=await planoResumo(ALVO);const alvo=$('app').querySelector('.dhead');const w=document.createElement('div');w.style.cssText='display:flex;flex-direction:column;gap:10px';w.innerHTML=(h||'')+dash;if(alvo)alvo.after(w);else $('app').prepend(w);}
 
 /* ---------- início do aluno ---------- */
+const ICO={
+ timer:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6M12 2v3"/></svg>',
+ cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h2M14 14h2M8 18h2"/></svg>',
+ livro:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 7h7M9 11h5"/></svg>',
+ pasta:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>',
+ video:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>',
+ lista:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M3.5 6l1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>',
+ grade:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18M15 3v18"/></svg>',
+ perfil:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg>',
+ seta:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>'};
 async function telaInicio(){abas('tabInicio');$('app').innerHTML='<p class="pend">Carregando…</p>';
   const hoje=isoD(new Date());
-  const [enc,ck]=await Promise.all([SB.from('m_encontros').select('*').eq('email',ALVO).order('data').order('ini'),SB.from('checkup').select('email').eq('email',ALVO).maybeSingle()]);
+  const [enc,ck]=await Promise.all([SB.from('m_encontros').select('*').eq('email',ALVO).order('data').order('ini'),SB.from('checkup').select('respostas').eq('email',ALVO).maybeSingle()]);
   let P=null;try{P=await carregaPlano(ALVO);}catch(e){}
   const E=enc.data||[],prox=E.find(e=>e.data>=hoje),nEnc=E.filter(e=>e.data<hoje).length;
-  const nome=(ANOME||'').split(' ')[0]||'';
-  let semHtml='<p class="pend" style="margin:0">O seu plano está sendo preparado pelo Prof. Jazz.</p>';
-  if(P&&P.sem.length){const W=P.itens.filter(x=>x.semana===P.sem[P.cur]),f=W.filter(x=>P.feito.has(x.id)).length,pct=W.length?Math.round(100*f/W.length):0,mats=[...new Set(W.map(x=>x.materia))];
-    semHtml=`<div class="mring"><svg viewBox="0 0 84 84"><circle cx="42" cy="42" r="34" fill="none" stroke="var(--soft)" stroke-width="9"/><circle cx="42" cy="42" r="34" fill="none" stroke="#1BAF7A" stroke-width="9" stroke-linecap="round" stroke-dasharray="${(2*Math.PI*34*pct/100).toFixed(1)} 999" transform="rotate(-90 42 42)"/></svg><b>${pct}%</b></div>
-      <div><b style="font-size:18px">${f} de ${W.length} assuntos</b><p class="pend" style="margin:2px 0 8px">Semana ${P.cur+1} de ${P.sem.length} · ${mats.length} matérias</p><button class="btn pri" data-go="plano">Abrir o plano da semana</button></div>`;}
-  const encHtml=prox?`<div class="mencd"><span class="mdia"><b>${pData(prox.data).getDate()}</b><small>${MESL[pData(prox.data).getMonth()].slice(0,3)}</small></span><div><b>${prox.data===hoje?'Hoje':esc(dataLonga(prox.data))}${prox.ini?` · ${hhm(prox.ini)}${prox.fim?'–'+hhm(prox.fim):''}`:''}</b><p class="pend" style="margin:2px 0 8px">${esc(prox.titulo||'Encontro de mentoria com o Prof. Jazz')}</p>${linkOk(prox.link)?`<a class="btn pri" href="${esc(prox.link.trim())}" target="_blank" rel="noopener" style="text-decoration:none">🎥 Entrar no encontro</a>`:'<span class="pend">O link da reunião aparece aqui.</span>'}</div></div>`:`<p class="pend" style="margin:0">Nenhum encontro marcado ainda.${IS_ADMIN?' Marque na aba Encontros.':''}</p>`;
-  $('app').innerHTML=`<div class="mhero"><div><span class="mk2">Mentoria individual · Prof. Jazz</span><h2>${nome?'Olá, '+esc(nome)+'!':'Olá!'}</h2><p>Aqui fica tudo da sua mentoria: o seu plano de estudos, o cronograma, os encontros e os materiais.</p></div><div class="mhs"><div><b>${nEnc}</b><span>encontros feitos</span></div><div><b>${P&&P.itens.length?Math.round(100*P.itens.filter(x=>P.feito.has(x.id)).length/P.itens.length):0}%</b><span>do plano estudado</span></div></div></div>
-   ${ck.data?'':`<div class="malert">📝 <div><b>Preencha o seu perfil de estudos.</b> Com ele o Prof. Jazz monta o seu Cronograma Semanal. <button class="btn pri" data-go="form">Preencher agora</button></div></div>`}
-   <div class="mg2"><section class="msec"><h3>📅 Próximo encontro</h3>${encHtml}</section><section class="msec"><h3>📋 Plano desta semana</h3><div class="mrow">${semHtml}</div></section></div>
-   <div class="matal"><a href="../estudos/" class="mat1"><span>⏱</span><b>Sala de Estudos</b><small>Cronômetro e o seu dashboard</small></a><button class="mat1" data-go="crono"><span>🗓</span><b>Cronograma Semanal</b><small>A sua semana organizada</small></button><a href="../bancodequestoes/" class="mat1"><span>📚</span><b>Banco de Questões</b><small>Provas da UFU de 2015 a 2026</small></a><button class="mat1" data-go="mat"><span>📁</span><b>Materiais</b><small>Os seus arquivos da mentoria</small></button></div>`;
-  const go={plano:()=>telaPlano(),form:telaForm,crono:telaCrono,mat:telaMat};$('app').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go[b.dataset.go]());}
+  const nome=((ck.data&&ck.data.respostas&&ck.data.respostas.nome)||ANOME||'').trim().split(/\s+/)[0]||'';
+  const prova=new Date(2027,3,4),hd=new Date();hd.setHours(0,0,0,0);const dias=Math.max(0,Math.round((prova-hd)/864e5));
+  const pctTot=P&&P.itens.length?Math.round(100*P.itens.filter(x=>P.feito.has(x.id)).length/P.itens.length):0;
+  // card do plano
+  let plano;
+  if(P&&P.sem.length){const W=P.itens.filter(x=>x.semana===P.sem[P.cur]),f=W.filter(x=>P.feito.has(x.id)).length,pct=W.length?Math.round(100*f/W.length):0,R=52,C=2*Math.PI*R;
+    const mats=[...new Set(W.map(x=>x.materia))].map(m=>{const L=W.filter(x=>x.materia===m),k=(PMAT.find(p=>p[0]===m)||[,'OUT'])[1];return {m,cor:CORD[k]||'#3A8CCB',f:L.filter(x=>P.feito.has(x.id)).length,n:L.length};});
+    const ini=pData(P.sem[P.cur]),fim=new Date(ini.getFullYear(),ini.getMonth(),ini.getDate()+6);
+    plano=`<div class="hcard pl"><svg class="hdeco" viewBox="0 0 240 240" aria-hidden="true">${PDEC.MAT||''}</svg>
+      <div class="hh"><span class="hico" style="background:#1BAF7A">${ICO.livro}</span><div><span class="hk">Plano de Estudos</span><b>Semana ${P.cur+1} de ${P.sem.length}</b><small>${dm(ini)} a ${dm(fim)}</small></div></div>
+      <div class="plb"><div class="pring2"><svg viewBox="0 0 124 124"><circle cx="62" cy="62" r="${R}" fill="none" stroke="var(--soft)" stroke-width="12"/><circle cx="62" cy="62" r="${R}" fill="none" stroke="#1BAF7A" stroke-width="12" stroke-linecap="round" stroke-dasharray="${(C*pct/100).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 62 62)"/></svg><div><b>${pct}%</b><span>${f} de ${W.length}</span></div></div>
+        <div class="pchips">${mats.map(x=>`<span class="pchip${x.f===x.n?' ok':''}" style="--c:${x.cor}"><i></i>${esc(x.m)}<em>${x.f}/${x.n}</em></span>`).join('')}</div></div>
+      <button class="hbtn" data-go="plano">Abrir o plano da semana ${ICO.seta}</button></div>`;}
+  else plano=`<div class="hcard pl"><div class="hh"><span class="hico" style="background:#1BAF7A">${ICO.livro}</span><div><span class="hk">Plano de Estudos</span><b>Em preparação</b></div></div><p class="hp">O Prof. Jazz está montando o seu plano individual. Assim que ficar pronto, ele aparece aqui, semana a semana.</p></div>`;
+  // card do encontro
+  let encH;
+  if(prox){const d=pData(prox.data),eh=prox.data===hoje;
+    encH=`<div class="hcard en"><div class="hh"><span class="hico" style="background:var(--azul)">${ICO.cal}</span><div><span class="hk">Próximo encontro</span><b>${eh?'É hoje!':esc(DSEML[d.getDay()])}</b><small>com o Prof. Jazz</small></div></div>
+      <div class="enb"><div class="bigcal"><span>${MESL[d.getMonth()].slice(0,3)}</span><b>${d.getDate()}</b><small>${DSEMC[d.getDay()]}</small></div>
+      <div class="ent"><b>${prox.ini?hhm(prox.ini)+(prox.fim?' – '+hhm(prox.fim):''):'Horário a combinar'}</b><p>${esc(prox.titulo||'Encontro de mentoria')}</p></div></div>
+      ${linkOk(prox.link)?`<a class="hbtn pri" href="${esc(prox.link.trim())}" target="_blank" rel="noopener">${ICO.video} Entrar no encontro</a>`:'<p class="hp">O link da reunião aparece aqui.</p>'}</div>`;}
+  else encH=`<div class="hcard en"><div class="hh"><span class="hico" style="background:var(--azul)">${ICO.cal}</span><div><span class="hk">Próximo encontro</span><b>Ainda não marcado</b></div></div><p class="hp">${IS_ADMIN?'Marque o primeiro encontro na aba Encontros.':'Assim que o Prof. Jazz marcar o seu próximo encontro, ele aparece aqui com o link da reunião.'}</p>${IS_ADMIN?`<button class="hbtn" data-go="enc">Marcar encontro ${ICO.seta}</button>`:''}</div>`;
+  const tiles=[['sala','../estudos/',ICO.timer,'Sala de Estudos','Ligue o cronômetro e acompanhe o seu dashboard','#EB6834','#E5484D'],
+    ['crono',null,ICO.grade,'Cronograma Semanal','A sua semana de estudos organizada, dia a dia','#3A8CCB','#1F4E79'],
+    ['banco','../bancodequestoes/',ICO.lista,'Banco de Questões','Provas da UFU de 2015 a 2026, com gabarito','#7B4FC9','#4C2A8C'],
+    ['mat',null,ICO.pasta,'Materiais','Os seus arquivos e os materiais da mentoria','#1BAF7A','#0E7A55']];
+  $('app').innerHTML=`<section class="mh2"><div class="mhx"><span class="hk2">Mentoria individual · Prof. Jazz</span><h2>${nome?'Olá, '+esc(nome)+'!':'Olá!'}</h2><p>Este é o seu espaço da mentoria: o plano de estudos feito só para você, o cronograma, os encontros e os materiais.</p>
+      <div class="mpills"><span><b>${dias}</b> dias para a 1ª fase da UFU</span><span><b>${pctTot}%</b> do plano estudado</span><span><b>${nEnc}</b> encontro${nEnc===1?'':'s'} realizado${nEnc===1?'':'s'}</span></div></div>
+    <div class="mhf"><picture><source srcset="../img/jazz.webp" type="image/webp"><img src="../img/jazz.png" alt="Prof. Jazz"></picture></div></section>
+   ${ck.data?'':`<button class="mperf" data-go="form"><span class="hico" style="background:var(--amarelo);color:#16304F">${ICO.perfil}</span><div><b>Preencha o seu perfil de estudos</b><small>Leva uns 10 minutos. Com ele o Prof. Jazz monta o seu Cronograma Semanal.</small></div>${ICO.seta}</button>`}
+   <div class="hgrid">${encH}${plano}</div>
+   <div class="htiles">${tiles.map(([k,h,ic,t,d,c1,c2])=>`<${h?`a href="${h}"`:`button data-go="${k}"`} class="htile" style="--c1:${c1};--c2:${c2}"><span class="tic">${ic}</span><b>${t}</b><small>${d}</small><span class="tar">${ICO.seta}</span></${h?'a':'button'}>`).join('')}</div>`;
+  const go={plano:()=>telaPlano(),form:telaForm,crono:telaCrono,mat:telaMat,enc:telaEnc};$('app').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go[b.dataset.go]());}
 
 /* ---------- encontros ---------- */
 async function telaEnc(){abas('tabEnc');$('app').innerHTML='<p class="pend">Carregando…</p>';
@@ -1476,6 +1508,41 @@ label.btn{display:inline-flex;align-items:center;cursor:pointer}
 .marqs{display:flex;flex-direction:column;gap:8px}.marq{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px}.marq>div{flex:1;min-width:0;display:flex;flex-direction:column}.marq small{color:var(--muted)}.mai{font-size:24px}.marq .btn{padding:7px 12px;font-size:13.5px}
 #exBar button{margin-left:6px}
 @media (max-width:760px){.mk{grid-template-columns:repeat(2,1fr)}.mg2{grid-template-columns:1fr}.matal{grid-template-columns:repeat(2,1fr)}.m3{grid-template-columns:1fr 1fr}.mhero h2{font-size:24px}}
+
+.mh2{position:relative;overflow:hidden;display:flex;align-items:flex-end;justify-content:space-between;gap:10px;min-height:250px;background:radial-gradient(circle at 85% 30%,rgba(58,140,203,.55),transparent 55%),linear-gradient(135deg,#0F2440,#1F4E79);color:#fff;border-radius:24px;padding:0 0 0 30px;border-bottom:5px solid var(--amarelo)}
+.mh2::before{content:'';position:absolute;right:-60px;top:-60px;width:260px;height:260px;border-radius:50%;border:3px solid rgba(221,221,36,.35)}
+.mhx{position:relative;z-index:1;padding:28px 0;max-width:600px}.mhx h2{margin:6px 0 6px;font:800 38px var(--display)}.mhx p{margin:0;opacity:.9;font-size:16px;line-height:1.5}
+.hk2{font:700 12px var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--amarelo)}
+.mpills{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}.mpills span{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:7px 14px;font-size:13.5px}.mpills b{font:800 16px var(--display);margin-right:3px}
+.mhf{position:relative;z-index:1;align-self:flex-end;height:250px;flex:none}.mhf img{height:100%;width:auto;display:block;filter:drop-shadow(0 14px 30px rgba(0,0,0,.45))}
+.mperf{display:flex;align-items:center;gap:14px;width:100%;text-align:left;font:inherit;color:var(--ink);cursor:pointer;background:color-mix(in srgb,var(--amarelo) 12%,var(--card));border:1px solid color-mix(in srgb,var(--amarelo) 55%,var(--line));border-radius:18px;padding:16px 18px}
+.mperf>div{flex:1;display:flex;flex-direction:column}.mperf b{font-size:17px}.mperf small{color:var(--muted);font-size:14px}.mperf>svg{width:22px;height:22px}
+.hgrid{display:grid;grid-template-columns:1fr 1.25fr;gap:16px}
+.hcard{position:relative;overflow:hidden;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:22px;display:flex;flex-direction:column;gap:16px;box-shadow:var(--shadow)}
+.hdeco{position:absolute;right:-30px;bottom:-30px;width:220px;height:220px;opacity:.07;color:var(--ink);stroke:currentColor;fill:currentColor;pointer-events:none}
+.hh{display:flex;align-items:center;gap:14px;position:relative}.hh b{display:block;font:800 22px var(--display)}.hh small{color:var(--muted)}
+.hk{display:block;font:700 11.5px var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.hico{flex:none;width:52px;height:52px;border-radius:15px;display:grid;place-items:center;color:#fff}.hico svg{width:26px;height:26px}
+.hp{margin:0;color:var(--muted);line-height:1.5;position:relative}
+.hbtn{position:relative;align-self:flex-start;display:inline-flex;align-items:center;gap:8px;text-decoration:none;font:700 15px var(--body);padding:11px 18px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}.hbtn svg{width:18px;height:18px}
+.hbtn.pri{background:var(--azul);border-color:var(--azul);color:#fff}.hbtn:hover{border-color:var(--azul)}
+.enb{display:flex;gap:18px;align-items:center}.bigcal{flex:none;width:96px;border-radius:18px;overflow:hidden;text-align:center;background:var(--bg);border:1px solid var(--line);box-shadow:0 8px 20px rgba(0,0,0,.18)}
+.bigcal span{display:block;background:#E5484D;color:#fff;font:800 13px var(--body);text-transform:uppercase;letter-spacing:.08em;padding:6px 0}.bigcal b{display:block;font:800 44px var(--display);line-height:1.1;padding-top:6px}.bigcal small{display:block;padding-bottom:8px;color:var(--muted);text-transform:uppercase;font-weight:700;font-size:12px}
+.ent b{font:800 22px var(--display)}.ent p{margin:4px 0 0;color:var(--muted);line-height:1.45}
+.plb{display:flex;gap:20px;align-items:center;position:relative}.pring2{position:relative;width:124px;height:124px;flex:none}.pring2 svg{width:124px;height:124px}.pring2 div{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}.pring2 b{font:800 28px var(--display)}.pring2 span{font-size:12.5px;color:var(--muted)}
+.pchips{display:flex;flex-wrap:wrap;gap:7px}.pchip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:5px 10px;border-radius:999px;background:color-mix(in srgb,var(--c) 14%,var(--card));border:1px solid color-mix(in srgb,var(--c) 35%,transparent)}
+.pchip i{width:8px;height:8px;border-radius:50%;background:var(--c)}.pchip em{font-style:normal;color:var(--muted);font-weight:700}.pchip.ok{background:var(--c);color:#fff;border-color:var(--c)}.pchip.ok i{background:#fff}.pchip.ok em{color:rgba(255,255,255,.85)}
+.htiles{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.htile{position:relative;overflow:hidden;display:flex;flex-direction:column;gap:6px;min-height:178px;justify-content:flex-end;text-align:left;text-decoration:none;font:inherit;cursor:pointer;color:#fff;border:0;border-radius:22px;padding:20px;background:linear-gradient(140deg,var(--c1),var(--c2));box-shadow:0 10px 26px color-mix(in srgb,var(--c1) 30%,transparent);transition:transform .15s}
+.htile:hover{transform:translateY(-4px)}
+.htile::before{content:'';position:absolute;right:-40px;top:-40px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.14)}
+.htile::after{content:'';position:absolute;right:30px;top:70px;width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.1)}
+.tic{position:absolute;top:18px;left:18px;width:52px;height:52px;border-radius:15px;background:rgba(255,255,255,.2);display:grid;place-items:center}.tic svg{width:28px;height:28px}
+.htile b{font:800 19px var(--display);position:relative}.htile small{opacity:.92;font-size:13.5px;line-height:1.4;position:relative;padding-right:28px}
+.tar{position:absolute;right:18px;bottom:18px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.22);display:grid;place-items:center}.tar svg{width:16px;height:16px}
+@media (max-width:900px){.hgrid{grid-template-columns:1fr}.htiles{grid-template-columns:1fr 1fr}.mhf{height:200px}}
+.htile{padding-top:88px}
+@media (max-width:600px){.mh2::before{display:none}.htile{min-height:0}.htile small{padding-right:0;padding-bottom:30px}.mh2{flex-direction:column;align-items:stretch;padding:0 22px}.mhx{padding:24px 0 0}.mhx h2{font-size:30px}.mhf{height:190px;align-self:center}.plb{flex-direction:column;align-items:flex-start}.htile{min-height:160px}}
 </style>
 
 <script src="../js/presenca.js" defer></script>
