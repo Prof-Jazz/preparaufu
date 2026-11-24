@@ -383,11 +383,11 @@ body{animation:fadein .25s ease}@keyframes fadein{from{opacity:0}to{opacity:1}}
   <a class="logos" href="/" title="Início da plataforma PREPARA UFU" style="text-decoration:none"><img class="j" src="../bancodequestoes/logo/jazz_claro.png" alt="Jazz, Professor de Matemática"><span class="sep"></span><img class="p" src="../bancodequestoes/logo/prepara_transp.png" alt="Prepara UFU"></a>
   <nav class="tabs"><button class="theme" id="theme" aria-label="Alternar modo diurno e noturno" title="Modo diurno / noturno"><span class="sun">☀</span><span class="moon">☾</span></button><a href="../bancodequestoes/">Banco de Questões</a><a href="../estudos/">Sala de Estudos</a><a href="../aulas/#agenda">Agenda</a><a href="../aulas/#materiais">Materiais</a><button id="sair">Sair</button></nav>
 </header>
-<nav class="subnav" aria-label="Assessoria"><div class="in"><button id="tabGeral" hidden>Comportamento da turma</button><button id="tabResp" hidden>Alunos</button><button id="tabCad" hidden>Cadastro de alunos</button><button id="tabExemplo" hidden>Ver como aluno</button><button id="tabCrono" hidden>Cronograma Semanal</button><button id="tabPlano" hidden>Plano de Estudos</button><button class="on" id="tabForm" hidden>Perfil de estudos</button><button id="tabFaq" hidden>Dúvidas</button></div></nav>
+<nav class="subnav" aria-label="Assessoria"><div class="in"><button id="tabGeral" hidden>Comportamento da turma</button><button id="tabResp" hidden>Alunos</button><button id="tabCad" hidden>Cadastro</button><button id="tabExemplo" hidden>Ver como aluno</button><button id="tabCrono" hidden>Cronograma Semanal</button><button id="tabPlano" hidden>Plano de Estudos</button><button class="on" id="tabForm" hidden>Perfil de estudos</button><button id="tabFaq" hidden>Dúvidas</button></div></nav>
 <div id="exBar" hidden>Modo aluno exemplo — é assim que o aluno vê. Nada aqui entra nas estatísticas da turma. <button type="button" id="exSair">Sair do modo exemplo</button></div>
 <main id="app"></main>
 
-<script>(function(){var V='1795535177';var K='bqufu-recarga-';
+<script>(function(){var V='1795536235';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -407,7 +407,7 @@ const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
 
 const SB=supabase.createClient('https://ygdlbhoqyqjsqoyyfizk.supabase.co','sb_publishable_jB2I59Ruw4MaMT63KLWtSA_O-DMf63b');
 const ADMIN='jesrrael.santos@gmail.com';
-let EMAIL='',IS_ADMIN=false,ALVO='',EXMODO=false;
+let EMAIL='',IS_ADMIN=false,IS_ASSESSOR=false,IS_STAFF=false,ALVO='',EXMODO=false,ASSNOMES={};
 const EXEMPLO='exemplo@preparaufu.com.br';
 
 /* ===== Questionário ===== */
@@ -950,7 +950,7 @@ function desenhar(st){
   const ordem=Object.values(R).sort((a,b)=>b.min-a.min);const tot=ordem.reduce((s,x)=>s+x.min,0);
   const sw=x=>x.tipo==='rev'?'background:#fff;border:2px solid #868E96':x.tipo==='sim'?'background:#212529;border:2px solid var(--amarelo)':`background:${CORD[x.k]||CORD.OUT}`;
   const resumo=`<table class="cr"><tr><th>Disciplina</th><th>Blocos na semana</th><th>Horas</th></tr>${ordem.map(x=>`<tr><td><i style="${sw(x)}"></i>${esc(x.n)}</td><td>${x.v}</td><td>${hfmt(x.min/60)}</td></tr>`).join('')}<tr class="tt"><td>Total de estudo na semana</td><td></td><td>${hfmt(tot/60)}</td></tr></table><p class="pend" style="margin:6px 0 0">As aulas ao vivo do PREPARA UFU (segunda e quinta, 19h–20h30) não contam como tempo de estudo: as suas horas de estudo são além delas.</p>`;
-  const quem=st.info&&st.info.atualizado_por?(st.info.atualizado_por===ADMIN?(st.email===EXEMPLO?'você':'Prof. Jazz'):(st.info.atualizado_por===st.email?(st.quem==='prof'?'o aluno':'você'):st.info.atualizado_por)):'';
+  const quem=st.info&&st.info.atualizado_por?(st.info.atualizado_por===ADMIN?(st.email===EXEMPLO?'você':'Prof. Jazz'):(st.info.atualizado_por===st.email?(st.quem==='prof'?'o aluno':'você'):st.info.atualizado_por===EMAIL?'você':(ASSNOMES[st.info.atualizado_por]?'assessor(a) '+ASSNOMES[st.info.atualizado_por].split(' ')[0]:'a assessoria'))):'';
   st.el.innerHTML=`${choques(st.p).map(a=>`<div class="caviso choque">⚠ ${esc(a)} Não dá para estar nos dois ao mesmo tempo: corrija os compromissos no seu perfil de estudos.</div>`).join('')}${st.avisos.map(a=>`<div class="caviso">${esc(a)}</div>`).join('')}${(()=>{const L=opcoesMateria(st.p).filter(([k])=>GRUPO[k]&&!B.some(b=>b.k===k)).map(o=>o[1]);return L.length?`<div class="caviso">Atenção: ${esc(L.join(', '))} não aparece${L.length>1?'m':''} no cronograma. Toda matéria precisa aparecer pelo menos uma vez na semana.</div>`:'';})()}
    ${conf.size?'<div class="caviso">Há blocos se sobrepondo a outros compromissos (contorno vermelho). Arraste-os para outro horário.</div>':''}
    <div class="ctb"><button class="btn pri" data-a="add">+ Adicionar bloco</button><button class="btn" data-a="refazer">Montar de novo pelo perfil de estudos</button><button class="btn" data-a="print">Imprimir / PDF</button><span class="cst">${st.info&&st.info.atualizado_em?`Última alteração: ${new Date(st.info.atualizado_em).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}${quem?' por '+esc(quem):''}`:'Ainda não alterado'}</span></div>
@@ -1057,7 +1057,8 @@ const FAQ=[
 let CAD=[],CADF='todos';
 async function telaCad(){abas('tabCad');$('app').innerHTML='<p class="pend">Carregando…</p>';await cadLoad();}
 async function cadLoad(msg){const {data,error}=await SB.rpc('admin_lista');if(error){$('app').innerHTML=`<p class="pend">${esc(error.message)}</p>`;return;}
-  CAD=(data||[]).filter(a=>a.email!==ADMIN&&a.email!==EXEMPLO);cadDraw(msg);}
+  CAD=(data||[]).filter(a=>a.email!==ADMIN&&a.email!==EXEMPLO);const as=await SB.rpc('admin_assessores');ASSL=as.data||[];cadDraw(msg);}
+let ASSL=[];
 function cadDraw(msg){const busca=($('cadBusca')||{}).value||'';
   const n=CAD.length,as=CAD.filter(a=>a.assessoria).length,ent=CAD.filter(a=>a.cadastrado).length;
   const nrm=t=>String(t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
@@ -1070,6 +1071,9 @@ function cadDraw(msg){const busca=($('cadBusca')||{}).value||'';
    <label class="chk" style="grid-column:1/-1"><input type="checkbox" id="cadAss" checked> É aluno da Assessoria</label></form>
    <details><summary style="cursor:pointer;font-size:14px;color:var(--muted)">Liberar vários de uma vez</summary><div style="display:flex;flex-direction:column;gap:8px;margin-top:8px"><textarea id="cadLote" rows="5" placeholder="um aluno por linha: e-mail; nome"></textarea><label class="chk"><input type="checkbox" id="cadLoteAss" checked> Todos são da Assessoria</label><button class="btn" id="cadLoteBtn" type="button" style="align-self:flex-start">Liberar todos</button></div></details>
    <p class="cadmsg" id="cadMsg" role="status">${esc(msg||'')}</p></div>
+  <div class="cadbox"><h3>Assessores</h3><p class="pend" style="margin:0">O assessor vê o Plano de Estudos (planejamento semanal), o perfil de estudos, o dashboard e o cronograma de cada aluno da Assessoria, e pode mexer e arrastar os blocos do cronograma. Não cadastra alunos e não vê as mensagens entre os alunos. Ele entra pela primeira vez em “Primeiro acesso? Crie sua senha”, com o e-mail cadastrado aqui.</p>
+   <form class="cadf" id="assAdd"><input id="assNome" type="text" placeholder="nome completo do assessor" required><input id="assEmail" type="email" placeholder="e-mail do assessor" required><button class="btn pri" type="submit">Cadastrar assessor</button></form>
+   ${ASSL.length?`<div style="overflow:auto"><table class="cadt"><thead><tr><th>Assessor</th><th>Situação</th><th></th></tr></thead><tbody>${ASSL.map(a=>`<tr><td><b>${esc(a.nome)}</b><br><span class="em" style="color:var(--muted);font-size:13px">${esc(a.email)}</span></td><td>${a.cadastrado?`<span class="tg ok">já criou senha</span>${a.ultimo_acesso?`<br><span style="font-size:12px;color:var(--muted)">último acesso ${fdt(a.ultimo_acesso)}</span>`:''}`:'<span class="tg">ainda não entrou</span>'}</td><td style="white-space:nowrap;text-align:right">${a.cadastrado?`<button class="x" data-az="${esc(a.email)}">Zerar senha</button>`:''}<button class="x del" data-ar="${esc(a.email)}">Remover</button></td></tr>`).join('')}</tbody></table></div>`:'<p class="pend" style="margin:0">Nenhum assessor cadastrado ainda.</p>'}</div>
   <div class="cadbox"><div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center"><h3>Alunos liberados</h3><div class="cadfil">${[['todos','Todos',n],['ass','Assessoria',as],['banco','Só banco',n-as],['nao','Ainda não entraram',n-ent]].map(([k,t,c])=>`<button data-f="${k}" class="${CADF===k?'on':''}">${t} (${c})</button>`).join('')}</div><input id="cadBusca" type="search" placeholder="procurar aluno" value="${esc(busca)}" style="max-width:260px;margin-left:auto"></div>
    <div style="overflow:auto"><table class="cadt"><thead><tr><th>Aluno</th><th>Situação</th><th>Assessoria</th><th>Perfil</th><th></th></tr></thead><tbody>${L.map(a=>`<tr><td><b>${esc(a.nome||'(sem nome)')}</b><br><span class="em" style="color:var(--muted);font-size:13px">${esc(a.email)}</span></td>
     <td>${a.cadastrado?`<span class="tg ok">já criou senha</span>${a.ultimo_acesso?`<br><span style="font-size:12px;color:var(--muted)">último acesso ${fdt(a.ultimo_acesso)}</span>`:''}`:'<span class="tg">ainda não entrou</span>'}</td>
@@ -1080,6 +1084,13 @@ function cadDraw(msg){const busca=($('cadBusca')||{}).value||'';
   const liberar=async(lista,ass)=>{const rows=lista.map(([e,nm])=>({email:String(e||'').trim().toLowerCase(),nome:String(nm||'').trim()||null,assessoria:!!ass})).filter(r=>/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(r.email));
     if(!rows.length){msgf('Nenhum e-mail válido.');return;}
     const {error}=await SB.from('allowed_emails').upsert(rows,{onConflict:'email'});await cadLoad(error?error.message:rows.length+' aluno(s) liberado(s).');RESP.length=0;};
+  $('assAdd').onsubmit=async ev=>{ev.preventDefault();const email=$('assEmail').value.trim().toLowerCase(),nome=$('assNome').value.trim().replace(/\s+/g,' ');
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){msgf('E-mail do assessor inválido.');return;}
+    if(nome.split(' ').length<2){msgf('Escreva o nome completo do assessor.');return;}
+    if(CAD.some(a=>a.email===email)){msgf('Este e-mail já está cadastrado como aluno. Remova o aluno antes, ou use outro e-mail.');return;}
+    const {error}=await SB.from('assessores').upsert({email,nome},{onConflict:'email'});await cadLoad(error?error.message:'Assessor cadastrado: '+nome);};
+  $('app').querySelectorAll('button[data-az]').forEach(b=>b.onclick=async()=>{const e=b.dataset.az;if(!confirm('Zerar a senha de '+e+'? O assessor vai criar uma nova em “Primeiro acesso”.'))return;const {error}=await SB.rpc('admin_zerar_senha',{e});await cadLoad(error?error.message:'Senha zerada: '+e);});
+  $('app').querySelectorAll('button[data-ar]').forEach(b=>b.onclick=async()=>{const e=b.dataset.ar;if(!confirm('Remover o assessor '+e+'? Ele perde o acesso à plataforma.'))return;await SB.rpc('admin_zerar_senha',{e});const {error}=await SB.from('assessores').delete().eq('email',e);await cadLoad(error?error.message:'Assessor removido: '+e);});
   $('cadAdd').onsubmit=ev=>{ev.preventDefault();liberar([[$('cadEmail').value,$('cadNome').value]],$('cadAss').checked);};
   $('cadLoteBtn').onclick=()=>liberar($('cadLote').value.split(/\n+/).filter(l=>l.trim()).map(l=>l.split(/[;,\t]/)),$('cadLoteAss').checked);
   $('cadBusca').oninput=()=>{const pos=$('cadBusca').selectionStart;cadDraw();const b=$('cadBusca');b.focus();b.setSelectionRange(pos,pos);};
@@ -1180,12 +1191,15 @@ $('gForm').onsubmit=async ev=>{ev.preventDefault();const email=$('gEmail').value
   }catch(e){gm(e.message||'Não foi possível entrar.');}finally{$('gBtn').disabled=false;}};
 async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!session){location.replace('/?volta='+encodeURIComponent(location.pathname+location.hash));return;}
   EMAIL=(session.user.email||'').toLowerCase();IS_ADMIN=EMAIL===ADMIN;
-  const {data:ok}=await SB.rpc('is_assessoria');
+  const [{data:ok},{data:pap}]=await Promise.all([SB.rpc('is_assessoria'),SB.rpc('meu_papel')]);
+  IS_ASSESSOR=pap==='assessor';IS_STAFF=IS_ADMIN||IS_ASSESSOR;
+  if(IS_STAFF){SB.from('assessores').select('email,nome').then(({data})=>{(data||[]).forEach(a=>ASSNOMES[a.email]=a.nome);});}
   $('gate').hidden=true;
   if(!ok){$('app').innerHTML=`<div class="aviso"><h2>Área exclusiva da Assessoria PREPARA UFU</h2><p>Aqui os alunos da Assessoria preenchem o perfil de estudos e recebem um Cronograma Semanal personalizado, montado a partir da rotina, das dificuldades e do curso de cada um, e ajustado nos encontros com o Prof. Jazz.</p><p>O seu acesso hoje é ao Banco de Questões. Quer fazer parte da Assessoria? Fale com o Prof. Jazz. Se você já é aluno da Assessoria e está vendo esta mensagem, avise o Prof. Jazz para liberar o seu e-mail.</p><a href="../bancodequestoes/">Ir para o Banco de Questões</a></div>`;return;}
-  $('tabForm').hidden=false;$('tabResp').hidden=!IS_ADMIN;$('tabGeral').hidden=!IS_ADMIN;
+  $('tabForm').hidden=IS_ASSESSOR;$('tabResp').hidden=!IS_STAFF;$('tabGeral').hidden=!IS_STAFF;
   ALVO=EMAIL;$('tabForm').onclick=telaForm;$('tabResp').onclick=telaResp;$('tabGeral').onclick=telaGeral;$('tabCrono').onclick=telaCrono;$('tabFaq').onclick=telaFaq;$('tabFaq').hidden=false;$('tabPlano').onclick=telaPlano;$('tabPlano').hidden=false;
   $('tabExemplo').hidden=!IS_ADMIN;$('tabCad').hidden=!IS_ADMIN;$('tabCad').onclick=telaCad;$('tabExemplo').onclick=()=>modoExemplo(true);$('exSair').onclick=()=>modoExemplo(false);
+  if(IS_ASSESSOR){$('tabCrono').hidden=true;telaResp();return;}
   if(!IS_ADMIN){const {data:ex}=await SB.from('checkup').select('email').eq('email',EMAIL).maybeSingle();$('tabCrono').hidden=!ex;}
   if(IS_ADMIN){$('tabForm').textContent='Ver formulário';let ex=null;try{ex=sessionStorage.getItem('bqufu-exemplo');}catch(e){}if(ex)modoExemplo(true);else telaGeral();}else if(!$('tabCrono').hidden)telaCrono();else telaForm();}
 $('sair').onclick=async()=>{await SB.auth.signOut();location.href='/';};
