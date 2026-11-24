@@ -378,6 +378,8 @@ body{animation:fadein .25s ease}@keyframes fadein{from{opacity:0}to{opacity:1}}
 .aovr .pos{grid-row:span 2;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--soft);font:800 13px var(--display)}.aovr li:nth-child(1) .pos{background:#DDDD24;color:#16304F}.aovr li:nth-child(2) .pos{background:#C0C7D6;color:#16304F}.aovr li:nth-child(3) .pos{background:#D9A066;color:#16304F}
 .aovr .hrs{font:800 15px var(--display)}.aovr small{grid-column:2/4;color:var(--muted);font-size:12.5px}
 .aovp{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}.aovp div{border:1px solid var(--line);border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;min-width:0}.aovp b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.aovp small{color:var(--muted);font-size:12px}
+
+.aovlive{position:relative}.aovlive i{width:14px;height:14px;border-radius:50%;background:#1BAF7A;box-shadow:0 0 0 5px rgba(27,175,122,.25)}
 @media (max-width:760px){.aovc{grid-template-columns:1fr}.aovd{gap:2px}.aovb i{width:7px}.aovp{grid-template-columns:1fr}}
 .kclk{cursor:pointer;transition:transform .15s,border-color .15s}.kclk:hover{transform:translateY(-2px);border-color:var(--azul)}
 .adlg{position:fixed;inset:0;z-index:90;background:rgba(5,8,18,.6);display:flex;align-items:flex-start;justify-content:center;padding:30px 14px;overflow:auto}
@@ -410,7 +412,7 @@ body{animation:fadein .25s ease}@keyframes fadein{from{opacity:0}to{opacity:1}}
 <div id="exBar" hidden>Modo aluno exemplo — é assim que o aluno vê. Nada aqui entra nas estatísticas da turma. <button type="button" id="exSair">Sair do modo exemplo</button></div>
 <main id="app"></main>
 
-<script>(function(){var V='1795557586';var K='bqufu-recarga-';
+<script>(function(){var V='1795557746';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,.adlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -665,15 +667,16 @@ let AOV={dias:7,grupo:'ass'};
 const CORMAT={'Matemática':'#D9480F','Física':'#1864AB','Química':'#5F3DC4','Biologia':'#2B8A3E','Português':'#C92A2A','Literatura':'#A61E4D','Redação':'#C2255C','História':'#7F4F24','Geografia':'#5C7A0A','Filosofia':'#495057','Sociologia':'#8C6500','Inglês':'#0B7285','Espanhol':'#0B7285','Francês':'#0B7285'};
 async function todasLinhas(mk){let out=[],i=0;for(;;){const {data,error}=await mk().range(i,i+999);if(error)throw error;out=out.concat(data||[]);if(!data||data.length<1000)break;i+=1000;}return out;}
 const isoL=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-async function turmaAoVivo(el){if(!el)return;el.innerHTML='<p class="pend">Carregando os dados de estudo da turma…</p>';
+async function turmaAoVivo(el){if(!el)return;if(!el.querySelector('.kpis'))el.innerHTML='<p class="pend">Carregando os dados de estudo da turma…</p>';
   let alunos,S,A;
   try{const {data,error}=await SB.rpc('admin_lista');if(error)throw error;
     alunos=(data||[]).filter(a=>a.email!==ADMIN&&a.email!==EXEMPLO&&(AOV.grupo==='todos'||(AOV.grupo==='ass'?a.assessoria:!a.assessoria)));
     const hoje=new Date();hoje.setHours(0,0,0,0);const ini=AOV.dias?new Date(hoje.getTime()-(AOV.dias-1)*864e5):new Date(2026,0,1);const ini14=new Date(hoje.getTime()-13*864e5);
     const desde=new Date(Math.min(ini,ini14));
-    [S,A]=await Promise.all([todasLinhas(()=>SB.from('sessoes').select('email,inicio,segundos,tipo,materia,questoes,acertos').gte('inicio',desde.toISOString()).order('inicio')),todasLinhas(()=>SB.from('acessos').select('email,dia').gte('dia',isoL(desde)))]);
+    let V;[S,A,V]=await Promise.all([todasLinhas(()=>SB.from('sessoes').select('email,inicio,segundos,tipo,materia,questoes,acertos').gte('inicio',desde.toISOString()).order('inicio')),todasLinhas(()=>SB.from('acessos').select('email,dia').gte('dia',isoL(desde))),SB.rpc('turma_ao_vivo').then(x=>Array.isArray(x.data)?x.data:[])]);AOV.vivo=V;
   }catch(e){el.innerHTML=`<div class="chart"><p class="pend">Não foi possível carregar: ${esc(e.message)}</p></div>`;return;}
   if(!document.body.contains(el))return;
+  const VV=(AOV.vivo||[]).filter(v=>alunos.some(a=>a.email===v.email)),vEst=VV.filter(v=>v.estudando),vOn=VV.filter(v=>!v.estudando);
   const E=new Set(alunos.map(a=>a.email)),nome=e=>{const a=alunos.find(x=>x.email===e);return (a&&a.nome)||e;};
   const hoje=new Date();hoje.setHours(0,0,0,0);const hj=isoL(hoje);const ini=AOV.dias?new Date(hoje.getTime()-(AOV.dias-1)*864e5):new Date(2026,0,1);
   const Sall=S.filter(x=>E.has(x.email)),Aall=A.filter(x=>E.has(x.email));
@@ -704,7 +707,8 @@ async function turmaAoVivo(el){if(!el)return;el.innerHTML='<p class="pend">Carre
   el.innerHTML=`<div class="aovc"><div class="aovf">${[[1,'Hoje'],[7,'7 dias'],[30,'30 dias'],[0,'Desde o início']].map(([d,t])=>`<button data-d="${d}" class="${AOV.dias===d?'on':''}">${t}</button>`).join('')}</div>
      <div class="aovf">${[['ass','Assessoria'],['mat','Curso de Matemática'],['todos','Todas as turmas']].map(([g,t])=>`<button data-g="${g}" class="${AOV.grupo===g?'on':''}">${t}</button>`).join('')}</div></div>
    <div class="kpis">
-    ${kpi(ringSVG(ativos.size/N,'#1BAF7A',Math.round(100*ativos.size/N)+'%'),'Alunos estudando',`${ativos.size} <em class="of">de ${alunos.length}</em>`,`registraram estudo ${per}`,'k-a','est')}
+    ${kpi(`<span class="ico aovlive"><i></i></span>`,'Estudando agora',`${vEst.length} <em class="of">ao vivo</em>`,`${vOn.length} online no site sem o cronômetro · clique para ver`,'k-a','vivo')}
+    ${kpi(ringSVG(ativos.size/N,'#1BAF7A',Math.round(100*ativos.size/N)+'%'),'Estudaram no período',`${ativos.size} <em class="of">de ${alunos.length}</em>`,`registraram estudo ${per}`,'','est')}
     ${kpi(ico('⏱'),'Estudo médio por aluno',hfmt(medDia)+' <em class="of">/dia</em>',`entre quem estudou: ${hfmt(medAtivo)} por dia`,'','horas')}
     ${kpi(ico('📅'),'Acessaram hoje',`${acHoje.size} <em class="of">de ${alunos.length}</em>`,`${estHoje.size} estudaram hoje com o cronômetro`,'','hoje')}
     ${kpi(ico('✏️'),'Questões da turma',String(Q),`${pct==null?'sem questões registradas':pct+'% de acerto'} · ${semQ} aluno(s) sem questões ${per}`,'','quest')}
@@ -724,12 +728,15 @@ async function turmaAoVivo(el){if(!el)return;el.innerHTML='<p class="pend">Carre
   const lin=(e,det)=>({e,n:nome(e),det});
   const hrs=e=>porAl[e]?`${hfmt(porAl[e].s/3600)} em ${porAl[e].d.size} dia(s)`:'';
   const ult=e=>{const a=alunos.find(x=>x.email===e);return ultEst[e]?`último estudo há ${diasDe(ultEst[e])} dia(s)`:(a&&!a.cadastrado?'ainda não entrou na plataforma':'nunca usou o cronômetro');};
+  const minDe=t=>t?Math.max(1,Math.round((Date.now()-new Date(t))/60000)):0;
   const LISTAS={
+    vivo:['Estudando agora',[[`Com o cronômetro ligado (${vEst.length})`,vEst.map(v=>lin(v.email,`${v.materia||''}${v.tipo?' · '+String(v.tipo).split(',').map(t=>({teoria:'Teoria',questoes:'Questões',revisao:'Revisão',correcao:'Correção de simulado'})[t]||t).join(' + '):''} · há ${(m=>m<60?m+' min':hfmt(m/60))(minDe(v.desde))}`))],[`Online no site (${vOn.length})`,vOn.map(v=>lin(v.email,'na plataforma agora, sem o cronômetro'))]]],
     est:['Alunos estudando',[[`Estudaram ${per} (${ativos.size})`,[...ativos].map(e=>lin(e,hrs(e)))],[`Não estudaram (${alunos.length-ativos.size})`,alunos.filter(a=>!ativos.has(a.email)).map(a=>lin(a.email,ult(a.email)))]]],
     hoje:['Acessos de hoje',[[`Acessaram hoje (${acHoje.size})`,[...acHoje].map(e=>lin(e,estHoje.has(e)?'estudou hoje com o cronômetro':'entrou, mas não usou o cronômetro'))],[`Não acessaram hoje (${alunos.length-acHoje.size})`,alunos.filter(a=>!acHoje.has(a.email)).map(a=>lin(a.email,ultAc[a.email]?`último acesso há ${diasDe(ultAc[a.email])} dia(s)`:(a.cadastrado?'sem acesso registrado':'ainda não entrou na plataforma')))]]],
     quest:['Questões da turma',[[`Fizeram questões ${per}`,Object.entries(porAl).filter(([,o])=>o.q>0).sort((a,b)=>b[1].q-a[1].q).map(([e,o])=>lin(e,`${o.q} questões · ${Math.round(100*o.a/o.q)}% de acerto`))],[`Sem questões ${per}`,alunos.filter(a=>!(porAl[a.email]&&porAl[a.email].q>0)).map(a=>lin(a.email,ult(a.email)))]]],
     horas:['Horas de estudo por aluno',[[`Todos os alunos ${per}`,alunos.map(a=>({a,s:porAl[a.email]?porAl[a.email].s:0})).sort((x,y)=>y.s-x.s).map(({a,s})=>lin(a.email,s?hrs(a.email):ult(a.email)))]]]};
   el.querySelectorAll('.kclk').forEach(c=>c.onclick=()=>listaAlunosDlg(...LISTAS[c.dataset.k]));
+  clearTimeout(AOV.tm);AOV.tm=setTimeout(()=>{if(document.body.contains(el)&&!document.hidden&&!document.querySelector('.adlg'))turmaAoVivo(el);},60000);
   el.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{AOV.dias=+b.dataset.d;turmaAoVivo(el);});
   el.querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>{AOV.grupo=b.dataset.g;turmaAoVivo(el);});}
 function listaAlunosDlg(titulo,grupos){const d=document.createElement('div');d.className='adlg';let g=0;
@@ -1321,6 +1328,6 @@ async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!se
 $('sair').onclick=async()=>{await SB.auth.signOut();location.href='/';};
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795557586" defer></script>
+<script src="../js/presenca.js?v=1795557746" defer></script>
 </body>
 </html>
