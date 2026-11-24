@@ -28,6 +28,19 @@
     }catch(e){}
   }
   setTimeout(navArea,1200);
+  function logoAreas(){
+    try{
+      if(typeof SB==='undefined'||!SB)return;
+      if(sessionStorage.getItem('bqufu-mentoria-puro'))return;
+      SB.auth.getSession().then(function(r){
+        if(!r||!r.data||!r.data.session)return;
+        SB.rpc('minhas_areas').then(function(x){var a=x&&x.data;if(!a||!a.turma||!a.mentoria)return;
+          document.querySelectorAll('a.logos').forEach(function(l){l.href='/?area=escolher';l.title='Escolher a área: Turmas ou Mentoria individual';});
+        },function(){});
+      });
+    }catch(e){}
+  }
+  setTimeout(logoAreas,800);
   function modoAlunoMentoria(){
     try{
       if(/^\/mentoria\//.test(location.pathname))return;
