@@ -388,7 +388,7 @@ body{animation:fadein .25s ease}@keyframes fadein{from{opacity:0}to{opacity:1}}
 <div id="exBar" hidden><span id="exTxt"></span> <button type="button" id="exPuro"></button> <button type="button" id="exSair">Voltar aos mentorados</button><button type="button" id="exTroca" hidden></button></div>
 <main id="app"></main>
 
-<script>(function(){var V='1795553728';var K='bqufu-recarga-';
+<script>(function(){var V='1795554730';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -1384,8 +1384,9 @@ const brl=v=>v==null||v===''?'':Number(v).toLocaleString('pt-BR',{style:'currenc
 function stVenc(v){if(!v)return null;const d=Math.round((pData(v)-pData(isoD(new Date())))/864e5);return {dias:d,tipo:d<0?'vencido':d===0?'hoje':d<=5?'vence':'ok'};}
 const telWa=t=>{let d=String(t||'').replace(/\D/g,'');if(!d)return '';if(d.length<=11)d='55'+d;return d;};
 function quandoVence(v){const s=stVenc(v),dt=brData(v);return s.dias<0?`venceu em ${dt}`:s.dias===0?`vence hoje (${dt})`:s.dias===1?`vence amanhã (${dt})`:`vence em ${dt}`;}
-function msgCobranca(a){const n=(a.nome||'').trim().split(/\s+/)[0];
-  return `Olá, ${n}! Tudo bem? Aqui é o Prof. Jazz. 😊\n\nPassando para avisar que o seu plano da Mentoria Individual precisa ser renovado: ele ${quandoVence(a.vencimento)}.\n\nO valor da renovação é de ${brl(a.valor)}.\n\nPara seguir com o seu plano de estudos, os nossos encontros e todo o acompanhamento, é só me responder por aqui que eu te passo os dados para o pagamento.\n\nVamos juntos rumo à aprovação! 💛`;}
+function msgCobranca(a){const n=(a.nome||'').trim().split(/\s+/)[0];const v=stVenc(a.vencimento),dt=dm(pData(a.vencimento));
+  const quando=v.dias<0?`venceu no dia ${dt}`:v.dias===0?`vence hoje (${dt})`:`vence no dia ${dt}`;
+  return `Olá, ${n}! Tudo bem?\n\nAqui é o Prof. Jazz. Passando para lembrar que a mensalidade da sua Mentoria Individual ${quando}, e o plano precisa ser renovado para seguirmos com o seu acompanhamento.\n\nO valor da renovação é de ${brl(a.valor)}.\n\nAssim que puder, me responda por aqui que eu te envio os dados para o pagamento. Se já tiver feito, por favor, me desconsidere e me mande o comprovante.\n\nObrigado pela confiança. Seguimos juntos rumo à aprovação!\n\nProf. Jazz`;}
 const linkWa=a=>{const t=telWa(a.whatsapp);return t?`https://wa.me/${t}?text=${encodeURIComponent(msgCobranca(a))}`:'';};
 function maisMes(v){const d=pData(v||isoD(new Date()));const x=new Date(d.getFullYear(),d.getMonth()+1,d.getDate());if(x.getDate()!==d.getDate())x.setDate(0);return isoD(x);}
 function pagar(a,depois){const prox=maisMes(a.vencimento);
@@ -1509,7 +1510,7 @@ async function telaInicio(){abas('tabInicio');$('app').innerHTML='<p class="pend
    <div class="htiles">${tiles.map(([k,h,ic,t,d,c1,c2])=>`<${h?`a href="${h}"`:`button data-go="${k}"`} class="htile" style="--c1:${c1};--c2:${c2}"><span class="tic">${ic}</span><b>${t}</b><small>${d}</small><span class="tar">${ICO.seta}</span></${h?'a':'button'}>`).join('')}</div>`;
   if(avisa&&!IS_ADMIN){const k='bqufu-aviso-venc-'+ALVO+'-'+isoD(new Date());let ja=null;try{ja=sessionStorage.getItem(k);}catch(e){}
     if(!ja){try{sessionStorage.setItem(k,'1');}catch(e){}const nm=((M.nome||'').split(' ')[0]||'');
-      mdlg(`<div class="mtop" style="--c:${sv.tipo==='vencido'?'#E5484D':'#C9A227'}"><h3>${sv.tipo==='vencido'?'Hora de renovar a sua mentoria':'Sua mentoria está vencendo'}</h3><p>Mentoria Individual · Prof. Jazz</p></div><div class="mfm"><p style="margin:0;font-size:16px;line-height:1.55">${nm?esc(nm)+', o':'O'} seu plano da Mentoria Individual <b>${quandoVence(M.vencimento)}</b>.${M.valor!=null?` O valor da renovação é de <b>${brl(M.valor)}</b>.`:''}</p><p style="margin:0;color:var(--muted)">Para continuar com o seu plano de estudos, os encontros e todo o acompanhamento, fale com o Prof. Jazz para renovar. Seguimos juntos rumo à aprovação! 💛</p><div class="mbt"><button class="btn pri" data-fecha>Entendi</button></div></div>`,sv.tipo==='vencido'?'#E5484D':'#C9A227');}}
+      mdlg(`<div class="mtop" style="--c:${sv.tipo==='vencido'?'#E5484D':'#C9A227'}"><h3>${sv.tipo==='vencido'?'Hora de renovar a sua mentoria':'Sua mentoria está vencendo'}</h3><p>Mentoria Individual · Prof. Jazz</p></div><div class="mfm"><p style="margin:0;font-size:16px;line-height:1.55">${nm?esc(nm)+', o':'O'} seu plano da Mentoria Individual <b>${quandoVence(M.vencimento)}</b>.${M.valor!=null?` O valor da renovação é de <b>${brl(M.valor)}</b>.`:''}</p><p style="margin:0;color:var(--muted)">Para continuar com o seu plano de estudos, os encontros e todo o acompanhamento, fale com o Prof. Jazz para renovar. Seguimos juntos rumo à aprovação!</p><div class="mbt"><button class="btn pri" data-fecha>Entendi</button></div></div>`,sv.tipo==='vencido'?'#E5484D':'#C9A227');}}
   const go={plano:()=>telaPlano(),form:telaForm,crono:telaCrono,mat:telaMat,enc:telaEnc,dash:telaDash};$('app').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go[b.dataset.go]());}
 
 /* ---------- encontros ---------- */
@@ -1763,6 +1764,6 @@ label.btn{display:inline-flex;align-items:center;cursor:pointer}
 .mvenc b{font:800 18px var(--display)}.mvenc p{margin:4px 0 0;line-height:1.5}
 </style>
 
-<script src="../js/presenca.js?v=1795553728" defer></script>
+<script src="../js/presenca.js?v=1795554730" defer></script>
 </body>
 </html>
