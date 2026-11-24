@@ -384,10 +384,10 @@ body{animation:fadein .25s ease}@keyframes fadein{from{opacity:0}to{opacity:1}}
   <nav class="tabs"><button class="theme" id="theme" aria-label="Alternar modo diurno e noturno" title="Modo diurno / noturno"><span class="sun">☀</span><span class="moon">☾</span></button><a href="../bancodequestoes/">Banco de Questões</a><a href="../estudos/">Sala de Estudos</a><a href="/?area=escolher" id="lkAreas" hidden>Trocar de área</a><button id="sair">Sair</button></nav>
 </header>
 <nav class="subnav" aria-label="Mentoria"><div class="in"><button id="tabResp" hidden>Mentorados</button><button id="tabCad" hidden>Cadastro</button><button id="tabGerais" hidden>Materiais para todos</button><button id="tabInicio" hidden>Início</button><button id="tabDash" hidden>Meu Dashboard</button><button id="tabRaio" hidden>Raio-x do aluno</button><button id="tabPlano" hidden>Plano de Estudos</button><button id="tabCrono" hidden>Cronograma Semanal</button><button id="tabEnc" hidden>Encontros</button><button id="tabMat" hidden>Materiais</button><button id="tabForm" hidden>Perfil de estudos</button><button id="tabFaq" hidden>Dúvidas</button><button id="tabGeral" hidden></button><button id="tabExemplo" hidden></button></div></nav>
-<div id="exBar" hidden>Você está na área de <b id="exNome"></b>: é assim que o aluno vê, com os seus botões de professor. <button type="button" id="exTroca">Trocar aluno</button> <button type="button" id="exSair">Voltar aos mentorados</button></div>
+<div id="exBar" hidden><span id="exTxt"></span> <button type="button" id="exPuro"></button> <button type="button" id="exSair">Voltar aos mentorados</button><button type="button" id="exTroca" hidden></button></div>
 <main id="app"></main>
 
-<script>(function(){var V='1795549475';var K='bqufu-recarga-';
+<script>(function(){var V='1795549567';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -1268,7 +1268,8 @@ async function telaPainel(email,cab){if(!cab)abas('tabPainel');$('app').innerHTM
      ${ML.map(([n,m])=>{const p=m.q?Math.round(100*m.a/m.q):null;const cor=CORM[n]||'#3A8CCB';return `<tr><td><span class="nm"><i style="background:${cor}"></i>${esc(n)}</span></td><td style="white-space:nowrap;font-weight:700">${hfmt(m.s)}</td><td class="opt" style="width:28%"><div class="tbar"><em style="width:${Math.round(100*m.s/smax)}%;background:${cor}"></em></div></td><td style="font-weight:700">${m.q||'—'}</td><td>${m.q?`<div class="ae" title="${m.a} acertos · ${m.e} erros"><span class="a" style="width:${100*m.a/m.q}%"></span><span class="e" style="width:${100*m.e/m.q}%"></span></div><small class="pend">${m.a} ✓ · ${m.e} ✗</small>`:'<small class="pend">sem questões</small>'}</td><td><span class="pc ${pcCls(p)}">${p==null?'—':p+'%'}</span></td></tr>`;}).join('')}</tbody></table></div></div>
    <div class="chart"><h3><i class="hi c"></i>Atividade recente</h3><div class="hoje" style="margin-top:10px">${S.length?'':'<p class="pend">Nenhuma sessão registrada ainda. As últimas sessões aparecem aqui.</p>'}${S.slice(-8).reverse().map(x=>{const [n,ic,,c]=TI(x.tipo);const h=new Date(x.inicio);return `<div class="ses" style="--c:${c}"><span style="font-size:20px">${ic}</span><div class="tx"><b>${esc(x.materia)} · ${esc(n)}</b><span>${dm(h)} às ${String(h.getHours()).padStart(2,'0')}:${String(h.getMinutes()).padStart(2,'0')} · ${esc(x.assunto||'')}${x.questoes?` · ${x.acertos}/${x.questoes} acertos`:''}</span></div><span class="du">${hfmt(x.segundos)}</span></div>`;}).join('')}</div></div>`;
   ligaCab();if($('irSala'))$('irSala').onclick=telaSala;}
-window.dashM=telaPainel;
+let LINGUA='';
+window.dashM=async(email,cab)=>{try{const {data}=await SB.from('checkup').select('respostas').eq('email',email).maybeSingle();LINGUA=(data&&data.respostas&&data.respostas.lingua)||'';}catch(e){}return telaPainel(email,cab);};
 })();
 /* ===================== MENTORIA INDIVIDUAL ===================== */
 CORD.OUT='#3A8CCB';PICO.OUT='📘';PDEC.OUT='';PKEYS.OUT=[];
@@ -1279,7 +1280,7 @@ FAQ.unshift(['Mentoria individual',[
   ['O meu plano é igual ao de outros alunos?','Não. O Prof. Jazz monta e ajusta o seu plano individualmente, semana a semana. Marque cada assunto quando terminar de estudar: ele acompanha o seu progresso.'],
   ['Onde ficam os meus materiais?','Na aba Materiais. Há pastas só suas e pastas com materiais para todos os alunos da mentoria.']]]);
 const MTABS=['tabDash','tabInicio','tabResp','tabCad','tabGerais','tabRaio','tabCrono','tabPlano','tabEnc','tabMat','tabForm','tabFaq'];
-let MLISTA=null,ANOME='';
+let MLISTA=null,ANOME='',PURO=false;
 const DSEMC=['dom','seg','ter','qua','qui','sex','sáb'],DSEML=['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
 const hhm=t=>t?String(t).slice(0,5):'';
 const dataLonga=s=>{const d=pData(s);return `${DSEML[d.getDay()]}, ${d.getDate()} de ${MESL[d.getMonth()]}`;};
@@ -1289,13 +1290,14 @@ function abas(on){$('app').classList.toggle('largo',!['tabForm','tabFaq'].includ
 function menuM(){const adm=IS_ADMIN&&!EXMODO,aluno=!IS_ADMIN||EXMODO;
   ['tabResp','tabCad','tabGerais'].forEach(t=>$(t).hidden=!adm);
   ['tabInicio','tabPlano','tabCrono','tabEnc','tabMat','tabForm','tabFaq'].forEach(t=>$(t).hidden=!aluno);
-  $('tabDash').hidden=!aluno;$('tabDash').textContent=IS_ADMIN?'Dashboard do aluno':'Meu Dashboard';$('tabRaio').hidden=!(IS_ADMIN&&EXMODO);$('exBar').hidden=!EXMODO;if(EXMODO)$('exNome').textContent=ANOME||ALVO;
-  document.body.classList.toggle('mprof',IS_ADMIN);}
+  $('tabDash').hidden=!aluno;$('tabDash').textContent=IS_ADMIN?'Dashboard do aluno':'Meu Dashboard';$('tabRaio').hidden=!(IS_ADMIN&&EXMODO);$('exBar').hidden=!EXMODO;
+  if(EXMODO){$('exTxt').innerHTML=PURO?`Modo aluno: é exatamente o que <b>${esc(ANOME||ALVO)}</b> vê.`:`Você está gerenciando a área de <b>${esc(ANOME||ALVO)}</b>, com os seus botões de professor.`;$('exPuro').textContent=PURO?'Sair do modo aluno':'Ver como o aluno vê';$('exSair').hidden=PURO;}
+  document.body.classList.toggle('mprof',IS_ADMIN);$('lkAreas').hidden=PURO||!window.AMBAS;}
 function telaGeral(){telaMentorados();}
 function telaResp(){telaMentorados();}
 function modoExemplo(on){if(on)entraAluno(EXEMPLO,'Aluno Exemplo da Mentoria');else saiAluno();}
 function entraAluno(email,nome){EXMODO=true;ALVO=email;ANOME=nome||email;try{sessionStorage.setItem('bqufu-mentoria-ver',JSON.stringify({email,nome:ANOME}));}catch(e){}menuM();telaInicio();window.scrollTo(0,0);}
-function saiAluno(){EXMODO=false;ALVO=EMAIL;ANOME='';try{sessionStorage.removeItem('bqufu-mentoria-ver');}catch(e){}menuM();telaMentorados();}
+function saiAluno(){if(PURO){PURO=false;IS_ADMIN=true;}EXMODO=false;ALVO=EMAIL;ANOME='';try{sessionStorage.removeItem('bqufu-mentoria-ver');}catch(e){}menuM();telaMentorados();}
 function mdlg(html,cor){const d=document.createElement('div');d.className='mdlg';d.innerHTML=`<div class="mbox" style="--c:${cor||'#16304F'}">${html}</div>`;document.body.appendChild(d);
   const fecha=()=>d.remove();d.onclick=e=>{if(e.target===d||e.target.closest('[data-fecha]'))fecha();};return [d,fecha];}
 
@@ -1529,10 +1531,11 @@ async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!se
   EMAIL=(session.user.email||'').toLowerCase();IS_ADMIN=EMAIL===ADMIN;IS_STAFF=IS_ADMIN;$('gate').hidden=true;
   const {data:ar}=await SB.rpc('minhas_areas');
   if(!ar||!ar.mentoria){$('app').innerHTML=`<div class="aviso"><h2>Área da Mentoria Individual</h2><p>Esta área é exclusiva dos alunos da mentoria individual com o Prof. Jazz.</p><p><a class="btn pri" href="/" style="text-decoration:none">Voltar ao início</a></p></div>`;return;}
-  $('lkAreas').hidden=!(ar.turma&&ar.mentoria);
+  window.AMBAS=!!(ar.turma&&ar.mentoria);$('lkAreas').hidden=!AMBAS;
   ALVO=EMAIL;
   $('tabResp').onclick=telaMentorados;$('tabCad').onclick=telaCad;$('tabGerais').onclick=telaGerais;$('tabInicio').onclick=telaInicio;$('tabRaio').onclick=telaRaio;$('tabDash').onclick=telaDash;$('tabPlano').onclick=()=>telaPlano();$('tabCrono').onclick=telaCrono;$('tabEnc').onclick=telaEnc;$('tabMat').onclick=telaMat;$('tabForm').onclick=telaForm;$('tabFaq').onclick=telaFaq;
   $('exSair').onclick=saiAluno;$('exTroca').onclick=saiAluno;
+  $('exPuro').onclick=()=>{const atual=MTABS.find(t=>$(t).classList.contains('on'));PURO=!PURO;IS_ADMIN=!PURO;menuM();const mapa={tabInicio:telaInicio,tabDash:telaDash,tabPlano:()=>telaPlano(),tabCrono:telaCrono,tabEnc:telaEnc,tabMat:telaMat,tabForm:telaForm,tabFaq:telaFaq};(mapa[atual]||telaInicio)();window.scrollTo(0,0);};
   if(IS_ADMIN){let v=null;try{v=JSON.parse(sessionStorage.getItem('bqufu-mentoria-ver')||'null');}catch(e){}if(v&&v.email){entraAluno(v.email,v.nome);return;}menuM();telaMentorados();}
   else{const {data:me}=await SB.from('mentorados').select('nome').eq('email',EMAIL).maybeSingle();ANOME=me?me.nome:'';menuM();telaInicio();}}
 entrar();
