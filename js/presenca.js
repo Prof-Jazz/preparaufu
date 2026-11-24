@@ -41,6 +41,21 @@
     }catch(e){}
   }
   setTimeout(logoAreas,800);
+  function avisoMsgs(){
+    try{
+      if(typeof SB==='undefined'||!SB)return;
+      SB.auth.getSession().then(function(r){
+        if(!r||!r.data||!r.data.session)return;
+        SB.rpc('nao_lidas').then(function(x){var n=x&&x.data||0;
+          document.querySelectorAll('header nav a[href*="estudos/"]').forEach(function(l){var b=l.querySelector('.msgbdg');
+            if(!n){if(b)b.remove();return;}
+            if(!b){b=document.createElement('em');b.className='msgbdg';b.style.cssText='display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;margin-left:6px;border-radius:999px;background:#E5484D;color:#fff;font:800 11px system-ui;font-style:normal;vertical-align:middle';l.appendChild(b);}
+            b.textContent=n;b.title=n+' mensagem(ns) nova(s) na Sala de Estudos';});
+        },function(){});
+      });
+    }catch(e){}
+  }
+  setTimeout(avisoMsgs,1500);setInterval(function(){if(!document.hidden)avisoMsgs();},60000);
   function modoAlunoMentoria(){
     try{
       if(/^\/mentoria\//.test(location.pathname))return;
