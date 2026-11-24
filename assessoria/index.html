@@ -379,6 +379,8 @@ body{animation:fadein .25s ease}@keyframes fadein{from{opacity:0}to{opacity:1}}
 .aovr .hrs{font:800 15px var(--display)}.aovr small{grid-column:2/4;color:var(--muted);font-size:12.5px}
 .aovp{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}.aovp div{border:1px solid var(--line);border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;min-width:0}.aovp b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.aovp small{color:var(--muted);font-size:12px}
 
+#aoVivo .kpis{grid-template-columns:repeat(3,minmax(0,1fr))}@media (max-width:900px){#aoVivo .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}@media (max-width:560px){#aoVivo .kpis{grid-template-columns:1fr}}
+#aoVivo .kpi{grid-template-columns:64px 1fr}.kimg{width:60px;height:60px;object-fit:contain;filter:drop-shadow(0 6px 12px rgba(0,0,0,.25))}
 .aovlive{position:relative}.aovlive i{width:14px;height:14px;border-radius:50%;background:#1BAF7A;box-shadow:0 0 0 5px rgba(27,175,122,.25)}
 @media (max-width:760px){.aovc{grid-template-columns:1fr}.aovd{gap:2px}.aovb i{width:7px}.aovp{grid-template-columns:1fr}}
 .kclk{cursor:pointer;transition:transform .15s,border-color .15s}.kclk:hover{transform:translateY(-2px);border-color:var(--azul)}
@@ -412,7 +414,7 @@ body{animation:fadein .25s ease}@keyframes fadein{from{opacity:0}to{opacity:1}}
 <div id="exBar" hidden>Modo aluno exemplo — é assim que o aluno vê. Nada aqui entra nas estatísticas da turma. <button type="button" id="exSair">Sair do modo exemplo</button></div>
 <main id="app"></main>
 
-<script>(function(){var V='1795557746';var K='bqufu-recarga-';
+<script>(function(){var V='1795558387';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,.adlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -701,18 +703,18 @@ async function turmaAoVivo(el){if(!el)return;if(!el.querySelector('.kpis'))el.in
   const diasDe=k=>Math.round((hoje-new Date(k+'T00:00:00'))/864e5);
   const parados=alunos.filter(a=>!ativos.has(a.email)).map(a=>({n:a.nome||a.email,ue:ultEst[a.email],ua:ultAc[a.email]||(a.ultimo_acesso?isoL(new Date(a.ultimo_acesso)):null),entrou:a.cadastrado})).sort((x,y)=>(x.ue||'')<(y.ue||'')?-1:1);
   const semQ=alunos.filter(a=>!SP.some(x=>x.email===a.email&&x.questoes>0)).length;
-  const kpi=(ic,l,v,sub,cls='',k='')=>`<div class="kpi ${cls}${k?' kclk':''}"${k?` data-k="${k}" title="Clique para ver os alunos"`:''}>${ic}<div><span>${l}</span><b>${v}</b><small>${sub}</small></div></div>`;const ico=t=>`<span class="ico">${t}</span>`;
+  const kpi=(ic,l,v,sub,cls='',k='')=>`<div class="kpi ${cls}${k?' kclk':''}"${k?` data-k="${k}" title="Clique para ver os alunos"`:''}>${ic}<div><span>${l}</span><b>${v}</b><small>${sub}</small></div></div>`;const ico=t=>`<span class="ico">${t}</span>`;const kim=f=>`<img class="kimg" src="../img/kpi-${f}.png" alt="" aria-hidden="true">`;
   const per=AOV.dias===1?'hoje':AOV.dias?`nos últimos ${AOV.dias} dias`:'desde o início';
   const pct=Q?Math.round(100*Ac/Q):null;
   el.innerHTML=`<div class="aovc"><div class="aovf">${[[1,'Hoje'],[7,'7 dias'],[30,'30 dias'],[0,'Desde o início']].map(([d,t])=>`<button data-d="${d}" class="${AOV.dias===d?'on':''}">${t}</button>`).join('')}</div>
      <div class="aovf">${[['ass','Assessoria'],['mat','Curso de Matemática'],['todos','Todas as turmas']].map(([g,t])=>`<button data-g="${g}" class="${AOV.grupo===g?'on':''}">${t}</button>`).join('')}</div></div>
    <div class="kpis">
-    ${kpi(`<span class="ico aovlive"><i></i></span>`,'Estudando agora',`${vEst.length} <em class="of">ao vivo</em>`,`${vOn.length} online no site sem o cronômetro · clique para ver`,'k-a','vivo')}
-    ${kpi(ringSVG(ativos.size/N,'#1BAF7A',Math.round(100*ativos.size/N)+'%'),'Estudaram no período',`${ativos.size} <em class="of">de ${alunos.length}</em>`,`registraram estudo ${per}`,'','est')}
-    ${kpi(ico('⏱'),'Estudo médio por aluno',hfmt(medDia)+' <em class="of">/dia</em>',`entre quem estudou: ${hfmt(medAtivo)} por dia`,'','horas')}
-    ${kpi(ico('📅'),'Acessaram hoje',`${acHoje.size} <em class="of">de ${alunos.length}</em>`,`${estHoje.size} estudaram hoje com o cronômetro`,'','hoje')}
-    ${kpi(ico('✏️'),'Questões da turma',String(Q),`${pct==null?'sem questões registradas':pct+'% de acerto'} · ${semQ} aluno(s) sem questões ${per}`,'','quest')}
-    ${kpi(ico('📚'),'Horas estudadas',hfmt(tot/3600),`${SP.length} sessões ${per}`,'','horas')}
+    ${kpi(kim('agora'),'Estudando agora',`${vEst.length} <em class="of">ao vivo</em>`,`${vOn.length} online no site sem o cronômetro · clique para ver`,'k-a','vivo')}
+    ${kpi(kim('periodo'),'Estudaram no período',`${ativos.size} <em class="of">de ${alunos.length}</em>`,`${Math.round(100*ativos.size/N)}% da turma registrou estudo ${per}`,'','est')}
+    ${kpi(kim('medio'),'Estudo médio por aluno',hfmt(medDia)+' <em class="of">/dia</em>',`entre quem estudou: ${hfmt(medAtivo)} por dia`,'','horas')}
+    ${kpi(kim('acessos'),'Acessaram hoje',`${acHoje.size} <em class="of">de ${alunos.length}</em>`,`${estHoje.size} estudaram hoje com o cronômetro`,'','hoje')}
+    ${kpi(kim('questoes'),'Questões da turma',String(Q),`${pct==null?'sem questões registradas':pct+'% de acerto'} · ${semQ} aluno(s) sem questões ${per}`,'','quest')}
+    ${kpi(kim('horas'),'Horas estudadas',hfmt(tot/3600),`${SP.length} sessões ${per}`,'','horas')}
    </div>
    <section class="chart"><h3><i class="hi a"></i>Acessos e estudo nos últimos 14 dias</h3><p class="cs">Quantos alunos entraram na plataforma (azul) e quantos estudaram com o cronômetro (verde) em cada dia.</p>
      <div class="aovd">${D.map(x=>`<div class="aovdi${x.k===hj?' hj':''}"><div class="aovb"><i style="height:${Math.round(120*x.a/dmx)}px" title="${x.a} acessaram"><b>${x.a||''}</b></i><i class="e" style="height:${Math.round(120*x.e/dmx)}px" title="${x.e} estudaram"><b>${x.e||''}</b></i></div><span>${String(x.d.getDate()).padStart(2,'0')}/${String(x.d.getMonth()+1).padStart(2,'0')}</span></div>`).join('')}</div>
@@ -1328,6 +1330,6 @@ async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!se
 $('sair').onclick=async()=>{await SB.auth.signOut();location.href='/';};
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795557746" defer></script>
+<script src="../js/presenca.js?v=1795558387" defer></script>
 </body>
 </html>

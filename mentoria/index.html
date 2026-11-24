@@ -388,7 +388,7 @@ body{animation:fadein .25s ease}@keyframes fadein{from{opacity:0}to{opacity:1}}
 <div id="exBar" hidden><span id="exTxt"></span> <button type="button" id="exPuro"></button> <button type="button" id="exSair">Voltar aos mentorados</button><button type="button" id="exTroca" hidden></button></div>
 <main id="app"></main>
 
-<script>(function(){var V='1795557746';var K='bqufu-recarga-';
+<script>(function(){var V='1795558387';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -1764,6 +1764,6 @@ label.btn{display:inline-flex;align-items:center;cursor:pointer}
 .mvenc b{font:800 18px var(--display)}.mvenc p{margin:4px 0 0;line-height:1.5}
 </style>
 
-<script src="../js/presenca.js?v=1795557746" defer></script>
+<script src="../js/presenca.js?v=1795558387" defer></script>
 </body>
 </html>
