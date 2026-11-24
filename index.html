@@ -63,11 +63,11 @@ body[data-tela]{animation:fadein .35s ease}@keyframes fadein{from{opacity:0}to{o
 #login .itens{display:flex;flex-wrap:wrap;gap:8px;max-width:500px}
 #login .itens span{display:inline-flex;align-items:center;gap:7px;font:600 13.5px var(--body);color:#D6E0EE;background:rgba(21,28,46,.7);border:1px solid #2B3654;border-radius:999px;padding:6px 12px}
 #login .itens i{width:9px;height:9px;border-radius:2px;transform:rotate(45deg);display:inline-block}
-.hexes{position:absolute;right:-6%;bottom:-8%;width:min(560px,60%);opacity:.9;z-index:0;pointer-events:none}
+.hexes{position:absolute;right:2%;bottom:6%;width:min(420px,42%);height:auto;opacity:.10;z-index:0;pointer-events:none;filter:saturate(1.2)}
 .cartao{position:relative;z-index:1;background:rgba(17,24,42,.92);border:1px solid #2B3654;border-radius:22px;box-shadow:0 30px 70px rgba(0,0,0,.45);overflow:hidden;backdrop-filter:blur(6px);max-width:430px;width:100%;justify-self:end}
 .cartao .faixa{height:6px;background:linear-gradient(90deg,var(--azul) 0 50%,var(--amarelo) 50% 100%)}
 .cartao form{padding:28px 28px 26px;display:flex;flex-direction:column;gap:14px}
-.cartao .hx{width:46px;height:46px}
+.cartao .hx{width:44px;height:auto}
 .cartao h2{margin:0;font:800 26px var(--display)}
 .cartao p.sub2{margin:-6px 0 4px;color:var(--muted);font-size:14.5px}
 .campo{display:flex;flex-direction:column;gap:6px;font:600 13.5px var(--body);color:#C9D1E6}
@@ -81,7 +81,7 @@ body[data-tela]{animation:fadein .35s ease}@keyframes fadein{from{opacity:0}to{o
 .ajuda{margin:0;text-align:center;color:#7F88A6;font-size:13px}
 #sairTopo{position:fixed;top:16px;right:18px;z-index:5;font:600 13.5px var(--body);color:#D6E0EE;background:rgba(14,34,56,.75);border:1px solid #33405F;border-radius:999px;padding:7px 14px;cursor:pointer}
 #sairTopo:hover{border-color:var(--amarelo);color:#fff}
-@media (max-width:860px){#login{grid-template-columns:1fr;gap:26px;padding:28px 18px 40px;align-content:start}#login .marca .logos{margin-bottom:22px}.cartao{justify-self:stretch;max-width:none}.hexes{width:70%;right:-20%;top:-4%;bottom:auto;opacity:.45}#login .itens{display:none}#login .lead{margin-bottom:0}}
+@media (max-width:860px){#login{grid-template-columns:1fr;gap:26px;padding:28px 18px 40px;align-content:start}#login .marca .logos{margin-bottom:22px}.cartao{justify-self:stretch;max-width:none}.hexes{width:55%;right:-12%;top:2%;bottom:auto;opacity:.08}#login .itens{display:none}#login .lead{margin-bottom:0}}
 @media (max-width:860px){
   .wrap{grid-template-columns:1fr;align-items:start;padding:0 18px;gap:0}
   .foto{order:-1;height:auto;margin-top:34px;border-bottom:4px solid var(--amarelo)}
@@ -95,10 +95,7 @@ body[data-tela]{animation:fadein .35s ease}@keyframes fadein{from{opacity:0}to{o
 </head>
 <body>
 <section id="login" aria-label="Entrar na plataforma">
-  <svg class="hexes" viewBox="0 0 600 600" aria-hidden="true"><g fill="none" stroke-linejoin="round">
-    <polygon points="300,40 525,170 525,430 300,560 75,430 75,170" stroke="#3A8CCB" stroke-width="26" opacity=".55"/>
-    <polygon points="300,120 455,210 455,390 300,480 145,390 145,210" stroke="#DDDD24" stroke-width="22" opacity=".7"/>
-    <polygon points="300,200 385,250 385,350 300,400 215,350 215,250" stroke="#3A8CCB" stroke-width="14" opacity=".45"/></g></svg>
+  <img class="hexes" src="img/jazz-marca.png" alt="" aria-hidden="true">
   <div class="marca">
     <div class="logos"><img class="j" src="bancodequestoes/logo/jazz_claro.png" alt="Jazz, Professor de Matemática"><span class="sep"></span><img class="p" src="bancodequestoes/logo/prepara_transp.png" alt="PREPARA UFU"><span class="sep"></span><img class="u" src="bancodequestoes/logo/ufu_branco.png" alt="Universidade Federal de Uberlândia"></div>
     <span class="kicker">Vestibular UFU 2027-2</span>
@@ -108,7 +105,7 @@ body[data-tela]{animation:fadein .35s ease}@keyframes fadein{from{opacity:0}to{o
   </div>
   <div class="cartao"><div class="faixa"></div>
     <form id="gForm" autocomplete="on">
-      <svg class="hx" viewBox="0 0 48 48" aria-hidden="true"><polygon points="24,3 42,13.5 42,34.5 24,45 6,34.5 6,13.5" fill="none" stroke="#3A8CCB" stroke-width="5" stroke-linejoin="round"/><polygon points="24,13 33,18.2 33,29.8 24,35 15,29.8 15,18.2" fill="none" stroke="#DDDD24" stroke-width="4.5" stroke-linejoin="round"/></svg>
+      <img class="hx" src="img/jazz-marca.png" alt="" aria-hidden="true">
       <h2 id="gTit">Entrar</h2><p class="sub2" id="gTxt">Use o seu e-mail e a sua senha.</p>
       <label class="campo">E-mail<input id="gEmail" type="email" placeholder="seu e-mail" autocomplete="email" required></label>
       <label class="campo">Senha<span class="senha"><input id="gPass" type="password" placeholder="sua senha" autocomplete="current-password" minlength="6" required><button type="button" id="verSenha">mostrar</button></span></label>
@@ -180,7 +177,7 @@ $('sairTopo').onclick=async()=>{await SB.auth.signOut();history.replaceState(nul
 inicio();
 })();
 </script>
-<script>(function(){var V='1795489641';var K='bqufu-recarga-';
+<script>(function(){var V='1795489704';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
