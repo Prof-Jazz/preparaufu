@@ -205,7 +205,7 @@ select,input[type=number],input[type=text]{font:500 16px var(--body);padding:11p
 <div id="exBar" hidden>Modo aluno exemplo — é assim que o aluno vê. <button type="button" id="exSair">Sair do modo exemplo</button></div>
 <main id="app"><p class="pend">Carregando…</p></main>
 
-<script>(function(){var V='1795536235';var K='bqufu-recarga-';
+<script>(function(){var V='1795548682';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -224,7 +224,7 @@ const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
   set(m||'dark');$('theme').onclick=()=>set(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');})();
 const SB=supabase.createClient('https://ygdlbhoqyqjsqoyyfizk.supabase.co','sb_publishable_jB2I59Ruw4MaMT63KLWtSA_O-DMf63b');
 const ADMIN='jesrrael.santos@gmail.com',EXEMPLO='exemplo@preparaufu.com.br';
-let EMAIL='',REAL_ADMIN=false,STAFF=false,ASSESSORIA=false,ALVO='',EXMODO=false,PLANO=null,LINGUA='';
+let EMAIL='',REAL_ADMIN=false,STAFF=false,MENTORADO=false,ASSESSORIA=false,ALVO='',EXMODO=false,PLANO=null,LINGUA='';
 const tlist=t=>String(t||'').split(',').filter(k=>TIPOS[k]);
 const TI=t=>{const L=tlist(t);if(!L.length)L.push('teoria');return [L.map(k=>TIPOS[k][0]).join(' + '),L.map(k=>TIPOS[k][1]).join(''),'',TIPOS[L[0]][3]];};
 const TIPOS={teoria:['Teoria','📖','Assistir aula, ler e resumir','#3A8CCB'],questoes:['Questões','✏️','Resolver listas e provas','#EB6834'],revisao:['Revisão','🔁','Flashcards, Anki, caderno de erros','#1BAF7A'],correcao:['Correção de simulado','✅','Corrigir e entender os erros','#7B4FC9']};
@@ -243,9 +243,9 @@ const MESX=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','d
 $('sair').onclick=async()=>{await SB.auth.signOut();location.href='/';};
 async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!session){location.replace('/?volta='+encodeURIComponent(location.pathname+location.hash));return;}
   EMAIL=(session.user.email||'').toLowerCase();REAL_ADMIN=EMAIL===ADMIN;
-  const [ok,as,pp]=await Promise.all([SB.rpc('is_allowed'),SB.rpc('is_assessoria'),SB.rpc('meu_papel')]);STAFF=REAL_ADMIN||pp.data==='assessor';
+  const [ok,as,pp,ar]=await Promise.all([SB.rpc('is_allowed'),SB.rpc('is_assessoria'),SB.rpc('meu_papel'),SB.rpc('minhas_areas')]);STAFF=REAL_ADMIN||pp.data==='assessor';MENTORADO=!REAL_ADMIN&&!!(ar.data&&ar.data.mentoria);
   if(!ok.data){await SB.auth.signOut();location.href='/';return;}
-  ASSESSORIA=!!as.data;ALVO=EMAIL;
+  ASSESSORIA=!!as.data||MENTORADO;ALVO=EMAIL;
   let ex=null;try{ex=sessionStorage.getItem('bqufu-exemplo');}catch(e){}
   if(REAL_ADMIN&&ex){EXMODO=true;ALVO=EXEMPLO;}
   menus();
@@ -262,7 +262,7 @@ async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!se
 function menus(){const adm=REAL_ADMIN&&!EXMODO,stf=STAFF&&!EXMODO;$('tabPainel').hidden=!(ASSESSORIA&&!stf);$('tabPainel').textContent='Meu Dashboard';$('tabAlunos').hidden=!stf;$('tabDen').hidden=!adm;$('tabEx').hidden=!adm;$('exBar').hidden=!EXMODO;}
 const abas=on=>['tabSala','tabPainel','tabAlunos','tabDen'].forEach(t=>$(t).classList.toggle('on',t===on));
 
-async function carregaPlano(){if(PLANO)return;const [p,c]=await Promise.all([SB.from('plano_itens').select('id,semana,materia,frente,assunto').order('id'),SB.from('checkup').select('respostas').eq('email',ALVO).maybeSingle()]);
+async function carregaPlano(){if(PLANO)return;const [p,c]=await Promise.all([MENTORADO?SB.from('m_plano').select('id,semana,materia,frente,assunto').eq('email',ALVO).order('semana').order('id'):SB.from('plano_itens').select('id,semana,materia,frente,assunto').order('id'),SB.from('checkup').select('respostas').eq('email',ALVO).maybeSingle()]);
   PLANO=p.data||[];LINGUA=(c.data&&c.data.respostas&&c.data.respostas.lingua)||'';}
 const semanas=()=>[...new Set(PLANO.map(x=>x.semana))].sort();
 const semAtual=()=>{const s=semanas(),h=iso(new Date());let i=s.findIndex((x,k)=>h>=x&&(k===s.length-1||h<s[k+1]));return i<0?(h<s[0]?0:s.length-1):i;};
@@ -340,7 +340,7 @@ function encerrar(s){const seg=Math.round(decorrido(s)/1000);if(s.rodando){s.acu
     const bt=f.querySelector('[type=submit]');bt.disabled=true;
     const fimT=Date.now();const row={email:s.email,inicio:new Date(s.inicio).toISOString(),fim:new Date(fimT).toISOString(),segundos:seg,tipo:s.tipo,materia:s.materia,assunto:s.assunto||null,plano_item:s.item,questoes:q,acertos:a,erros:e};
     const r=await SB.from('sessoes').insert(row);if(r.error){msg('Não foi possível salvar: '+r.error.message);bt.disabled=false;return;}
-    if(f.mk&&f.mk.checked)await SB.from('plano_feito').insert({email:s.email,item:s.item});
+    if(f.mk&&f.mk.checked)await SB.from(MENTORADO?'m_plano_feito':'plano_feito').insert({email:s.email,item:s.item});
     gravaS(null);d.remove();telaSala();};}
 function ASSESSORIA_ALVO(){return EXMODO||ASSESSORIA;}
 async function desenhaHoje(){const ini=new Date();ini.setHours(0,0,0,0);
@@ -407,10 +407,11 @@ async function telaPainel(email,cab){if(!cab)abas('tabPainel');$('app').innerHTM
 let LALUNOS=null;
 function ligaCab(){const s=$('selAl');if(!s)return;s.onchange=()=>telaAlunos(s.value);$('alAnt').onclick=()=>{if(s.selectedIndex>0){s.selectedIndex--;s.onchange();}};$('alProx').onclick=()=>{if(s.selectedIndex<s.options.length-1){s.selectedIndex++;s.onchange();}};}
 async function telaAlunos(email){abas('tabAlunos');
-  if(!LALUNOS){const {data}=await SB.rpc('admin_lista');LALUNOS=(data||[]).filter(a=>a.email!==ADMIN&&a.email!==EXEMPLO).sort((a,b)=>(b.assessoria-a.assessoria)||(a.nome||a.email).localeCompare(b.nome||b.email,'pt-BR',{sensitivity:'base'}));}
+  if(!LALUNOS){const {data}=await SB.rpc('admin_lista');LALUNOS=(data||[]).filter(a=>a.email!==ADMIN&&a.email!==EXEMPLO).sort((a,b)=>(b.assessoria-a.assessoria)||(a.nome||a.email).localeCompare(b.nome||b.email,'pt-BR',{sensitivity:'base'}));
+    if(REAL_ADMIN){const m=await SB.rpc('m_lista');(m.data||[]).filter(x=>x.email!=='exemplo.mentoria@preparaufu.com.br').forEach(x=>{const t=LALUNOS.find(y=>y.email===x.email);if(t)t.mentoria=true;else LALUNOS.push({email:x.email,nome:x.nome,assessoria:true,mentoria:true,so_mentoria:true});});}}
   if(!LALUNOS.length){$('app').innerHTML='<div class="card"><p class="pend">Nenhum aluno cadastrado.</p></div>';return;}
   const al=email&&LALUNOS.find(a=>a.email===email)?email:LALUNOS[0].email;
-  const cab=`<div class="card dtop"><h2>Dashboard do aluno</h2><select id="selAl">${LALUNOS.map(a=>`<option value="${esc(a.email)}"${a.email===al?' selected':''}>${esc(a.nome||a.email)}${a.assessoria?'':' (Curso de Matemática)'}</option>`).join('')}</select><button class="btn" id="alAnt">‹</button><button class="btn" id="alProx">›</button></div>`;
+  const cab=`<div class="card dtop"><h2>Dashboard do aluno</h2><select id="selAl">${LALUNOS.map(a=>`<option value="${esc(a.email)}"${a.email===al?' selected':''}>${esc(a.nome||a.email)}${a.so_mentoria?' (Mentoria individual)':a.assessoria?'':' (Curso de Matemática)'}</option>`).join('')}</select><button class="btn" id="alAnt">‹</button><button class="btn" id="alProx">›</button></div>`;
   history.replaceState(null,'','?aluno='+encodeURIComponent(al)+'#alunos');
   telaPainel(al,cab);}
 

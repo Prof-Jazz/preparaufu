@@ -60,6 +60,19 @@ h1 span{color:var(--amarelo)}
 /* ---------- login ---------- */
 body:not([data-tela="home"]) .wrap,body:not([data-tela="home"]) #sairTopo{display:none}
 body:not([data-tela="login"]) #login{display:none}
+body:not([data-tela="areas"]) #areas{display:none}
+#areas{min-height:100vh;max-width:980px;margin:0 auto;padding:48px 24px;display:flex;flex-direction:column;justify-content:center;gap:22px}
+#areas .logos{margin-bottom:6px}#areas h1{font-size:clamp(30px,4vw,46px);margin:0}#areas .lead{margin:0}
+.areas2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.area{position:relative;overflow:hidden;display:flex;flex-direction:column;gap:10px;text-align:left;text-decoration:none;color:var(--ink);background:rgba(21,28,46,.82);border:1px solid #2B3654;border-radius:22px;padding:26px 24px;cursor:pointer;font:inherit;transition:transform .15s,border-color .15s}
+.area:hover,.area:focus-visible{transform:translateY(-3px);border-color:var(--azul);outline:none}
+.area .ic{width:58px;height:58px;border-radius:16px;display:grid;place-items:center;font-size:28px}
+.area.tu .ic{background:var(--azul)}.area.me .ic{background:var(--amarelo)}.area.me{border-color:rgba(221,221,36,.45)}
+.area b{font:800 23px var(--display)}.area small{color:var(--muted);font-size:15px;line-height:1.45}
+.area .ir{margin-top:6px;font:700 14px var(--body);color:var(--amarelo)}
+#trocaArea{position:fixed;top:16px;right:92px;z-index:5;font:600 14px var(--body);color:var(--ink);text-decoration:none;background:rgba(21,28,46,.8);border:1px solid #2B3654;border-radius:999px;padding:8px 14px}
+body:not([data-tela="home"]) #trocaArea{display:none}
+@media (max-width:720px){.areas2{grid-template-columns:1fr}#trocaArea{right:auto;left:16px}}
 body[data-tela]{animation:fadein .35s ease}@keyframes fadein{from{opacity:0}to{opacity:1}}
 #login{min-height:100vh;max-width:1180px;margin:0 auto;padding:40px 28px;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:48px;align-items:center;position:relative}
 #login .marca{position:relative;z-index:1}
@@ -123,6 +136,14 @@ body[data-tela]{animation:fadein .35s ease}@keyframes fadein{from{opacity:0}to{o
       <p class="ajuda">Esqueceu a senha? Fale com o Prof. Jazz.</p>
     </form></div>
 </section>
+<section id="areas" aria-label="Escolha a área">
+  <div class="logos"><img class="j" src="bancodequestoes/logo/jazz_claro.png" alt="Jazz, Professor de Matemática"><span class="sep"></span><img class="p" src="bancodequestoes/logo/prepara_transp.png" alt="PREPARA UFU"></div>
+  <h1 id="arTit">Olá! Para onde vamos?</h1><p class="lead">Escolha a área que você quer acessar agora. Dá para trocar depois.</p>
+  <div class="areas2"><button class="area tu" id="arTurma" type="button"><span class="ic">🎓</span><b>Turmas PREPARA UFU</b><small id="arTurmaTx">Assessoria e Curso de Matemática: Banco de Questões, Sala de Estudos, Agenda, Materiais, alunos, cadastro e assessores.</small><span class="ir">Entrar nas turmas ›</span></button>
+  <a class="area me" href="/mentoria/"><span class="ic">🧭</span><b>Mentoria individual</b><small id="arMentTx">Os seus alunos da mentoria individual: plano de estudos de cada um, encontros, cronograma, materiais e dashboard.</small><span class="ir">Entrar na mentoria ›</span></a></div>
+  <button id="arSair" type="button" class="lnk" style="align-self:flex-start;background:none;border:0;color:var(--muted);cursor:pointer;font:600 14px var(--body)">Sair</button>
+</section>
+<a id="trocaArea" href="/?area=escolher" hidden>Trocar de área</a>
 <button id="sairTopo" type="button">Sair</button>
 <main class="wrap">
   <section class="txt">
@@ -165,7 +186,19 @@ function modo(n){novo=n;$('campo2').hidden=!n;$('gPass2').required=n;$('gBtn').t
   $('gPass').autocomplete=n?'new-password':'current-password';gm('');}
 $('gMode').onclick=()=>modo(!novo);
 $('verSenha').onclick=()=>{const i=$('gPass'),m=i.type==='password';i.type=m?'text':'password';$('gPass2').type=i.type;$('verSenha').textContent=m?'ocultar':'mostrar';};
-async function depois(){if(volta){location.replace(volta);return;}tela('home');}
+async function depois(){if(volta){location.replace(volta);return;}
+  let ar=null;try{ar=(await SB.rpc('minhas_areas')).data;}catch(e){}
+  if(ar&&ar.mentoria&&!ar.turma){location.replace('/mentoria/');return;}
+  if(ar&&ar.mentoria&&ar.turma){$('trocaArea').hidden=false;
+    if(ar.papel==='admin'){$('arTit').textContent='Olá, Prof. Jazz! Para onde vamos?';}else{$('arTurmaTx').textContent='A sua turma do PREPARA UFU: Banco de Questões, Sala de Estudos, Agenda e Materiais.';$('arMentTx').textContent='A sua mentoria individual com o Prof. Jazz: plano de estudos, encontros, cronograma e materiais.';}
+    let esc_=null;try{esc_=sessionStorage.getItem('bqufu-area');}catch(e){}
+    const pede=new URLSearchParams(location.search).get('area')==='escolher';
+    if(pede)history.replaceState(null,'','/');
+    if(esc_==='turma'&&!pede){tela('home');return;}
+    tela('areas');return;}
+  tela('home');}
+$('arTurma').onclick=()=>{try{sessionStorage.setItem('bqufu-area','turma');}catch(e){}tela('home');window.scrollTo(0,0);};
+$('arSair').onclick=()=>$('sairTopo').click();
 async function inicio(){const {data:{session}}=await SB.auth.getSession();
   if(!session){tela('login');return;}
   const {data:ok}=await SB.rpc('is_allowed');
@@ -183,11 +216,11 @@ $('gForm').onsubmit=async ev=>{ev.preventDefault();const email=$('gEmail').value
     const {data:ok}=await SB.rpc('is_allowed');if(!ok){await SB.auth.signOut();throw new Error('Seu acesso não está liberado. Fale com o Prof. Jazz.');}
     gm('');depois();
   }catch(e){gm(e.message||'Não foi possível entrar.');}finally{$('gBtn').disabled=false;}};
-$('sairTopo').onclick=async()=>{await SB.auth.signOut();history.replaceState(null,'','/');modo(false);$('gPass').value='';tela('login');};
+$('sairTopo').onclick=async()=>{try{sessionStorage.removeItem('bqufu-area');sessionStorage.removeItem('bqufu-mentoria-ver');}catch(e){}await SB.auth.signOut();history.replaceState(null,'','/');modo(false);$('gPass').value='';tela('login');};
 inicio();
 })();
 </script>
-<script>(function(){var V='1795536235';var K='bqufu-recarga-';
+<script>(function(){var V='1795548682';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
