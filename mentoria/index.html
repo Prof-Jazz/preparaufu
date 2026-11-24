@@ -383,11 +383,11 @@ body{animation:fadein .25s ease}@keyframes fadein{from{opacity:0}to{opacity:1}}
   <a class="logos" href="/" title="Início da plataforma PREPARA UFU" style="text-decoration:none"><img class="j" src="../bancodequestoes/logo/jazz_claro.png" alt="Jazz, Professor de Matemática"><span class="sep"></span><img class="p" src="../bancodequestoes/logo/prepara_transp.png" alt="Prepara UFU"></a>
   <nav class="tabs"><button class="theme" id="theme" aria-label="Alternar modo diurno e noturno" title="Modo diurno / noturno"><span class="sun">☀</span><span class="moon">☾</span></button><a href="../bancodequestoes/">Banco de Questões</a><a href="../estudos/">Sala de Estudos</a><a href="/?area=escolher" id="lkAreas" hidden>Trocar de área</a><button id="sair">Sair</button></nav>
 </header>
-<nav class="subnav" aria-label="Mentoria"><div class="in"><button id="tabResp" hidden>Mentorados</button><button id="tabCad" hidden>Cadastro</button><button id="tabGerais" hidden>Materiais para todos</button><button id="tabInicio" hidden>Início</button><button id="tabRaio" hidden>Raio-x do aluno</button><button id="tabPlano" hidden>Plano de Estudos</button><button id="tabCrono" hidden>Cronograma Semanal</button><button id="tabEnc" hidden>Encontros</button><button id="tabMat" hidden>Materiais</button><button id="tabForm" hidden>Perfil de estudos</button><button id="tabFaq" hidden>Dúvidas</button><button id="tabGeral" hidden></button><button id="tabExemplo" hidden></button></div></nav>
+<nav class="subnav" aria-label="Mentoria"><div class="in"><button id="tabResp" hidden>Mentorados</button><button id="tabCad" hidden>Cadastro</button><button id="tabGerais" hidden>Materiais para todos</button><button id="tabInicio" hidden>Início</button><button id="tabDash" hidden>Meu Dashboard</button><button id="tabRaio" hidden>Raio-x do aluno</button><button id="tabPlano" hidden>Plano de Estudos</button><button id="tabCrono" hidden>Cronograma Semanal</button><button id="tabEnc" hidden>Encontros</button><button id="tabMat" hidden>Materiais</button><button id="tabForm" hidden>Perfil de estudos</button><button id="tabFaq" hidden>Dúvidas</button><button id="tabGeral" hidden></button><button id="tabExemplo" hidden></button></div></nav>
 <div id="exBar" hidden>Você está na área de <b id="exNome"></b>: é assim que o aluno vê, com os seus botões de professor. <button type="button" id="exTroca">Trocar aluno</button> <button type="button" id="exSair">Voltar aos mentorados</button></div>
 <main id="app"></main>
 
-<script>(function(){var V='1795549225';var K='bqufu-recarga-';
+<script>(function(){var V='1795549475';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -1205,6 +1205,71 @@ async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!se
 $('sair').onclick=async()=>{await SB.auth.signOut();location.href='/';};
 </script>
 <script>
+(function(){
+const abas=()=>{},ligaCab=()=>{},telaSala=()=>{location.href="../estudos/";};
+const tlist=t=>String(t||'').split(',').filter(k=>TIPOS[k]);
+const TI=t=>{const L=tlist(t);if(!L.length)L.push('teoria');return [L.map(k=>TIPOS[k][0]).join(' + '),L.map(k=>TIPOS[k][1]).join(''),'',TIPOS[L[0]][3]];};
+const TIPOS={teoria:['Teoria','📖','Assistir aula, ler e resumir','#3A8CCB'],questoes:['Questões','✏️','Resolver listas e provas','#EB6834'],revisao:['Revisão','🔁','Flashcards, Anki, caderno de erros','#1BAF7A'],correcao:['Correção de simulado','✅','Corrigir e entender os erros','#7B4FC9']};
+const CORM={'Matemática':'#D9480F','Física':'#1864AB','Química':'#5F3DC4','Biologia':'#2B8A3E','Português':'#C92A2A','Literatura':'#A61E4D','Redação':'#C2255C','História':'#7F4F24','Geografia':'#5C7A0A','Filosofia':'#495057','Sociologia':'#8C6500','Inglês':'#0B7285','Espanhol':'#0B7285','Francês':'#0B7285'};
+const PROVA=new Date(2027,3,4);
+const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const dm=d=>String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0');
+const hfmt=s=>{const m=Math.round(s/60);if(m<60)return m+' min';const h=Math.floor(m/60),r=m%60;return h+' h'+(r?' '+String(r).padStart(2,'0'):'');};
+const hdec=s=>(s/3600).toFixed(1).replace('.',',');
+const MESX=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+const anel=(p,cor)=>{const R=24,C=2*Math.PI*R;return `<svg class="ring" viewBox="0 0 60 60"><circle cx="30" cy="30" r="${R}" fill="none" stroke="var(--soft)" stroke-width="7"/><circle cx="30" cy="30" r="${R}" fill="none" stroke="${cor}" stroke-width="7" stroke-linecap="round" stroke-dasharray="${(C*p/100).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 30 30)"/><text class="rv" x="30" y="35" text-anchor="middle">${p}%</text></svg>`;};
+const pcCls=p=>p==null?'nd':p>=70?'bom':p>=50?'med':'ruim';
+async function telaPainel(email,cab){if(!cab)abas('tabPainel');$('app').innerHTML=(cab||'')+'<p class="pend">Carregando o dashboard…</p>';
+  const {data,error}=await SB.from('sessoes').select('*').eq('email',email).order('inicio');
+  if(error){$('app').innerHTML=(cab||'')+`<div class="card"><p class="pend">${esc(error.message)}</p></div>`;ligaCab();return;}
+  const S=data||[];
+  const vazio=!S.length?`<div class="card vazio" style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><div style="flex:1;min-width:220px"><b>${cab?'Este aluno ainda não registrou sessões de estudo.':'Seu dashboard ainda está zerado.'}</b><p class="pend" style="margin-top:4px">${cab?'Os números aparecem aqui assim que ele usar a Sala de Estudos.':'Cada sessão que você registrar na Sala de Estudos preenche os números e os gráficos abaixo.'}</p></div>${cab?'':'<button class="btn pri" id="irSala">⏱ Ir para a Sala de Estudos</button>'}</div>`:'';
+  const tot=S.reduce((t,x)=>t+x.segundos,0),Q=S.reduce((t,x)=>t+x.questoes,0),A=S.reduce((t,x)=>t+x.acertos,0),E=S.reduce((t,x)=>t+x.erros,0);
+  const porDia={};S.forEach(x=>{const k=iso(new Date(x.inicio));porDia[k]=(porDia[k]||0)+x.segundos;});
+  const dias=Object.keys(porDia).length;
+  const hoje=new Date();hoje.setHours(0,0,0,0);const seg=new Date(hoje);seg.setDate(hoje.getDate()-((hoje.getDay()+6)%7));
+  const semana=S.filter(x=>new Date(x.inicio)>=seg).reduce((t,x)=>t+x.segundos,0);
+  let seq=0;for(let d=new Date(hoje);;d.setDate(d.getDate()-1)){if(porDia[iso(d)])seq++;else if(iso(d)!==iso(hoje))break;else continue;if(seq>400)break;}
+  const pct=Q?Math.round(100*A/Q):null;const faltam=Math.max(0,Math.round((PROVA-hoje)/864e5));
+  // heatmap
+  const ini=new Date(Math.min(new Date(2026,10,23),S.length?new Date(S[0].inicio):Infinity));ini.setHours(0,0,0,0);ini.setDate(ini.getDate()-((ini.getDay()+6)%7));
+  const fimH=new Date(2027,3,4);const cols=[];for(let d=new Date(ini);d<=fimH;d.setDate(d.getDate()+7))cols.push(new Date(d));
+  const lv=s=>!s?'':s<1800?'l1':s<3600*2?'l2':s<3600*4?'l3':'l4';
+  let heat=`<div class="dl"></div>${['Seg','','Qua','','Sex','','Dom'].map(x=>`<div class="dl">${x}</div>`).join('')}`;
+  let mesAnt=-1;
+  cols.forEach(c=>{const ml=c.getMonth()!==mesAnt?MESX[c.getMonth()]:'';mesAnt=c.getMonth();heat+=`<div class="ml">${ml}</div>`;
+    for(let i=0;i<7;i++){const d=new Date(c);d.setDate(c.getDate()+i);const k=iso(d),s=porDia[k]||0;const fut=d>hoje;const pv=k==='2027-04-04';
+      heat+=`<div class="c ${lv(s)}${k===iso(hoje)?' hj':''}${fut?' fut':''}${pv?' prova':''}" title="${dm(d)}: ${pv?'Prova UFU · ':''}${s?hfmt(s)+' de estudo':'sem estudo'}"></div>`;}});
+  // semanas
+  const W=[];for(let k=7;k>=0;k--){const a=new Date(seg);a.setDate(seg.getDate()-7*k);const b=new Date(a);b.setDate(a.getDate()+7);W.push({a,s:S.filter(x=>{const t=new Date(x.inicio);return t>=a&&t<b;}).reduce((t,x)=>t+x.segundos,0)});}
+  const wmax=Math.max(3600,...W.map(w=>w.s));
+  // matérias
+  const M={};S.forEach(x=>{const m=M[x.materia]=M[x.materia]||{s:0,q:0,a:0,e:0};m.s+=x.segundos;m.q+=x.questoes;m.a+=x.acertos;m.e+=x.erros;});
+  const ML=S.length?Object.entries(M).sort((a,b)=>b[1].s-a[1].s):Object.keys(CORM).filter(n=>!['Inglês','Espanhol','Francês'].includes(n)||n===(LINGUA||'Inglês')).map(n=>[n,{s:0,q:0,a:0,e:0}]);const smax=Math.max(1,...ML.map(x=>x[1].s));
+  const qComp=ML.filter(([,m])=>m.q>0);const melhor=qComp.length?qComp.slice().sort((a,b)=>b[1].a/b[1].q-a[1].a/a[1].q)[0]:null;const pior=qComp.length>1?qComp.slice().sort((a,b)=>a[1].a/a[1].q-b[1].a/b[1].q)[0]:null;
+  // tipos
+  const T={};S.forEach(x=>{const L=tlist(x.tipo);L.forEach(k=>{T[k]=(T[k]||0)+x.segundos/L.length;});});
+  let ang=0;const R=70,C=2*Math.PI*R;const segs=Object.entries(TIPOS).filter(([k])=>T[k]).map(([k,v])=>{const f=T[k]/tot,len=C*f;const el=`<circle cx="95" cy="95" r="${R}" fill="none" stroke="${v[3]}" stroke-width="26" stroke-dasharray="${len.toFixed(1)} ${(C-len).toFixed(1)}" stroke-dashoffset="${(-ang).toFixed(1)}" transform="rotate(-90 95 95)"/>`;ang+=len;return el;}).join('');
+  $('app').innerHTML=(cab||'')+vazio+`<div class="kpis">
+     <div class="kpi k-a"><div class="ico">⏱</div><div><span>Tempo total estudado</span><b>${hfmt(tot)}</b><small>${S.length} sessões · faltam ${faltam} dias para a UFU</small></div></div>
+     <div class="kpi"><div class="ico">📅</div><div><span>Esta semana</span><b>${hdec(semana)} <small>h</small></b><small>desde segunda-feira</small></div></div>
+     <div class="kpi"><div class="ico">🔥</div><div><span>Dias estudados</span><b>${dias}</b><small>${seq?`sequência atual: ${seq} dia${seq>1?'s':''} seguido${seq>1?'s':''}`:'comece uma sequência hoje'}</small></div></div>
+     <div class="kpi"><div class="ico">✏️</div><div><span>Questões feitas</span><b>${Q}</b><small><span style="color:#1BAF7A;font:inherit;text-transform:none;letter-spacing:0">${A} acertos</span> · <span style="color:#E5484D;font:inherit;text-transform:none;letter-spacing:0">${E} erros</span></small></div></div>
+     <div class="kpi">${anel(pct||0,pct==null?'var(--soft)':pct>=70?'#1BAF7A':pct>=50?'#C9C91A':'#E5484D')}<div><span>Aproveitamento</span><b>${pct==null?'—':pct+'%'}</b><small>${melhor?`melhor: ${esc(melhor[0])}`:'registre questões para ver'}${pior?` · atenção: ${esc(pior[0])}`:''}</small></div></div></div>
+   <div class="chart"><h3><i class="hi c"></i>Dias de estudo</h3><p class="sub">Cada quadradinho é um dia, de segunda a domingo. Quanto mais verde, mais tempo de estudo. O amarelo é o dia da prova.</p>
+     <div class="heat"><div class="grid">${heat}</div></div><div class="hleg">Menos <span class="c" style="background:var(--soft)"></span><span class="c l1"></span><span class="c l2"></span><span class="c l3"></span><span class="c l4" style="background:var(--verde)"></span> Mais</div></div>
+   <div class="duo"><div class="chart"><h3><i class="hi a"></i>Horas por semana</h3><p class="sub">As últimas 8 semanas (a amarela é a atual).</p>
+       <div class="wbars">${W.map((w,i)=>`<div class="wb${i===W.length-1?' cur':''}"><b>${hdec(w.s)}h</b><i style="height:${Math.max(2,Math.round(130*w.s/wmax))}px"></i><span>${dm(w.a)}</span></div>`).join('')}</div></div>
+     <div class="chart"><h3><i class="hi b"></i>Como você estuda</h3><p class="sub">Tempo por tipo de estudo (sessão com mais de um tipo divide o tempo entre eles).</p>
+       <div class="dwrap"><svg viewBox="0 0 190 190" class="donut"><circle cx="95" cy="95" r="${R}" fill="none" stroke="var(--soft)" stroke-width="26"/>${segs}<text x="95" y="92" text-anchor="middle" style="font:800 22px var(--display)">${hdec(tot)}h</text><text x="95" y="112" text-anchor="middle" style="font:600 10px var(--body);opacity:.7">NO TOTAL</text></svg>
+       <div class="legend">${Object.entries(TIPOS).map(([k,v])=>`<div class="lg"><i style="background:${v[3]}"></i><span>${v[0]}</span><b>${hfmt(T[k]||0)}</b><small>${tot?Math.round(100*(T[k]||0)/tot):0}%</small></div>`).join('')}</div></div></div></div>
+   <div class="chart"><h3><i class="hi a"></i>Desempenho por matéria</h3><p class="sub">Tempo de estudo, questões feitas, acertos (verde) e erros (vermelho) e o aproveitamento de cada matéria.</p>
+     <div style="overflow-x:auto"><table class="mt"><thead><tr><th>Matéria</th><th>Tempo</th><th class="opt"></th><th>Questões</th><th>Acertos × erros</th><th>Aproveitamento</th></tr></thead><tbody>
+     ${ML.map(([n,m])=>{const p=m.q?Math.round(100*m.a/m.q):null;const cor=CORM[n]||'#3A8CCB';return `<tr><td><span class="nm"><i style="background:${cor}"></i>${esc(n)}</span></td><td style="white-space:nowrap;font-weight:700">${hfmt(m.s)}</td><td class="opt" style="width:28%"><div class="tbar"><em style="width:${Math.round(100*m.s/smax)}%;background:${cor}"></em></div></td><td style="font-weight:700">${m.q||'—'}</td><td>${m.q?`<div class="ae" title="${m.a} acertos · ${m.e} erros"><span class="a" style="width:${100*m.a/m.q}%"></span><span class="e" style="width:${100*m.e/m.q}%"></span></div><small class="pend">${m.a} ✓ · ${m.e} ✗</small>`:'<small class="pend">sem questões</small>'}</td><td><span class="pc ${pcCls(p)}">${p==null?'—':p+'%'}</span></td></tr>`;}).join('')}</tbody></table></div></div>
+   <div class="chart"><h3><i class="hi c"></i>Atividade recente</h3><div class="hoje" style="margin-top:10px">${S.length?'':'<p class="pend">Nenhuma sessão registrada ainda. As últimas sessões aparecem aqui.</p>'}${S.slice(-8).reverse().map(x=>{const [n,ic,,c]=TI(x.tipo);const h=new Date(x.inicio);return `<div class="ses" style="--c:${c}"><span style="font-size:20px">${ic}</span><div class="tx"><b>${esc(x.materia)} · ${esc(n)}</b><span>${dm(h)} às ${String(h.getHours()).padStart(2,'0')}:${String(h.getMinutes()).padStart(2,'0')} · ${esc(x.assunto||'')}${x.questoes?` · ${x.acertos}/${x.questoes} acertos`:''}</span></div><span class="du">${hfmt(x.segundos)}</span></div>`;}).join('')}</div></div>`;
+  ligaCab();if($('irSala'))$('irSala').onclick=telaSala;}
+window.dashM=telaPainel;
+})();
 /* ===================== MENTORIA INDIVIDUAL ===================== */
 CORD.OUT='#3A8CCB';PICO.OUT='📘';PDEC.OUT='';PKEYS.OUT=[];
 (function(){const f=CAMPOS.find(x=>x.k==='aulas_mat');if(f){f.show=()=>false;f.req=0;}})();
@@ -1213,7 +1278,7 @@ FAQ.unshift(['Mentoria individual',[
   ['Onde vejo o próximo encontro?','Na aba Início e na aba Encontros. No dia, aparece o botão "Entrar no encontro" com o link da reunião. Depois de cada encontro, os combinados ficam registrados ali.'],
   ['O meu plano é igual ao de outros alunos?','Não. O Prof. Jazz monta e ajusta o seu plano individualmente, semana a semana. Marque cada assunto quando terminar de estudar: ele acompanha o seu progresso.'],
   ['Onde ficam os meus materiais?','Na aba Materiais. Há pastas só suas e pastas com materiais para todos os alunos da mentoria.']]]);
-const MTABS=['tabInicio','tabResp','tabCad','tabGerais','tabRaio','tabCrono','tabPlano','tabEnc','tabMat','tabForm','tabFaq'];
+const MTABS=['tabDash','tabInicio','tabResp','tabCad','tabGerais','tabRaio','tabCrono','tabPlano','tabEnc','tabMat','tabForm','tabFaq'];
 let MLISTA=null,ANOME='';
 const DSEMC=['dom','seg','ter','qua','qui','sex','sáb'],DSEML=['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
 const hhm=t=>t?String(t).slice(0,5):'';
@@ -1224,7 +1289,7 @@ function abas(on){$('app').classList.toggle('largo',!['tabForm','tabFaq'].includ
 function menuM(){const adm=IS_ADMIN&&!EXMODO,aluno=!IS_ADMIN||EXMODO;
   ['tabResp','tabCad','tabGerais'].forEach(t=>$(t).hidden=!adm);
   ['tabInicio','tabPlano','tabCrono','tabEnc','tabMat','tabForm','tabFaq'].forEach(t=>$(t).hidden=!aluno);
-  $('tabRaio').hidden=!(IS_ADMIN&&EXMODO);$('exBar').hidden=!EXMODO;if(EXMODO)$('exNome').textContent=ANOME||ALVO;
+  $('tabDash').hidden=!aluno;$('tabDash').textContent=IS_ADMIN?'Dashboard do aluno':'Meu Dashboard';$('tabRaio').hidden=!(IS_ADMIN&&EXMODO);$('exBar').hidden=!EXMODO;if(EXMODO)$('exNome').textContent=ANOME||ALVO;
   document.body.classList.toggle('mprof',IS_ADMIN);}
 function telaGeral(){telaMentorados();}
 function telaResp(){telaMentorados();}
@@ -1341,13 +1406,13 @@ async function telaCad(){abas('tabCad');$('app').innerHTML='<p class="pend">Carr
   $('app').querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>entraAluno(b.dataset.o,b.dataset.n));
   $('app').querySelectorAll('[data-z]').forEach(b=>b.onclick=async()=>{const e=b.dataset.z;if(!confirm('Zerar a senha de '+e+'? O aluno vai criar uma nova em “Primeiro acesso”.'))return;const {error}=await SB.rpc('admin_zerar_senha',{e});await telaCad();$('cadMsg').textContent=error?error.message:'Senha zerada: '+e;});
   $('app').querySelectorAll('[data-r]').forEach(b=>b.onclick=async()=>{const e=b.dataset.r;if(!confirm('Remover '+e+' da mentoria individual? Ele perde o acesso a esta área. O plano, os encontros e os materiais dele ficam guardados.'))return;const {error}=await SB.from('mentorados').delete().eq('email',e);await telaCad();$('cadMsg').textContent=error?error.message:'Removido da mentoria: '+e;});}
+async function telaDash(){abas('tabDash');
+  await dashM(ALVO,'');if(!$('tabDash').classList.contains('on'))return;const app=$('app');const w=document.createElement('div');w.className='dashm';while(app.firstChild)w.appendChild(app.firstChild);app.appendChild(w);}
 async function telaRaio(){abas('tabRaio');$('app').innerHTML='<p class="pend">Carregando…</p>';
   const {data}=await SB.from('checkup').select('*').eq('email',ALVO).maybeSingle();
-  const dash=`<a class="btn" style="text-decoration:none;align-self:flex-start" href="../estudos/?aluno=${encodeURIComponent(ALVO)}#alunos">📊 Ver o dashboard de estudos (Sala de Estudos)</a>`;
-  if(!data){$('app').innerHTML=`<div class="aviso"><h2>${esc(ANOME)} ainda não enviou o perfil de estudos</h2><p>O raio-x aparece aqui assim que o aluno preencher o perfil. Você também pode preencher por ele na aba “Perfil de estudos”.</p><p>${dash}</p></div>`;return;}
-  $('app').innerHTML=dossie(data);requestAnimationFrame(()=>encaixa($('app')));const box=$('app').querySelector('.cronoBox');if(box)montarCrono(box,data.respostas,ALVO,'prof');
-  const h=await planoResumo(ALVO);const alvo=$('app').querySelector('.dhead');const w=document.createElement('div');w.style.cssText='display:flex;flex-direction:column;gap:10px';w.innerHTML=(h||'')+dash;if(alvo)alvo.after(w);else $('app').prepend(w);}
-
+  if(!data){$('app').innerHTML=`<div class="aviso"><h2>${esc(ANOME)} ainda não enviou o perfil de estudos</h2><p>O raio-x aparece aqui assim que o aluno preencher o perfil. Você também pode preencher por ele na aba “Perfil de estudos”.</p></div>`;return;}
+  $('app').innerHTML=dossie(data);const cb=$('app').querySelector('.cronoBox');if(cb)cb.closest('section').remove();requestAnimationFrame(()=>encaixa($('app')));
+  const h=await planoResumo(ALVO);const alvo=$('app').querySelector('.dhead');if(h&&alvo){const w=document.createElement('div');w.innerHTML=h;alvo.after(w.firstChild);}}
 /* ---------- início do aluno ---------- */
 const ICO={
  timer:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6M12 2v3"/></svg>',
@@ -1358,6 +1423,7 @@ const ICO={
  lista:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M3.5 6l1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>',
  grade:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18M15 3v18"/></svg>',
  perfil:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg>',
+ grafico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6"/><rect x="12" y="8" width="3" height="10"/><rect x="17" y="5" width="3" height="13"/></svg>',
  seta:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>'};
 async function telaInicio(){abas('tabInicio');$('app').innerHTML='<p class="pend">Carregando…</p>';
   const hoje=isoD(new Date());
@@ -1386,7 +1452,8 @@ async function telaInicio(){abas('tabInicio');$('app').innerHTML='<p class="pend
       <div class="ent"><b>${prox.ini?hhm(prox.ini)+(prox.fim?' – '+hhm(prox.fim):''):'Horário a combinar'}</b><p>${esc(prox.titulo||'Encontro de mentoria')}</p></div></div>
       ${linkOk(prox.link)?`<a class="hbtn pri" href="${esc(prox.link.trim())}" target="_blank" rel="noopener">${ICO.video} Entrar no encontro</a>`:'<p class="hp">O link da reunião aparece aqui.</p>'}</div>`;}
   else encH=`<div class="hcard en"><div class="hh"><span class="hico" style="background:var(--azul)">${ICO.cal}</span><div><span class="hk">Próximo encontro</span><b>Ainda não marcado</b></div></div><p class="hp">${IS_ADMIN?'Marque o primeiro encontro na aba Encontros.':'Assim que o Prof. Jazz marcar o seu próximo encontro, ele aparece aqui com o link da reunião.'}</p>${IS_ADMIN?`<button class="hbtn" data-go="enc">Marcar encontro ${ICO.seta}</button>`:''}</div>`;
-  const tiles=[['sala','../estudos/',ICO.timer,'Sala de Estudos','Ligue o cronômetro e acompanhe o seu dashboard','#EB6834','#E5484D'],
+  const tiles=[['sala','../estudos/',ICO.timer,'Sala de Estudos','Ligue o cronômetro e registre as suas sessões','#EB6834','#E5484D'],
+    ['dash',null,ICO.grafico,'Meu Dashboard','Horas, dias estudados, questões e aproveitamento','#C9A227','#8C6500'],
     ['crono',null,ICO.grade,'Cronograma Semanal','A sua semana de estudos organizada, dia a dia','#3A8CCB','#1F4E79'],
     ['banco','../bancodequestoes/',ICO.lista,'Banco de Questões','Provas da UFU de 2015 a 2026, com gabarito','#7B4FC9','#4C2A8C'],
     ['mat',null,ICO.pasta,'Materiais','Os seus arquivos e os materiais da mentoria','#1BAF7A','#0E7A55']];
@@ -1396,7 +1463,7 @@ async function telaInicio(){abas('tabInicio');$('app').innerHTML='<p class="pend
    ${ck.data?'':`<button class="mperf" data-go="form"><span class="hico" style="background:var(--amarelo);color:#16304F">${ICO.perfil}</span><div><b>Preencha o seu perfil de estudos</b><small>Leva uns 10 minutos. Com ele o Prof. Jazz monta o seu Cronograma Semanal.</small></div>${ICO.seta}</button>`}
    <div class="hgrid">${encH}${plano}</div>
    <div class="htiles">${tiles.map(([k,h,ic,t,d,c1,c2])=>`<${h?`a href="${h}"`:`button data-go="${k}"`} class="htile" style="--c1:${c1};--c2:${c2}"><span class="tic">${ic}</span><b>${t}</b><small>${d}</small><span class="tar">${ICO.seta}</span></${h?'a':'button'}>`).join('')}</div>`;
-  const go={plano:()=>telaPlano(),form:telaForm,crono:telaCrono,mat:telaMat,enc:telaEnc};$('app').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go[b.dataset.go]());}
+  const go={plano:()=>telaPlano(),form:telaForm,crono:telaCrono,mat:telaMat,enc:telaEnc,dash:telaDash};$('app').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go[b.dataset.go]());}
 
 /* ---------- encontros ---------- */
 async function telaEnc(){abas('tabEnc');$('app').innerHTML='<p class="pend">Carregando…</p>';
@@ -1464,7 +1531,7 @@ async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!se
   if(!ar||!ar.mentoria){$('app').innerHTML=`<div class="aviso"><h2>Área da Mentoria Individual</h2><p>Esta área é exclusiva dos alunos da mentoria individual com o Prof. Jazz.</p><p><a class="btn pri" href="/" style="text-decoration:none">Voltar ao início</a></p></div>`;return;}
   $('lkAreas').hidden=!(ar.turma&&ar.mentoria);
   ALVO=EMAIL;
-  $('tabResp').onclick=telaMentorados;$('tabCad').onclick=telaCad;$('tabGerais').onclick=telaGerais;$('tabInicio').onclick=telaInicio;$('tabRaio').onclick=telaRaio;$('tabPlano').onclick=()=>telaPlano();$('tabCrono').onclick=telaCrono;$('tabEnc').onclick=telaEnc;$('tabMat').onclick=telaMat;$('tabForm').onclick=telaForm;$('tabFaq').onclick=telaFaq;
+  $('tabResp').onclick=telaMentorados;$('tabCad').onclick=telaCad;$('tabGerais').onclick=telaGerais;$('tabInicio').onclick=telaInicio;$('tabRaio').onclick=telaRaio;$('tabDash').onclick=telaDash;$('tabPlano').onclick=()=>telaPlano();$('tabCrono').onclick=telaCrono;$('tabEnc').onclick=telaEnc;$('tabMat').onclick=telaMat;$('tabForm').onclick=telaForm;$('tabFaq').onclick=telaFaq;
   $('exSair').onclick=saiAluno;$('exTroca').onclick=saiAluno;
   if(IS_ADMIN){let v=null;try{v=JSON.parse(sessionStorage.getItem('bqufu-mentoria-ver')||'null');}catch(e){}if(v&&v.email){entraAluno(v.email,v.nome);return;}menuM();telaMentorados();}
   else{const {data:me}=await SB.from('mentorados').select('nome').eq('email',EMAIL).maybeSingle();ANOME=me?me.nome:'';menuM();telaInicio();}}
@@ -1532,7 +1599,7 @@ label.btn{display:inline-flex;align-items:center;cursor:pointer}
 .plb{display:flex;gap:20px;align-items:center;position:relative}.pring2{position:relative;width:124px;height:124px;flex:none}.pring2 svg{width:124px;height:124px}.pring2 div{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}.pring2 b{font:800 28px var(--display)}.pring2 span{font-size:12.5px;color:var(--muted)}
 .pchips{display:flex;flex-wrap:wrap;gap:7px}.pchip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:5px 10px;border-radius:999px;background:color-mix(in srgb,var(--c) 14%,var(--card));border:1px solid color-mix(in srgb,var(--c) 35%,transparent)}
 .pchip i{width:8px;height:8px;border-radius:50%;background:var(--c)}.pchip em{font-style:normal;color:var(--muted);font-weight:700}.pchip.ok{background:var(--c);color:#fff;border-color:var(--c)}.pchip.ok i{background:#fff}.pchip.ok em{color:rgba(255,255,255,.85)}
-.htiles{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.htiles{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
 .htile{position:relative;overflow:hidden;display:flex;flex-direction:column;gap:6px;min-height:178px;justify-content:flex-end;text-align:left;text-decoration:none;font:inherit;cursor:pointer;color:#fff;border:0;border-radius:22px;padding:20px;background:linear-gradient(140deg,var(--c1),var(--c2));box-shadow:0 10px 26px color-mix(in srgb,var(--c1) 30%,transparent);transition:transform .15s}
 .htile:hover{transform:translateY(-4px)}
 .htile::before{content:'';position:absolute;right:-40px;top:-40px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.14)}
@@ -1543,6 +1610,90 @@ label.btn{display:inline-flex;align-items:center;cursor:pointer}
 @media (max-width:900px){.hgrid{grid-template-columns:1fr}.htiles{grid-template-columns:1fr 1fr}.mhf{height:200px}}
 .htile{padding-top:88px}
 @media (max-width:600px){.mh2::before{display:none}.htile{min-height:0}.htile small{padding-right:0;padding-bottom:30px}.mh2{flex-direction:column;align-items:stretch;padding:0 22px}.mhx{padding:24px 0 0}.mhx h2{font-size:30px}.mhf{height:190px;align-self:center}.plb{flex-direction:column;align-items:flex-start}.htile{min-height:160px}}
+.dashm{--verde:#1BAF7A;--verm:#E5484D;display:flex;flex-direction:column;gap:16px}
+.dashm .dtop{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.dashm .dtop h2{margin:0;font:800 24px var(--display)}
+.dashm .dtop select{width:auto;min-width:260px;font-weight:600}
+.dashm .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.dashm .kpi{border-radius:18px;padding:16px 18px;display:grid;grid-template-columns:60px 1fr;gap:14px;align-items:center;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);min-width:0}
+.dashm .kpi>div{min-width:0;display:flex;flex-direction:column}
+.dashm .kpi span{font:600 12px var(--body);text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}
+.dashm .kpi b{font:800 27px/1.15 var(--display);font-variant-numeric:tabular-nums}
+.dashm .kpi b small{font-size:15px;color:var(--muted)}
+.dashm .kpi small{font-size:13px;color:var(--muted)}
+.dashm .k-a{background:linear-gradient(135deg,#3A8CCB,#16304F);border:0;color:#fff}
+.dashm .k-a span,.dashm .k-a small,.dashm .k-a b small{color:#D6E6F5}
+.dashm .ico{width:56px;height:56px;border-radius:16px;display:grid;place-items:center;font-size:24px;background:var(--soft)}
+.dashm .k-a .ico{background:rgba(255,255,255,.16)}
+.dashm .ring{width:60px;height:60px}
+.dashm .ring .rv{font:800 14px var(--display);fill:var(--ink)}
+.dashm .chart{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px 22px;box-shadow:var(--shadow)}
+.dashm .chart h3{font:700 19px var(--display);margin:0 0 4px;display:flex;align-items:center;gap:10px}
+.dashm .chart h3 .hi{width:12px;height:26px;border-radius:6px;flex:none}
+.dashm .hi.a{background:linear-gradient(#3A8CCB,#DDDD24)}
+.dashm .hi.b{background:linear-gradient(#EB6834,#7B61FF)}
+.dashm .hi.c{background:linear-gradient(#1BAF7A,#3A8CCB)}
+.dashm .chart .sub{margin:0 0 12px;color:var(--muted);font-size:13.5px}
+.dashm .duo{display:grid;grid-template-columns:1.4fr 1fr;gap:16px}
+.dashm .heat{overflow-x:auto;padding-bottom:6px}
+.dashm .heat .grid{display:grid;grid-auto-flow:column;grid-template-rows:16px repeat(7,15px);gap:4px;width:max-content}
+.dashm .heat .dl{font-size:11px;color:var(--muted);line-height:15px;padding-right:4px}
+.dashm .heat .ml{font-size:11px;color:var(--muted);white-space:nowrap;line-height:16px}
+.dashm .heat .c{width:15px;height:15px;border-radius:4px;background:var(--soft)}
+.dashm .hleg .c{background:var(--soft)}
+.dashm .hleg .c.l1,.dashm .heat .c.l1{background:color-mix(in srgb,var(--verde) 30%,var(--soft))}
+.dashm .hleg .c.l2,.dashm .heat .c.l2{background:color-mix(in srgb,var(--verde) 55%,var(--soft))}
+.dashm .hleg .c.l3,.dashm .heat .c.l3{background:color-mix(in srgb,var(--verde) 80%,var(--soft))}
+.dashm .hleg .c.l4{background:var(--verde)}
+.dashm .heat .c.l4{background:var(--verde)}
+.dashm .heat .c.hj{outline:2px solid var(--amarelo);outline-offset:1px}
+.dashm .heat .c.fut{opacity:.35}
+.dashm .heat .c.prova{background:var(--amarelo)}
+.dashm .hleg{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);margin-top:8px}
+.dashm .hleg .c{width:12px;height:12px;border-radius:3px}
+.dashm .wbars{display:flex;align-items:flex-end;gap:8px;height:170px;padding-top:10px}
+.dashm .wb{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0;height:100%;justify-content:flex-end}
+.dashm .wb i{display:block;width:100%;max-width:44px;border-radius:8px 8px 3px 3px;background:linear-gradient(#3A8CCB,#16304F);min-height:3px}
+.dashm .wb.cur i{background:linear-gradient(#DDDD24,#C9A227)}
+.dashm .wb b{font:700 12px var(--body);font-variant-numeric:tabular-nums}
+.dashm .wb span{font-size:11px;color:var(--muted);white-space:nowrap}
+.dashm .mt{width:100%;border-collapse:collapse;font-size:14px}
+.dashm .mt th{color:var(--muted);font:600 11.5px var(--body);text-transform:uppercase;letter-spacing:.05em;text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+.dashm .mt td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+.dashm .mt .nm{display:flex;align-items:center;gap:8px;font-weight:700;white-space:nowrap}
+.dashm .mt .nm i{width:12px;height:12px;border-radius:4px;flex:none}
+.dashm .tbar{height:12px;border-radius:6px;background:var(--soft);overflow:hidden;min-width:90px}
+.dashm .tbar em{display:block;height:100%;border-radius:6px}
+.dashm .ae{display:flex;height:12px;border-radius:6px;overflow:hidden;background:var(--soft);min-width:110px}
+.dashm .ae .a{background:var(--verde)}
+.dashm .ae .e{background:var(--verm)}
+.dashm .pc{font:800 15px var(--display);padding:3px 9px;border-radius:999px;white-space:nowrap}
+.dashm .pc.bom{background:rgba(27,175,122,.16);color:#1BAF7A}
+.dashm .pc.med{background:rgba(221,221,36,.18);color:#B8B81C}
+.dashm .pc.ruim{background:rgba(217,67,79,.16);color:#E5484D}
+.dashm .pc.nd{color:var(--muted)}
+.dashm .donut text{fill:var(--ink)}
+.dashm .dwrap{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.dashm .dwrap svg{width:190px;height:190px;flex:none}
+.dashm .legend{flex:1;display:flex;flex-direction:column;gap:7px;min-width:180px}
+.dashm .lg{display:grid;grid-template-columns:14px 1fr auto auto;gap:9px;align-items:center;font-size:14px}
+.dashm .lg i{width:14px;height:14px;border-radius:4px}
+.dashm .lg small{color:var(--muted)}
+.dashm .vazio{text-align:center;padding:40px 20px}
+.dashm .vazio b{display:block;font:800 22px var(--display);margin-bottom:6px}
+.dashm .sessao{text-align:center}
+.dashm .sessao b{display:block;font:800 21px var(--display)}
+.dashm .sessao span{color:var(--muted)}
+.dashm .hoje{display:flex;flex-direction:column;gap:8px}
+.dashm .ses{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-left:6px solid var(--c);border-radius:12px;padding:10px 12px;background:var(--bg)}
+.dashm .ses .tx{flex:1;min-width:0}
+.dashm .ses .tx b{display:block}
+.dashm .ses .tx span{color:var(--muted);font-size:13px}
+.dashm .ses .du{font:800 17px var(--display);font-variant-numeric:tabular-nums;white-space:nowrap}
+.dashm .ses .del{border:0;background:none;color:var(--muted);cursor:pointer;font-size:18px}
+.dashm .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 20px;box-shadow:var(--shadow)}
+@media (max-width:860px){.dashm .duo{grid-template-columns:1fr}}
+.raiox{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 18px}.raiox summary{cursor:pointer;font:700 16px var(--display)}.raiox summary small{font-weight:500;color:var(--muted)}.rxb{display:flex;flex-direction:column;gap:16px;margin-top:14px}
 </style>
 
 <script src="../js/presenca.js" defer></script>
