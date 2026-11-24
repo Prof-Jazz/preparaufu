@@ -66,7 +66,10 @@ body:not([data-tela="areas"]) #areas{display:none}
 .areas2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
 .area{position:relative;overflow:hidden;display:flex;flex-direction:column;gap:10px;text-align:left;text-decoration:none;color:var(--ink);background:rgba(21,28,46,.82);border:1px solid #2B3654;border-radius:22px;padding:26px 24px;cursor:pointer;font:inherit;transition:transform .15s,border-color .15s}
 .area:hover,.area:focus-visible{transform:translateY(-3px);border-color:var(--azul);outline:none}
-.area .ic{width:58px;height:58px;border-radius:16px;display:grid;place-items:center;font-size:28px}
+.area .ai{height:120px;width:auto;align-self:flex-start;margin-bottom:6px;filter:drop-shadow(0 0 1px rgba(255,255,255,.55)) drop-shadow(0 6px 16px rgba(0,0,0,.35))}
+#areas{position:relative}#areas>*:not(.arhex){position:relative;z-index:1}
+.arhex{position:fixed;right:-6%;top:50%;transform:translateY(-50%);width:min(760px,62vw);height:auto;opacity:.09;z-index:0;pointer-events:none;filter:saturate(1.2)}
+@media (max-width:720px){.arhex{width:110vw;right:-35%;opacity:.07}.area .ai{height:96px}}
 .area.tu .ic{background:var(--azul)}.area.me .ic{background:var(--amarelo)}.area.me{border-color:rgba(221,221,36,.45)}
 .area b{font:800 23px var(--display)}.area small{color:var(--muted);font-size:15px;line-height:1.45}
 .area .ir{margin-top:6px;font:700 14px var(--body);color:var(--amarelo)}
@@ -136,11 +139,11 @@ body[data-tela]{animation:fadein .35s ease}@keyframes fadein{from{opacity:0}to{o
       <p class="ajuda">Esqueceu a senha? Fale com o Prof. Jazz.</p>
     </form></div>
 </section>
-<section id="areas" aria-label="Escolha a área">
+<section id="areas" aria-label="Escolha a área"><img class="arhex" src="img/jazz-marca.png" alt="" aria-hidden="true">
   <div class="logos"><img class="j" src="bancodequestoes/logo/jazz_claro.png" alt="Jazz, Professor de Matemática"><span class="sep"></span><img class="p" src="bancodequestoes/logo/prepara_transp.png" alt="PREPARA UFU"></div>
   <h1 id="arTit">Olá! Para onde vamos?</h1><p class="lead">Escolha a área que você quer acessar agora. Dá para trocar depois.</p>
-  <div class="areas2"><button class="area tu" id="arTurma" type="button"><span class="ic">🎓</span><b>Turmas PREPARA UFU</b><small id="arTurmaTx">Assessoria e Curso de Matemática: Banco de Questões, Sala de Estudos, Agenda, Materiais, alunos, cadastro e assessores.</small><span class="ir">Entrar nas turmas ›</span></button>
-  <a class="area me" href="/mentoria/"><span class="ic">🧭</span><b>Mentoria individual</b><small id="arMentTx">Os seus alunos da mentoria individual: plano de estudos de cada um, encontros, cronograma, materiais e dashboard.</small><span class="ir">Entrar na mentoria ›</span></a></div>
+  <div class="areas2"><button class="area tu" id="arTurma" type="button"><img class="ai" src="img/area-turmas.png" alt="" aria-hidden="true"><b>Turmas PREPARA UFU</b><small id="arTurmaTx">Assessoria e Curso de Matemática: Banco de Questões, Sala de Estudos, Agenda, Materiais, alunos, cadastro e assessores.</small><span class="ir">Entrar nas turmas ›</span></button>
+  <a class="area me" href="/mentoria/"><img class="ai" src="img/area-mentoria.png" alt="" aria-hidden="true"><b>Mentoria individual</b><small id="arMentTx">Os seus alunos da mentoria individual: plano de estudos de cada um, encontros, cronograma, materiais e dashboard.</small><span class="ir">Entrar na mentoria ›</span></a></div>
   <button id="arSair" type="button" class="lnk" style="align-self:flex-start;background:none;border:0;color:var(--muted);cursor:pointer;font:600 14px var(--body)">Sair</button>
 </section>
 <a id="trocaArea" href="/?area=escolher" hidden>Trocar de área</a>
@@ -220,7 +223,7 @@ $('sairTopo').onclick=async()=>{try{sessionStorage.removeItem('bqufu-area');sess
 inicio();
 })();
 </script>
-<script>(function(){var V='1795554730';var K='bqufu-recarga-';
+<script>(function(){var V='1795555344';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -230,6 +233,6 @@ confere(true);
 document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')confere(false);});
 window.addEventListener('focus',function(){confere(false);});
 setInterval(function(){if(document.visibilityState==='visible')confere(false);},180000);})();</script>
-<script src="js/presenca.js?v=1795554730" defer></script>
+<script src="js/presenca.js?v=1795555344" defer></script>
 </body>
 </html>
