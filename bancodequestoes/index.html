@@ -191,7 +191,7 @@ td.h{font-weight:700}.z{color:var(--line)}
 <header>
   <a class="logos" href="/" title="Início da plataforma PREPARA UFU" style="text-decoration:none"><img class="j" src="logo/jazz_claro.png" alt="Jazz, Professor de Matemática"><span class="sep"></span><img class="p" src="logo/prepara_transp.png" alt="Prepara UFU"><span class="sep"></span><img class="u" src="logo/ufu_branco.png" alt="Universidade Federal de Uberlândia"></a>
   <div class="ttl"><h1>Banco de Questões UFU</h1><p>Provas objetivas 2015–2026 · gabarito oficial</p></div>
-  <nav class="tabs" aria-label="Visões"><button class="theme" id="theme" aria-label="Alternar modo diurno e noturno" title="Modo diurno / noturno"><span class="sun">☀</span><span class="moon">☾</span></button><a id="ckBtn" href="../assessoria/" hidden style="font:600 14px var(--body);border:1px solid var(--amarelo);color:var(--amarelo);padding:7px 14px;border-radius:999px;text-decoration:none">Assessoria</a><button id="admBtn" hidden>Alunos</button><button class="sair" id="sairBtn" title="Sair">Sair</button><button id="tabQ" aria-pressed="true">Questões</button><button id="tabI" aria-pressed="false">Análise de Incidência</button></nav>
+  <nav class="tabs" aria-label="Visões"><button class="theme" id="theme" aria-label="Alternar modo diurno e noturno" title="Modo diurno / noturno"><span class="sun">☀</span><span class="moon">☾</span></button><a class="lkAul" href="../aulas/#agenda" hidden style="font:600 14px var(--body);border:1px solid #4A4F55;color:#fff;padding:7px 14px;border-radius:999px;text-decoration:none">Agenda</a><a class="lkAul" href="../aulas/#materiais" hidden style="font:600 14px var(--body);border:1px solid #4A4F55;color:#fff;padding:7px 14px;border-radius:999px;text-decoration:none">Materiais</a><a id="ckBtn" href="../assessoria/" hidden style="font:600 14px var(--body);border:1px solid var(--amarelo);color:var(--amarelo);padding:7px 14px;border-radius:999px;text-decoration:none">Assessoria</a><button id="admBtn" hidden>Alunos</button><button class="sair" id="sairBtn" title="Sair">Sair</button><button id="tabQ" aria-pressed="true">Questões</button><button id="tabI" aria-pressed="false">Análise de Incidência</button></nav>
 </header>
 <div class="wrap">
   <aside class="panel" aria-label="Filtros">
@@ -561,7 +561,7 @@ async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!se
   const {data:ok}=await SB.rpc('is_allowed');
   if(!ok){await SB.auth.signOut();$('gate').hidden=false;gm('Seu acesso não está liberado. Fale com o Prof. Jazz.');return;}
   $('gate').hidden=true;$('admBtn').hidden=true;
-  $('ckBtn').hidden=false;
+  $('ckBtn').hidden=false;document.querySelectorAll('.lkAul').forEach(a=>a.hidden=false);
   if(!iniciado){iniciado=true;$('viewQ').innerHTML='<div class="empty">Carregando o banco de questões…</div>';await iniciar();}}
 $('sairBtn').onclick=async()=>{await SB.auth.signOut();location.reload();};
 /* painel do professor */
