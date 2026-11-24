@@ -93,7 +93,7 @@ select,input[type=number],input[type=text]{font:500 16px var(--body);padding:11p
 .lado{display:flex;flex-direction:column;gap:16px;min-width:0}
 #vivoBox .vh{display:flex;align-items:center;gap:10px;margin-bottom:4px}#vivoBox .vh h3{margin:0;font:800 18px var(--display)}
 .vcount{display:inline-flex;align-items:center;gap:6px;font:800 14px var(--body);background:color-mix(in srgb,#1BAF7A 18%,transparent);color:#1BAF7A;padding:3px 10px;border-radius:999px}
-.vcount i{width:8px;height:8px;border-radius:50%;background:#1BAF7A;animation:vpulse 1.6s infinite}
+.vcount i{width:8px;height:8px;border-radius:50%;background:#1BAF7A}
 @keyframes vpulse{0%{box-shadow:0 0 0 0 rgba(27,175,122,.6)}70%{box-shadow:0 0 0 7px rgba(27,175,122,0)}100%{box-shadow:0 0 0 0 rgba(27,175,122,0)}}
 #vivoBox .vh .btn.sm,.btn.sm{margin-left:auto;padding:6px 12px;font-size:13px}
 .bdg{display:inline-grid;place-items:center;min-width:19px;height:19px;padding:0 5px;border-radius:999px;background:#E5484D;color:#fff;font:800 11px var(--body);font-style:normal;margin-left:4px}
@@ -105,7 +105,7 @@ select,input[type=number],input[type=text]{font:500 16px var(--body);padding:11p
 .viv .mi{opacity:0;transition:opacity .15s}.viv:hover .mi{opacity:.8}
 .viv .qd{display:flex;flex-direction:column;align-items:flex-end;gap:3px;color:var(--muted);font-size:12px;white-space:nowrap}
 .av{position:relative;flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--c);color:#fff;font:800 14px var(--display)}
-.av i{position:absolute;right:-1px;bottom:-1px;width:12px;height:12px;border-radius:50%;border:2px solid var(--card)}.av i.on{background:#1BAF7A;animation:vpulse 1.6s infinite}.av i.idle{background:#C9A227}
+.av i{position:absolute;right:-1px;bottom:-1px;width:12px;height:12px;border-radius:50%;border:2px solid var(--card)}.av i.on{background:#1BAF7A}.av i.idle{background:#C9A227}
 .vopt{display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line);font-size:13.5px;color:var(--muted);cursor:pointer}
 .dlg.chat .box{max-width:440px;display:flex;flex-direction:column}
 .dlg.chat .top{position:relative;padding-right:52px}.dlg.chat .x{position:absolute;right:12px;top:12px;width:32px;height:32px;border-radius:50%;border:0;background:rgba(255,255,255,.16);color:#fff;font:700 15px var(--body);cursor:pointer}
@@ -118,6 +118,10 @@ select,input[type=number],input[type=text]{font:500 16px var(--body);padding:11p
 .cin{display:flex;gap:8px;padding:12px 14px 6px;border-top:1px solid var(--line)}.cin input{flex:1;min-width:0;font:inherit;font-size:15px;padding:10px 14px;border-radius:999px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
 .cin .btn{border-radius:999px}
 .dlg.chat .regra{margin:0;padding:2px 16px 4px;font-size:12px;color:var(--muted);text-align:center}.dlg.chat .msg{padding:0 16px 10px;text-align:center}
+.chops{display:flex;gap:6px;margin-top:10px}.chops button{border:0;background:rgba(255,255,255,.14);color:#fff;font:600 12.5px var(--body);padding:5px 10px;border-radius:999px;cursor:pointer}.chops button:hover{background:rgba(255,255,255,.24)}
+.blqbar{padding:10px 16px;background:color-mix(in srgb,#E5484D 14%,var(--card));font-size:13.5px}.blqbar button{border:0;background:none;color:#3A8CCB;font:700 13.5px var(--body);cursor:pointer;padding:0 0 0 4px}
+.denf{display:flex;flex-direction:column;gap:8px;padding:14px 16px;border-bottom:1px solid var(--line);background:color-mix(in srgb,#E5484D 8%,var(--card))}.denf textarea{font:inherit;font-size:14px;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);resize:vertical}
+.den summary{cursor:pointer;font-size:15px}.den.ok{opacity:.7}
 /* cronômetro */
 .relogio{display:flex;flex-direction:column;align-items:center;gap:16px;padding:26px 18px;border-radius:24px;background:radial-gradient(600px 300px at 50% 0%,color-mix(in srgb,var(--c) 22%,transparent),transparent 70%),var(--card);border:1px solid var(--line)}
 .chip{display:inline-flex;align-items:center;gap:7px;background:var(--c);color:#fff;font:800 14px var(--body);padding:6px 14px;border-radius:999px}
@@ -197,11 +201,11 @@ select,input[type=number],input[type=text]{font:500 16px var(--body);padding:11p
   <a class="logos" href="/" title="Início da plataforma PREPARA UFU"><img class="j" src="../bancodequestoes/logo/jazz_claro.png" alt="Jazz, Professor de Matemática"><span class="sep"></span><img class="p" src="../bancodequestoes/logo/prepara_transp.png" alt="Prepara UFU"></a>
   <nav class="tabs"><button class="theme" id="theme" aria-label="Alternar modo diurno e noturno" title="Modo diurno / noturno"><span class="sun">☀</span><span class="moon">☾</span></button><a href="../bancodequestoes/">Banco de Questões</a><a href="../aulas/#agenda">Agenda</a><a href="../aulas/#materiais">Materiais</a><a class="am" href="../assessoria/">Assessoria</a><button id="sair">Sair</button></nav>
 </header>
-<nav class="subnav" aria-label="Sala de Estudos"><div class="in"><button id="tabSala" class="on">Sala de Estudos</button><button id="tabPainel" hidden>Meu Dashboard</button><button id="tabAlunos" hidden>Dashboard dos alunos</button><button id="tabEx" hidden>Ver como aluno</button></div></nav>
+<nav class="subnav" aria-label="Sala de Estudos"><div class="in"><button id="tabSala" class="on">Sala de Estudos</button><button id="tabPainel" hidden>Meu Dashboard</button><button id="tabAlunos" hidden>Dashboard dos alunos</button><button id="tabDen" hidden>Denúncias</button><button id="tabEx" hidden>Ver como aluno</button></div></nav>
 <div id="exBar" hidden>Modo aluno exemplo — é assim que o aluno vê. <button type="button" id="exSair">Sair do modo exemplo</button></div>
 <main id="app"><p class="pend">Carregando…</p></main>
 
-<script>(function(){var V='1795534884';var K='bqufu-recarga-';
+<script>(function(){var V='1795535177';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -247,15 +251,16 @@ async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!se
   menus();
   $('tabSala').onclick=()=>{history.replaceState(null,'','#sala');telaSala();};
   $('tabPainel').onclick=()=>{history.replaceState(null,'','#painel');telaPainel(ALVO);};
+  $('tabDen').onclick=()=>{history.replaceState(null,'','#denuncias');telaDen();};
   $('tabAlunos').onclick=()=>{history.replaceState(null,'','#alunos');telaAlunos();};
   $('tabEx').onclick=()=>{EXMODO=true;ALVO=EXEMPLO;try{sessionStorage.setItem('bqufu-exemplo','assessoria');}catch(e){}menus();telaSala();};
   $('exSair').onclick=()=>{EXMODO=false;ALVO=EMAIL;try{sessionStorage.removeItem('bqufu-exemplo');}catch(e){}menus();telaAlunos();};
   const al=new URLSearchParams(location.search).get('aluno');
-  if(REAL_ADMIN&&!EXMODO&&(al||location.hash==='#alunos'))telaAlunos(al);
+  if(REAL_ADMIN&&!EXMODO&&location.hash==='#denuncias')telaDen();else if(REAL_ADMIN&&!EXMODO&&(al||location.hash==='#alunos'))telaAlunos(al);
   else if(location.hash==='#painel'&&$('tabPainel').hidden===false)telaPainel(ALVO);
   else telaSala();}
-function menus(){const adm=REAL_ADMIN&&!EXMODO;$('tabPainel').hidden=!(ASSESSORIA&&!adm);$('tabPainel').textContent='Meu Dashboard';$('tabAlunos').hidden=!adm;$('tabEx').hidden=!adm;$('exBar').hidden=!EXMODO;}
-const abas=on=>['tabSala','tabPainel','tabAlunos'].forEach(t=>$(t).classList.toggle('on',t===on));
+function menus(){const adm=REAL_ADMIN&&!EXMODO;$('tabPainel').hidden=!(ASSESSORIA&&!adm);$('tabPainel').textContent='Meu Dashboard';$('tabAlunos').hidden=!adm;$('tabDen').hidden=!adm;$('tabEx').hidden=!adm;$('exBar').hidden=!EXMODO;}
+const abas=on=>['tabSala','tabPainel','tabAlunos','tabDen'].forEach(t=>$(t).classList.toggle('on',t===on));
 
 async function carregaPlano(){if(PLANO)return;const [p,c]=await Promise.all([SB.from('plano_itens').select('id,semana,materia,frente,assunto').order('id'),SB.from('checkup').select('respostas').eq('email',ALVO).maybeSingle()]);
   PLANO=p.data||[];LINGUA=(c.data&&c.data.respostas&&c.data.respostas.lingua)||'';}
@@ -439,17 +444,42 @@ async function abreCaixa(){if(CHAT)fechaChat();
   $('cxL').innerHTML=L.length?L.map(x=>`<button class="viv" data-u="${x.uid}" data-n="${esc(x.nome)}"><span class="av" style="--c:${x.estudando?'#1BAF7A':'#6B7393'}">${esc(iniN(x.nome))}${x.online?`<i class="${x.estudando?'on':'idle'}"></i>`:''}</span><span class="tx"><b>${esc(x.nome)}</b><small>${esc(x.ultima||'')}</small></span><span class="qd">${quandoMsg(x.quando)}${x.nao_lidas?`<em class="bdg">${x.nao_lidas}</em>`:''}</span></button>`).join(''):'<p class="pend" style="padding:6px 4px">Nenhuma conversa ainda. Em “Estudando agora”, toque num colega para mandar um oi.</p>';
   $('cxL').querySelectorAll('.viv').forEach(x=>x.onclick=()=>abreChat(x.dataset.u,x.dataset.n));}
 async function abreChat(uid,nome){if(CHAT){clearInterval(CHAT.t);CHAT.d.remove();CHAT=null;}
-  const d=document.createElement('div');d.className='dlg chat';d.innerHTML=`<div class="box" style="--c:#16304F"><div class="top"><button class="x" data-x aria-label="Fechar">✕</button><div class="cht"><span class="av" style="--c:#3A8CCB">${esc(iniN(nome))}</span><div><h3>${esc(nome)}</h3><p>${nome==='Prof. Jazz'?'Professor do PREPARA UFU':'Colega do PREPARA UFU'}</p></div></div></div>
+  const d=document.createElement('div');d.className='dlg chat';d.innerHTML=`<div class="box" style="--c:#16304F"><div class="top"><button class="x" data-x aria-label="Fechar">✕</button><div class="cht"><span class="av" style="--c:#3A8CCB">${esc(iniN(nome))}</span><div><h3>${esc(nome)}</h3><p>${nome==='Prof. Jazz'?'Professor do PREPARA UFU':'Colega do PREPARA UFU'}</p></div></div>
+    <div class="chops"><button type="button" data-a="blq">🚫 Bloquear</button><button type="button" data-a="den">⚑ Denunciar</button></div></div>
+    <div class="blqbar" id="blqBar" hidden>Você bloqueou esta pessoa: ela não pode te mandar mensagens. <button type="button" data-a="desb">Desbloquear</button></div>
     <div class="msgs" id="msgs"><p class="pend" style="text-align:center">Carregando…</p></div>
     <form class="cin"><input name="t" maxlength="500" placeholder="Escreva uma mensagem…" autocomplete="off" aria-label="Mensagem"><button class="btn pri" type="submit">Enviar</button></form>
-    <p class="regra">Seja gentil e respeitoso. As conversas ficam registradas e podem ser vistas pelo Prof. Jazz.</p><p class="msg" id="chErr"></p></div>`;
+    <p class="regra">Esta conversa é só entre vocês. Se algo te incomodar, use “Denunciar”.</p><p class="msg" id="chErr"></p></div>`;
   document.body.appendChild(d);d.onclick=e=>{if(e.target===d||e.target.closest('[data-x]'))fechaChat();};
   let ult='';const carrega=async()=>{const {data}=await SB.rpc('conversa',{p_com:uid});if(!$('msgs'))return;const L=(data||[]).slice().reverse();const k=L.length+':'+(L.length?L[L.length-1].id:'');if(k===ult)return;ult=k;
     const m=$('msgs');m.innerHTML=L.length?L.map(x=>`<div class="bal${x.minha?' eu':''}"><span>${esc(x.texto)}</span><small>${quandoMsg(x.criada)}</small></div>`).join(''):'<p class="pend" style="text-align:center;margin:auto">Diga um oi! 👋</p>';m.scrollTop=m.scrollHeight;};
   CHAT={d,t:setInterval(carrega,4000)};carrega();
-  const f=d.querySelector('form');setTimeout(()=>f.t.focus(),50);
+  const f=d.querySelector('form');
+  const estBlq=b=>{$('blqBar').hidden=!b;f.t.disabled=b;f.querySelector('button').disabled=b;d.querySelector('[data-a=blq]').hidden=b;};
+  SB.rpc('bloqueio',{p_com:uid,p_bloquear:null}).then(({data})=>estBlq(!!data));
+  d.querySelector('[data-a=blq]').onclick=async()=>{if(!confirm('Bloquear '+nome+'? Essa pessoa não vai mais conseguir te mandar mensagens e some da sua lista.'))return;await SB.rpc('bloqueio',{p_com:uid,p_bloquear:true});estBlq(true);};
+  d.querySelector('[data-a=desb]').onclick=async()=>{await SB.rpc('bloqueio',{p_com:uid,p_bloquear:false});estBlq(false);};
+  d.querySelector('[data-a=den]').onclick=()=>{if(d.querySelector('.denf'))return;const w=document.createElement('form');w.className='denf';
+    w.innerHTML=`<b>Denunciar ${esc(nome)}</b><p class="pend" style="margin:0">O Prof. Jazz recebe a denúncia com as mensagens desta conversa, e só desta. Ninguém mais fica sabendo.</p>
+      <textarea name="m" rows="3" maxlength="1000" placeholder="O que aconteceu? (opcional)"></textarea>
+      <label class="chk"><input type="checkbox" name="b" checked> Bloquear esta pessoa também</label>
+      <div style="display:flex;gap:8px"><button class="btn pri" type="submit" style="flex:1;background:#E5484D;border-color:#E5484D">Enviar denúncia</button><button class="btn" type="button" data-a="can">Cancelar</button></div>`;
+    d.querySelector('.msgs').before(w);w.querySelector('[data-a=can]').onclick=()=>w.remove();
+    w.onsubmit=async e=>{e.preventDefault();const {error}=await SB.rpc('denunciar',{p_com:uid,p_motivo:w.m.value,p_bloquear:w.b.checked});
+      if(error){$('chErr').textContent='Não deu para enviar a denúncia. Tente de novo.';return;}
+      const bl=w.b.checked;w.innerHTML='<b style="color:#1BAF7A">✓ Denúncia enviada ao Prof. Jazz.</b>'+(bl?'<p class="pend" style="margin:0">Esta pessoa foi bloqueada.</p>':'');if(bl)estBlq(true);setTimeout(()=>w.remove(),4000);};};setTimeout(()=>f.t.focus(),50);
   f.onsubmit=async e=>{e.preventDefault();const t=f.t.value.trim();if(!t)return;f.t.value='';$('chErr').textContent='';
-    const {error}=await SB.rpc('enviar_msg',{p_para:uid,p_texto:t});if(error){$('chErr').textContent=/muitas/.test(error.message)?'Muitas mensagens seguidas: espere um pouco.':'Não deu para enviar. Tente de novo.';f.t.value=t;return;}ult='';carrega();};}
+    const {error}=await SB.rpc('enviar_msg',{p_para:uid,p_texto:t});if(error){$('chErr').textContent=/muitas/.test(error.message)?'Muitas mensagens seguidas: espere um pouco.':/indisponivel/.test(error.message)?'Esta pessoa não está recebendo mensagens.':'Não deu para enviar. Tente de novo.';f.t.value=t;return;}ult='';carrega();};}
+
+async function telaDen(){abas('tabDen');$('app').innerHTML='<p class="pend">Carregando…</p>';
+  const {data,error}=await SB.rpc('admin_denuncias');if(error){$('app').innerHTML=`<div class="card"><p class="pend">${esc(error.message)}</p></div>`;return;}
+  const L=data||[];const ab=L.filter(x=>!x.resolvida).length;
+  $('app').innerHTML=`<div class="card" style="margin-bottom:14px"><h2 style="margin:0;font:800 22px var(--display)">Denúncias</h2><p class="pend" style="margin:4px 0 0">As conversas entre os alunos são privadas. Aqui aparecem só as que algum aluno denunciou, com as mensagens daquela conversa. ${ab?`<b style="color:#E5484D">${ab} em aberto.</b>`:'Nenhuma em aberto.'}</p></div>
+   ${L.map(x=>`<details class="card den${x.resolvida?' ok':''}" style="margin-bottom:10px"><summary><b>${esc(x.de_nome)}</b> denunciou <b>${esc(x.contra_nome)}</b> <span class="pend">· ${quandoMsg(x.criada)} · ${x.resolvida?'resolvida':'<span style="color:#E5484D;font-weight:700">em aberto</span>'}</span></summary>
+     <p class="pend" style="margin:8px 0">${esc(x.de)} → ${esc(x.contra)}</p>${x.motivo?`<p><b>Motivo:</b> ${esc(x.motivo)}</p>`:''}
+     <div class="msgs" style="height:auto;max-height:360px;border-radius:12px">${(x.conversa||[]).map(m=>`<div class="bal${m.autor===x.de_nome?' eu':''}"><small style="align-self:flex-start;font-weight:700">${esc(m.autor)}</small><span>${esc(m.texto)}</span><small>${quandoMsg(m.criada)}</small></div>`).join('')||'<p class="pend">Sem mensagens.</p>'}</div>
+     <button class="btn" data-id="${x.id}" data-r="${x.resolvida?0:1}" style="margin-top:10px">${x.resolvida?'Reabrir':'Marcar como resolvida'}</button></details>`).join('')}`;
+  $('app').querySelectorAll('[data-r]').forEach(b=>b.onclick=async()=>{await SB.rpc('admin_resolver',{p_id:+b.dataset.id,p:b.dataset.r==='1'});telaDen();});}
 entrar();
 </script>
 <script src="../js/presenca.js" defer></script>
