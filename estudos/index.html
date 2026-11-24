@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#16304F">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sala de Estudos · PREPARA UFU</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --azul:#3A8CCB; --amarelo:#DDDD24; --grafite:#222322; --laranja:#EB6834; --verde:#1BAF7A; --roxo:#7B4FC9; --verm:#D9434F;
+  --bg:#F4F6FB; --card:#FFFFFF; --ink:#141A2E; --muted:#5C6380; --line:#DDE1EC; --soft:#ECEFF6; --head:#16304F;
+  --ok:#1A8A4C; --bad:#D33A2C; --shadow:0 1px 2px rgba(20,26,46,.05),0 6px 20px rgba(20,26,46,.06);
+  --display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif; --body:"Public Sans",system-ui,sans-serif;
+  --t-teoria:#3A8CCB; --t-questoes:#EB6834; --t-revisao:#1BAF7A; --t-correcao:#7B4FC9;
+}
+:root[data-theme="dark"]{--bg:#0B1020;--card:#151C2E;--ink:#EEF0F7;--muted:#9AA1BD;--line:#262E46;--soft:#1E2740;--shadow:none;color-scheme:dark;}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:400 15.5px/1.5 var(--body);animation:fadein .25s ease}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+header{background:var(--head);padding:14px 22px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;border-bottom:4px solid var(--amarelo);position:relative}
+.logos{display:flex;align-items:center;gap:16px;text-decoration:none}
+.logos img.j{height:46px}.logos img.p{height:34px}
+.logos .sep{width:1px;height:40px;background:#55595E}
+.tabs{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.tabs a,.tabs button{font:600 14px var(--body);border:1px solid #4A4F55;background:transparent;color:#fff;padding:7px 14px;border-radius:999px;cursor:pointer;text-decoration:none}
+.tabs .am{border-color:var(--amarelo);color:var(--amarelo)}
+.theme{display:inline-flex!important;gap:2px;padding:3px!important;border:1px solid #3B5878!important;background:#0E2238!important}
+.theme span{width:28px;height:26px;display:grid;place-items:center;border-radius:999px;color:#9FB3CC;font-size:15px}
+:root:not([data-theme="dark"]) .theme .sun,:root[data-theme="dark"] .theme .moon{background:#fff;color:#16304F}
+@media (max-width:760px){header{padding:12px 14px;gap:10px}.logos{gap:10px}.logos img.j{height:32px}.logos img.p{height:24px}.logos .sep{height:28px}
+  .tabs{margin-left:0;flex:1 1 100%}.tabs a,.tabs button{padding:6px 11px;font-size:13px}.tabs .theme{position:absolute;top:13px;right:12px}html,body{overflow-x:clip}}
+.subnav{position:sticky;top:0;z-index:25;background:var(--card);border-bottom:1px solid var(--line)}
+.subnav .in{max-width:1180px;margin:0 auto;padding:8px 16px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;align-items:center}
+.subnav button{flex:none;font:600 14px var(--body);border:0;background:transparent;color:var(--muted);padding:9px 14px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.subnav button:hover{color:var(--ink);background:var(--soft)}.subnav button.on{background:var(--azul);color:#fff}
+#exBar{background:var(--amarelo);color:#16304F;font:600 14px var(--body);padding:8px 16px;text-align:center;position:sticky;top:52px;z-index:24}
+#exBar[hidden]{display:none}#exBar button{margin-left:10px;font:700 13px var(--body);background:#16304F;color:#fff;border:0;border-radius:999px;padding:5px 12px;cursor:pointer}
+main{max-width:1180px;margin:0 auto;padding:22px 16px 60px;display:flex;flex-direction:column;gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 20px;box-shadow:var(--shadow)}
+.pend{font-size:14px;color:var(--muted)}
+h2.t{margin:0;font:800 24px var(--display)}
+select,input[type=number],input[type=text]{font:500 16px var(--body);padding:11px 13px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);width:100%}
+.btn{font:700 15px var(--body);border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:11px 18px;border-radius:12px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;justify-content:center}
+.btn.pri{background:var(--azul);border-color:var(--azul);color:#fff}.btn.del{color:var(--verm)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+/* sala */
+.passo{display:flex;align-items:center;gap:10px;margin:0 0 12px}.passo b{width:28px;height:28px;border-radius:50%;background:var(--azul);color:#fff;display:grid;place-items:center;font:800 14px var(--display);flex:none}
+.passo h3{margin:0;font:800 19px var(--display)}
+.tipos{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.tipo{position:relative;overflow:hidden;border:2px solid transparent;border-radius:20px;padding:18px 16px 16px;cursor:pointer;color:#fff;text-align:left;font:inherit;background:var(--c);box-shadow:0 8px 24px color-mix(in srgb,var(--c) 30%,transparent);transition:transform .15s,box-shadow .15s,opacity .15s;min-height:132px;display:flex;flex-direction:column;justify-content:flex-end;gap:2px}
+.tipo::before{content:'';position:absolute;right:-30px;top:-30px;width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,.16)}
+.tipo::after{content:'';position:absolute;right:20px;top:46px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.1)}
+.tipo .ic{position:absolute;top:14px;left:14px;font-size:30px;line-height:1}
+.tipo b{font:800 19px var(--display);position:relative}.tipo small{font-size:13px;opacity:.9;position:relative}
+.tipo:hover{transform:translateY(-3px)}
+.tipos.esc .tipo:not(.on){opacity:.45}.tipo.on{border-color:#fff;box-shadow:0 0 0 4px color-mix(in srgb,var(--c) 45%,transparent),0 10px 28px color-mix(in srgb,var(--c) 40%,transparent)}
+.tipo.on::after{content:'✓';background:#fff;color:var(--c);display:grid;place-items:center;font:800 20px var(--body);width:34px;height:34px;right:14px;top:14px}
+.escolha{display:grid;grid-template-columns:1fr 1.6fr;gap:14px}
+.escolha label{display:flex;flex-direction:column;gap:6px;font:700 14px var(--body)}
+.escolha .ajuda{font-weight:500;font-size:12.5px;color:var(--muted)}
+.comecar{width:100%;font:800 19px var(--display);padding:16px;border-radius:16px;border:0;color:#16304F;background:var(--amarelo);cursor:pointer;margin-top:6px;box-shadow:0 10px 26px rgba(221,221,36,.25)}
+.comecar:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+/* cronômetro */
+.relogio{display:flex;flex-direction:column;align-items:center;gap:16px;padding:26px 18px;border-radius:24px;background:radial-gradient(600px 300px at 50% 0%,color-mix(in srgb,var(--c) 22%,transparent),transparent 70%),var(--card);border:1px solid var(--line)}
+.chip{display:inline-flex;align-items:center;gap:7px;background:var(--c);color:#fff;font:800 14px var(--body);padding:6px 14px;border-radius:999px}
+.rmat{text-align:center}.rmat b{display:block;font:800 22px var(--display)}.rmat span{color:var(--muted)}
+.dial{position:relative;width:min(330px,82vw);aspect-ratio:1}
+.dial svg{width:100%;height:100%}
+.dial .tm{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.dial .tm b{font:800 clamp(44px,12vw,64px)/1 var(--display);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.dial .tm span{margin-top:6px;color:var(--muted);font-size:14px}
+.dial.pausa .tm b{opacity:.55}
+.rbtns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.rbtns .btn{min-width:150px;font-size:16px;padding:13px 20px;border-radius:14px}
+.rbtns .fim{background:var(--verm);border-color:var(--verm);color:#fff}
+.pulse{animation:pulse 2s infinite}@keyframes pulse{50%{opacity:.6}}
+.hoje{display:flex;flex-direction:column;gap:8px}
+.ses{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-left:6px solid var(--c);border-radius:12px;padding:10px 12px;background:var(--bg)}
+.ses .tx{flex:1;min-width:0}.ses .tx b{display:block}.ses .tx span{color:var(--muted);font-size:13px}
+.ses .du{font:800 17px var(--display);font-variant-numeric:tabular-nums;white-space:nowrap}
+.ses .del{border:0;background:none;color:var(--muted);cursor:pointer;font-size:18px}
+/* diálogo */
+.dlg{position:fixed;inset:0;z-index:60;background:rgba(5,8,18,.6);display:flex;align-items:flex-start;justify-content:center;padding:30px 14px;overflow:auto}
+.dlg .box{background:var(--card);border:1px solid var(--line);border-radius:20px;max-width:460px;width:100%;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.dlg .top{padding:18px 20px;background:var(--c);color:#fff}.dlg .top h3{margin:0;font:800 21px var(--display)}.dlg .top p{margin:2px 0 0;opacity:.92}
+.dlg .bd{padding:18px 20px;display:flex;flex-direction:column;gap:14px}
+.qs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.qs label{display:flex;flex-direction:column;gap:5px;font:700 13px var(--body);text-align:center}
+.qs input{text-align:center;font:800 24px var(--display);padding:10px 6px}
+.qs .ac input{border-color:var(--verde)}.qs .er input{border-color:var(--verm)}
+.dlg .msg{color:var(--verm);font-size:14px;min-height:18px;margin:0}
+.dlg .chk{display:flex;gap:8px;align-items:center;font-size:14px}
+/* dashboard (mesma linguagem da Análise de Incidência) */
+.dtop{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.dtop h2{margin:0;font:800 24px var(--display)}.dtop select{width:auto;min-width:260px;font-weight:600}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.kpi{border-radius:18px;padding:16px 18px;display:grid;grid-template-columns:60px 1fr;gap:14px;align-items:center;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);min-width:0}
+.kpi>div{min-width:0;display:flex;flex-direction:column}
+.kpi span{font:600 12px var(--body);text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}
+.kpi b{font:800 27px/1.15 var(--display);font-variant-numeric:tabular-nums}.kpi b small{font-size:15px;color:var(--muted)}
+.kpi small{font-size:13px;color:var(--muted)}
+.k-a{background:linear-gradient(135deg,#3A8CCB,#16304F);border:0;color:#fff}.k-a span,.k-a small,.k-a b small{color:#D6E6F5}
+.ico{width:56px;height:56px;border-radius:16px;display:grid;place-items:center;font-size:24px;background:var(--soft)}.k-a .ico{background:rgba(255,255,255,.16)}
+.ring{width:60px;height:60px}.ring .rv{font:800 14px var(--display);fill:var(--ink)}
+.chart{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px 22px;box-shadow:var(--shadow)}
+.chart h3{font:700 19px var(--display);margin:0 0 4px;display:flex;align-items:center;gap:10px}.chart h3 .hi{width:12px;height:26px;border-radius:6px;flex:none}
+.hi.a{background:linear-gradient(#3A8CCB,#DDDD24)}.hi.b{background:linear-gradient(#EB6834,#7B61FF)}.hi.c{background:linear-gradient(#1BAF7A,#3A8CCB)}
+.chart .sub{margin:0 0 12px;color:var(--muted);font-size:13.5px}
+.duo{display:grid;grid-template-columns:1.4fr 1fr;gap:16px}
+.heat{overflow-x:auto;padding-bottom:6px}
+.heat .grid{display:grid;grid-auto-flow:column;grid-template-rows:16px repeat(7,15px);gap:4px;width:max-content}
+.heat .dl{font-size:11px;color:var(--muted);line-height:15px;padding-right:4px}
+.heat .ml{font-size:11px;color:var(--muted);white-space:nowrap;line-height:16px}
+.heat .c{width:15px;height:15px;border-radius:4px;background:var(--soft)}
+.heat .c.l1{background:color-mix(in srgb,var(--verde) 30%,var(--soft))}.heat .c.l2{background:color-mix(in srgb,var(--verde) 55%,var(--soft))}.heat .c.l3{background:color-mix(in srgb,var(--verde) 80%,var(--soft))}.heat .c.l4{background:var(--verde)}
+.heat .c.hj{outline:2px solid var(--amarelo);outline-offset:1px}.heat .c.fut{opacity:.35}.heat .c.prova{background:var(--amarelo)}
+.hleg{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);margin-top:8px}.hleg .c{width:12px;height:12px;border-radius:3px}
+.wbars{display:flex;align-items:flex-end;gap:8px;height:170px;padding-top:10px}
+.wb{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0;height:100%;justify-content:flex-end}
+.wb i{display:block;width:100%;max-width:44px;border-radius:8px 8px 3px 3px;background:linear-gradient(#3A8CCB,#16304F);min-height:3px}
+.wb.cur i{background:linear-gradient(#DDDD24,#C9A227)}
+.wb b{font:700 12px var(--body);font-variant-numeric:tabular-nums}.wb span{font-size:11px;color:var(--muted);white-space:nowrap}
+.mt{width:100%;border-collapse:collapse;font-size:14px}
+.mt th{color:var(--muted);font:600 11.5px var(--body);text-transform:uppercase;letter-spacing:.05em;text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+.mt td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+.mt .nm{display:flex;align-items:center;gap:8px;font-weight:700;white-space:nowrap}.mt .nm i{width:12px;height:12px;border-radius:4px;flex:none}
+.tbar{height:12px;border-radius:6px;background:var(--soft);overflow:hidden;min-width:90px}.tbar em{display:block;height:100%;border-radius:6px}
+.ae{display:flex;height:12px;border-radius:6px;overflow:hidden;background:var(--soft);min-width:110px}.ae .a{background:var(--verde)}.ae .e{background:var(--verm)}
+.pc{font:800 15px var(--display);padding:3px 9px;border-radius:999px;white-space:nowrap}
+.pc.bom{background:rgba(27,175,122,.16);color:#1BAF7A}.pc.med{background:rgba(221,221,36,.18);color:#B8B81C}.pc.ruim{background:rgba(217,67,79,.16);color:#E5484D}.pc.nd{color:var(--muted)}
+.donut text{fill:var(--ink)}
+.dwrap{display:flex;gap:18px;align-items:center;flex-wrap:wrap}.dwrap svg{width:190px;height:190px;flex:none}
+.legend{flex:1;display:flex;flex-direction:column;gap:7px;min-width:180px}.lg{display:grid;grid-template-columns:14px 1fr auto auto;gap:9px;align-items:center;font-size:14px}.lg i{width:14px;height:14px;border-radius:4px}.lg small{color:var(--muted)}
+.vazio{text-align:center;padding:40px 20px}.vazio b{display:block;font:800 22px var(--display);margin-bottom:6px}
+@media (max-width:860px){.tipos{grid-template-columns:repeat(2,minmax(0,1fr))}.escolha{grid-template-columns:1fr}.duo{grid-template-columns:1fr}.mt .opt{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <a class="logos" href="/" title="Início da plataforma PREPARA UFU"><img class="j" src="../bancodequestoes/logo/jazz_claro.png" alt="Jazz, Professor de Matemática"><span class="sep"></span><img class="p" src="../bancodequestoes/logo/prepara_transp.png" alt="Prepara UFU"></a>
+  <nav class="tabs"><button class="theme" id="theme" aria-label="Alternar modo diurno e noturno" title="Modo diurno / noturno"><span class="sun">☀</span><span class="moon">☾</span></button><a href="../bancodequestoes/">Banco de Questões</a><a href="../aulas/#agenda">Agenda</a><a href="../aulas/#materiais">Materiais</a><a class="am" href="../assessoria/">Assessoria</a><button id="sair">Sair</button></nav>
+</header>
+<nav class="subnav" aria-label="Sala de Estudos"><div class="in"><button id="tabSala" class="on">Sala de Estudos</button><button id="tabPainel" hidden>Meu Dashboard</button><button id="tabAlunos" hidden>Dashboard dos alunos</button><button id="tabEx" hidden>Ver como aluno</button></div></nav>
+<div id="exBar" hidden>Modo aluno exemplo — é assim que o aluno vê. <button type="button" id="exSair">Sair do modo exemplo</button></div>
+<main id="app"><p class="pend">Carregando…</p></main>
+
+<script>(function(){var V='1795533665';var K='bqufu-recarga-';
+function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
+function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
+  try{if(sessionStorage.getItem(K+t))return;}catch(e){}
+  if(!forcar&&aberto()){return;}
+  try{sessionStorage.setItem(K+t,'1')}catch(e){}var u=new URL(location.href);u.searchParams.set('v',t);location.replace(u.toString());}).catch(function(){});}
+confere(true);
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')confere(false);});
+window.addEventListener('focus',function(){confere(false);});
+setInterval(function(){if(document.visibilityState==='visible')confere(false);},180000);})();</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+(function(){let m=null;try{m=localStorage.getItem('bqufu-tema-v2');}catch(e){}
+  const set=t=>{document.documentElement.setAttribute('data-theme',t);try{localStorage.setItem('bqufu-tema-v2',t);}catch(e){}};
+  set(m||'dark');$('theme').onclick=()=>set(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');})();
+const SB=supabase.createClient('https://ygdlbhoqyqjsqoyyfizk.supabase.co','sb_publishable_jB2I59Ruw4MaMT63KLWtSA_O-DMf63b');
+const ADMIN='jesrrael.santos@gmail.com',EXEMPLO='exemplo@preparaufu.com.br';
+let EMAIL='',REAL_ADMIN=false,ASSESSORIA=false,ALVO='',EXMODO=false,PLANO=null,LINGUA='';
+const TIPOS={teoria:['Teoria','📖','Assistir aula, ler e resumir','#3A8CCB'],questoes:['Questões','✏️','Resolver listas e provas','#EB6834'],revisao:['Revisão','🔁','Flashcards, Anki, caderno de erros','#1BAF7A'],correcao:['Correção de simulado','✅','Corrigir e entender os erros','#7B4FC9']};
+const MATS=['Matemática','Física','Química','Biologia','Português','Literatura','Redação','História','Geografia','Filosofia','Sociologia','Inglês','Espanhol','Francês'];
+const CORM={'Matemática':'#D9480F','Física':'#1864AB','Química':'#5F3DC4','Biologia':'#2B8A3E','Português':'#C92A2A','Literatura':'#A61E4D','Redação':'#C2255C','História':'#7F4F24','Geografia':'#5C7A0A','Filosofia':'#495057','Sociologia':'#8C6500','Inglês':'#0B7285','Espanhol':'#0B7285','Francês':'#0B7285'};
+const PROVA=new Date(2027,3,4);
+const KEY='bqufu-sessao';
+const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const pData=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d);};
+const dm=d=>String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0');
+const hms=s=>{s=Math.max(0,Math.floor(s));return String(Math.floor(s/3600)).padStart(2,'0')+':'+String(Math.floor(s%3600/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');};
+const hfmt=s=>{const m=Math.round(s/60);if(m<60)return m+' min';const h=Math.floor(m/60),r=m%60;return h+' h'+(r?' '+String(r).padStart(2,'0'):'');};
+const hdec=s=>(s/3600).toFixed(1).replace('.',',');
+const MESX=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+
+$('sair').onclick=async()=>{await SB.auth.signOut();location.href='/';};
+async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!session){location.replace('/?volta='+encodeURIComponent(location.pathname+location.hash));return;}
+  EMAIL=(session.user.email||'').toLowerCase();REAL_ADMIN=EMAIL===ADMIN;
+  const [ok,as]=await Promise.all([SB.rpc('is_allowed'),SB.rpc('is_assessoria')]);
+  if(!ok.data){await SB.auth.signOut();location.href='/';return;}
+  ASSESSORIA=!!as.data;ALVO=EMAIL;
+  let ex=null;try{ex=sessionStorage.getItem('bqufu-exemplo');}catch(e){}
+  if(REAL_ADMIN&&ex){EXMODO=true;ALVO=EXEMPLO;}
+  menus();
+  $('tabSala').onclick=()=>{history.replaceState(null,'','#sala');telaSala();};
+  $('tabPainel').onclick=()=>{history.replaceState(null,'','#painel');telaPainel(ALVO);};
+  $('tabAlunos').onclick=()=>{history.replaceState(null,'','#alunos');telaAlunos();};
+  $('tabEx').onclick=()=>{EXMODO=true;ALVO=EXEMPLO;try{sessionStorage.setItem('bqufu-exemplo','assessoria');}catch(e){}menus();telaSala();};
+  $('exSair').onclick=()=>{EXMODO=false;ALVO=EMAIL;try{sessionStorage.removeItem('bqufu-exemplo');}catch(e){}menus();telaAlunos();};
+  const al=new URLSearchParams(location.search).get('aluno');
+  if(REAL_ADMIN&&!EXMODO&&(al||location.hash==='#alunos'))telaAlunos(al);
+  else if(location.hash==='#painel'&&$('tabPainel').hidden===false)telaPainel(ALVO);
+  else telaSala();}
+function menus(){const adm=REAL_ADMIN&&!EXMODO;$('tabPainel').hidden=!(ASSESSORIA&&!adm);$('tabPainel').textContent='Meu Dashboard';$('tabAlunos').hidden=!adm;$('tabEx').hidden=!adm;$('exBar').hidden=!EXMODO;}
+const abas=on=>['tabSala','tabPainel','tabAlunos'].forEach(t=>$(t).classList.toggle('on',t===on));
+
+async function carregaPlano(){if(PLANO)return;const [p,c]=await Promise.all([SB.from('plano_itens').select('id,semana,materia,frente,assunto').order('id'),SB.from('checkup').select('respostas').eq('email',ALVO).maybeSingle()]);
+  PLANO=p.data||[];LINGUA=(c.data&&c.data.respostas&&c.data.respostas.lingua)||'';}
+const semanas=()=>[...new Set(PLANO.map(x=>x.semana))].sort();
+const semAtual=()=>{const s=semanas(),h=iso(new Date());let i=s.findIndex((x,k)=>h>=x&&(k===s.length-1||h<s[k+1]));return i<0?(h<s[0]?0:s.length-1):i;};
+const lerS=()=>{try{const s=JSON.parse(localStorage.getItem(KEY)||'null');return s&&s.email===ALVO?s:null;}catch(e){return null;}};
+const gravaS=s=>{try{s?localStorage.setItem(KEY,JSON.stringify(s)):localStorage.removeItem(KEY);}catch(e){}};
+const decorrido=s=>(s.acum||0)+(s.rodando?Date.now()-s.desde:0);
+let TICK=null;
+
+/* ---------- Sala de Estudos ---------- */
+async function telaSala(){abas('tabSala');clearInterval(TICK);$('app').innerHTML='<p class="pend">Carregando a sala de estudos…</p>';
+  try{await carregaPlano();}catch(e){}
+  const s=lerS();if(s){desenhaRelogio(s);return;}
+  const esc_={tipo:null,materia:'',item:'',outro:''};
+  const lst=semanas(),ca=semAtual();
+  const matsPlano=[...new Set(PLANO.map(x=>x.materia))];
+  const ordem=MATS.filter(m=>matsPlano.includes(m)||!['Inglês','Espanhol','Francês'].includes(m)||(m==='Francês'&&LINGUA==='Francês'));
+  const minhas=ordem.filter(m=>!(m==='Inglês'&&LINGUA==='Espanhol')&&!(m==='Espanhol'&&LINGUA==='Inglês'));
+  $('app').innerHTML=`<div class="card"><div class="passo"><b>1</b><h3>O que você vai fazer agora?</h3></div>
+     <div class="tipos" id="tipos">${Object.entries(TIPOS).map(([k,[n,ic,d,c]])=>`<button class="tipo" data-t="${k}" style="--c:${c}"><span class="ic">${ic}</span><b>${n}</b><small>${d}</small></button>`).join('')}</div></div>
+   <div class="card"><div class="passo"><b>2</b><h3>O que você vai estudar?</h3></div>
+     <div class="escolha"><label>Matéria<select id="sMat"><option value="">Escolha a matéria</option>${minhas.map(m=>`<option>${esc(m)}</option>`).join('')}</select></label>
+     <label>Assunto<select id="sAss" disabled><option value="">Escolha antes a matéria</option></select><span class="ajuda">Aparecem todos os assuntos do Plano de Estudos, de todas as semanas: pode adiantar conteúdo.</span></label></div>
+     <label id="lOutro" hidden style="display:flex;flex-direction:column;gap:6px;font:700 14px var(--body);margin-top:12px">Qual assunto?<input type="text" id="sOutro" placeholder="ex.: lista de exercícios de funções" maxlength="140"></label></div>
+   <button class="comecar" id="go" disabled>▶ Começar a estudar</button>
+   <div class="card" id="hojeBox"><h3 style="margin:0 0 10px;font:800 18px var(--display)">Hoje</h3><p class="pend" style="margin:0">Carregando…</p></div>`;
+  const pronto=()=>{$('go').disabled=!(esc_.tipo&&esc_.materia&&(esc_.item&&esc_.item!=='__outro'||(esc_.item==='__outro'&&$('sOutro').value.trim())));};
+  $('tipos').querySelectorAll('.tipo').forEach(b=>b.onclick=()=>{esc_.tipo=b.dataset.t;$('tipos').classList.add('esc');$('tipos').querySelectorAll('.tipo').forEach(x=>x.classList.toggle('on',x===b));pronto();});
+  $('sMat').onchange=()=>{esc_.materia=$('sMat').value;esc_.item='';const L=PLANO.filter(x=>x.materia===esc_.materia);
+    let h='<option value="">Escolha o assunto</option>';
+    lst.forEach((w,i)=>{const G=L.filter(x=>x.semana===w);if(!G.length)return;h+=`<optgroup label="Semana ${i+1} · ${dm(pData(w))}${i===ca?' (esta semana)':''}">${G.map(x=>`<option value="${x.id}">${esc(x.assunto)}${x.frente?' — '+esc(x.frente):''}</option>`).join('')}</optgroup>`;});
+    h+='<option value="__outro">Outro assunto (digitar)</option>';
+    $('sAss').innerHTML=h;$('sAss').disabled=!esc_.materia;
+    const atual=L.find(x=>x.semana===lst[ca]);if(atual){$('sAss').value=String(atual.id);esc_.item=String(atual.id);}
+    else if(!L.length){$('sAss').value='__outro';esc_.item='__outro';}
+    $('lOutro').hidden=esc_.item!=='__outro';pronto();};
+  $('sAss').onchange=()=>{esc_.item=$('sAss').value;$('lOutro').hidden=esc_.item!=='__outro';if(esc_.item==='__outro')$('sOutro').focus();pronto();};
+  $('sOutro').oninput=pronto;
+  $('go').onclick=()=>{const it=esc_.item!=='__outro'?PLANO.find(x=>String(x.id)===esc_.item):null;
+    const s={email:ALVO,tipo:esc_.tipo,materia:esc_.materia,assunto:it?it.assunto:$('sOutro').value.trim(),item:it?it.id:null,inicio:Date.now(),desde:Date.now(),acum:0,rodando:true};
+    gravaS(s);desenhaRelogio(s);};
+  desenhaHoje();}
+function desenhaRelogio(s){abas('tabSala');const [n,ic,,c]=TIPOS[s.tipo];
+  $('app').innerHTML=`<div class="relogio" style="--c:${c}"><span class="chip">${ic} ${esc(n)}</span><div class="rmat"><b>${esc(s.materia)}</b><span>${esc(s.assunto||'')}</span></div>
+    <div class="dial" id="dial"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="88" fill="none" stroke="var(--soft)" stroke-width="12"/><circle id="arc" cx="100" cy="100" r="88" fill="none" stroke="${c}" stroke-width="12" stroke-linecap="round" transform="rotate(-90 100 100)" stroke-dasharray="0 553"/>${Array.from({length:12},(_,i)=>{const a=i*30*Math.PI/180;return `<circle cx="${100+76*Math.sin(a)}" cy="${100-76*Math.cos(a)}" r="${i%3?1.6:2.6}" fill="var(--muted)" opacity=".6"/>`;}).join('')}</svg>
+      <div class="tm"><b id="tempo">00:00:00</b><span id="estado"></span></div></div>
+    <div class="rbtns"><button class="btn" id="pp"></button><button class="btn fim" id="fim">■ Encerrar</button></div>
+    <p class="pend" style="margin:0;text-align:center">Pode fechar ou trocar de página: o cronômetro continua contando e você volta para ele aqui.</p></div>
+   <div class="card" id="hojeBox"><h3 style="margin:0 0 10px;font:800 18px var(--display)">Hoje</h3><p class="pend" style="margin:0">Carregando…</p></div>`;
+  const atual=()=>{const t=decorrido(s)/1000;$('tempo').textContent=hms(t);const frac=(t%3600)/3600;$('arc').setAttribute('stroke-dasharray',(553*frac).toFixed(1)+' 553');
+    $('estado').textContent=s.rodando?'estudando… (anel = minutos da hora)':'pausado';$('estado').className=s.rodando?'pulse':'';$('dial').classList.toggle('pausa',!s.rodando);
+    $('pp').textContent=s.rodando?'❚❚ Pausar':'▶ Continuar';};
+  clearInterval(TICK);TICK=setInterval(atual,500);atual();
+  $('pp').onclick=()=>{if(s.rodando){s.acum=decorrido(s);s.rodando=false;}else{s.desde=Date.now();s.rodando=true;}gravaS(s);atual();};
+  $('fim').onclick=()=>encerrar(s);
+  desenhaHoje();}
+function encerrar(s){const seg=Math.round(decorrido(s)/1000);if(s.rodando){s.acum=decorrido(s);s.rodando=false;gravaS(s);}
+  const [n,ic,,c]=TIPOS[s.tipo];const pedeQ=s.tipo==='questoes'||s.tipo==='correcao';
+  const d=document.createElement('div');d.className='dlg';d.innerHTML=`<div class="box" style="--c:${c}"><div class="top"><h3>${ic} Sessão encerrada: ${hfmt(seg)}</h3><p>${esc(s.materia)} · ${esc(s.assunto||'')}</p></div>
+   <form class="bd"><div><b style="font-size:15px">Questões ${pedeQ?'':'(se você fez alguma)'}</b><p class="pend" style="margin:2px 0 8px">Quantas você fez, acertou e errou nesta sessão?</p>
+    <div class="qs"><label>Feitas<input type="number" name="q" min="0" max="999" inputmode="numeric" value="${pedeQ?'':0}"></label><label class="ac">Acertos<input type="number" name="a" min="0" max="999" inputmode="numeric" value="${pedeQ?'':0}"></label><label class="er">Erros<input type="number" name="e" min="0" max="999" inputmode="numeric" value="${pedeQ?'':0}"></label></div></div>
+    ${s.item&&ASSESSORIA_ALVO()?`<label class="chk"><input type="checkbox" name="mk" checked> Marcar “${esc(s.assunto)}” como estudado no Plano de Estudos</label>`:''}
+    <p class="msg"></p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn pri" type="submit" style="flex:1">Salvar sessão</button><button class="btn" type="button" data-x="volta">Voltar a estudar</button></div>
+    <button class="btn del" type="button" data-x="desc" style="background:none;border:0">Descartar esta sessão</button></form></div>`;
+  document.body.appendChild(d);const f=d.querySelector('form'),msg=t=>d.querySelector('.msg').textContent=t;
+  const num=x=>{const v=parseInt(f[x].value,10);return isNaN(v)?0:v;};
+  f.a.oninput=()=>{if(f.q.value!=='')f.e.value=Math.max(0,num('q')-num('a'));};f.q.oninput=f.a.oninput;
+  d.querySelector('[data-x=volta]').onclick=()=>{d.remove();s.desde=Date.now();s.rodando=true;gravaS(s);desenhaRelogio(s);};
+  d.querySelector('[data-x=desc]').onclick=()=>{if(!confirm('Descartar esta sessão? O tempo não será salvo.'))return;gravaS(null);d.remove();telaSala();};
+  f.onsubmit=async ev=>{ev.preventDefault();const q=num('q'),a=num('a'),e=num('e');
+    if(a+e>q){msg('Acertos + erros não pode passar do total de questões feitas.');return;}
+    const bt=f.querySelector('[type=submit]');bt.disabled=true;
+    const fimT=Date.now();const row={email:s.email,inicio:new Date(s.inicio).toISOString(),fim:new Date(fimT).toISOString(),segundos:seg,tipo:s.tipo,materia:s.materia,assunto:s.assunto||null,plano_item:s.item,questoes:q,acertos:a,erros:e};
+    const r=await SB.from('sessoes').insert(row);if(r.error){msg('Não foi possível salvar: '+r.error.message);bt.disabled=false;return;}
+    if(f.mk&&f.mk.checked)await SB.from('plano_feito').insert({email:s.email,item:s.item});
+    gravaS(null);d.remove();telaSala();};}
+function ASSESSORIA_ALVO(){return EXMODO||ASSESSORIA;}
+async function desenhaHoje(){const ini=new Date();ini.setHours(0,0,0,0);
+  const {data}=await SB.from('sessoes').select('*').eq('email',ALVO).gte('inicio',ini.toISOString()).order('inicio',{ascending:false});
+  const box=$('hojeBox');if(!box)return;const L=data||[];const tot=L.reduce((t,x)=>t+x.segundos,0),q=L.reduce((t,x)=>t+x.questoes,0),a=L.reduce((t,x)=>t+x.acertos,0);
+  box.innerHTML=`<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px"><h3 style="margin:0;font:800 18px var(--display)">Hoje</h3><span class="pend">${L.length?`${hfmt(tot)} estudados · ${q} questões${q?` · ${Math.round(100*a/q)}% de acerto`:''}`:'nenhuma sessão ainda'}</span></div>
+   <div class="hoje">${L.map(x=>{const [n,ic,,c]=TIPOS[x.tipo];const h=new Date(x.inicio);return `<div class="ses" style="--c:${c}"><span style="font-size:20px">${ic}</span><div class="tx"><b>${esc(x.materia)} · ${esc(n)}</b><span>${String(h.getHours()).padStart(2,'0')}:${String(h.getMinutes()).padStart(2,'0')} · ${esc(x.assunto||'')}${x.questoes?` · ${x.acertos}/${x.questoes} acertos`:''}</span></div><span class="du">${hfmt(x.segundos)}</span><button class="del" data-id="${x.id}" title="Apagar sessão">×</button></div>`;}).join('')}</div>`;
+  box.querySelectorAll('.del').forEach(b=>b.onclick=async()=>{if(!confirm('Apagar esta sessão do seu histórico?'))return;await SB.from('sessoes').delete().eq('id',b.dataset.id);desenhaHoje();});}
+
+/* ---------- Dashboard ---------- */
+const anel=(p,cor)=>{const R=24,C=2*Math.PI*R;return `<svg class="ring" viewBox="0 0 60 60"><circle cx="30" cy="30" r="${R}" fill="none" stroke="var(--soft)" stroke-width="7"/><circle cx="30" cy="30" r="${R}" fill="none" stroke="${cor}" stroke-width="7" stroke-linecap="round" stroke-dasharray="${(C*p/100).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 30 30)"/><text class="rv" x="30" y="35" text-anchor="middle">${p}%</text></svg>`;};
+const pcCls=p=>p==null?'nd':p>=70?'bom':p>=50?'med':'ruim';
+async function telaPainel(email,cab){if(!cab)abas('tabPainel');$('app').innerHTML=(cab||'')+'<p class="pend">Carregando o dashboard…</p>';
+  const {data,error}=await SB.from('sessoes').select('*').eq('email',email).order('inicio');
+  if(error){$('app').innerHTML=(cab||'')+`<div class="card"><p class="pend">${esc(error.message)}</p></div>`;ligaCab();return;}
+  const S=data||[];
+  if(!S.length){$('app').innerHTML=(cab||'')+`<div class="card vazio"><b>${cab?'Este aluno ainda não registrou sessões de estudo.':'Seu dashboard aparece aqui assim que você registrar a primeira sessão.'}</b><p class="pend">${cab?'':'Vá à Sala de Estudos, escolha o que vai fazer e aperte “Começar”.'}</p>${cab?'':'<button class="btn pri" id="irSala" style="margin-top:10px">Ir para a Sala de Estudos</button>'}</div>`;ligaCab();if($('irSala'))$('irSala').onclick=telaSala;return;}
+  const tot=S.reduce((t,x)=>t+x.segundos,0),Q=S.reduce((t,x)=>t+x.questoes,0),A=S.reduce((t,x)=>t+x.acertos,0),E=S.reduce((t,x)=>t+x.erros,0);
+  const porDia={};S.forEach(x=>{const k=iso(new Date(x.inicio));porDia[k]=(porDia[k]||0)+x.segundos;});
+  const dias=Object.keys(porDia).length;
+  const hoje=new Date();hoje.setHours(0,0,0,0);const seg=new Date(hoje);seg.setDate(hoje.getDate()-((hoje.getDay()+6)%7));
+  const semana=S.filter(x=>new Date(x.inicio)>=seg).reduce((t,x)=>t+x.segundos,0);
+  let seq=0;for(let d=new Date(hoje);;d.setDate(d.getDate()-1)){if(porDia[iso(d)])seq++;else if(iso(d)!==iso(hoje))break;else continue;if(seq>400)break;}
+  const pct=Q?Math.round(100*A/Q):null;const faltam=Math.max(0,Math.round((PROVA-hoje)/864e5));
+  // heatmap
+  const ini=new Date(Math.min(new Date(2026,10,23),new Date(S[0].inicio)));ini.setHours(0,0,0,0);ini.setDate(ini.getDate()-((ini.getDay()+6)%7));
+  const fimH=new Date(2027,3,4);const cols=[];for(let d=new Date(ini);d<=fimH;d.setDate(d.getDate()+7))cols.push(new Date(d));
+  const lv=s=>!s?'':s<1800?'l1':s<3600*2?'l2':s<3600*4?'l3':'l4';
+  let heat=`<div class="dl"></div>${['Seg','','Qua','','Sex','','Dom'].map(x=>`<div class="dl">${x}</div>`).join('')}`;
+  let mesAnt=-1;
+  cols.forEach(c=>{const ml=c.getMonth()!==mesAnt?MESX[c.getMonth()]:'';mesAnt=c.getMonth();heat+=`<div class="ml">${ml}</div>`;
+    for(let i=0;i<7;i++){const d=new Date(c);d.setDate(c.getDate()+i);const k=iso(d),s=porDia[k]||0;const fut=d>hoje;const pv=k==='2027-04-04';
+      heat+=`<div class="c ${lv(s)}${k===iso(hoje)?' hj':''}${fut?' fut':''}${pv?' prova':''}" title="${dm(d)}: ${pv?'Prova UFU · ':''}${s?hfmt(s)+' de estudo':'sem estudo'}"></div>`;}});
+  // semanas
+  const W=[];for(let k=7;k>=0;k--){const a=new Date(seg);a.setDate(seg.getDate()-7*k);const b=new Date(a);b.setDate(a.getDate()+7);W.push({a,s:S.filter(x=>{const t=new Date(x.inicio);return t>=a&&t<b;}).reduce((t,x)=>t+x.segundos,0)});}
+  const wmax=Math.max(3600,...W.map(w=>w.s));
+  // matérias
+  const M={};S.forEach(x=>{const m=M[x.materia]=M[x.materia]||{s:0,q:0,a:0,e:0};m.s+=x.segundos;m.q+=x.questoes;m.a+=x.acertos;m.e+=x.erros;});
+  const ML=Object.entries(M).sort((a,b)=>b[1].s-a[1].s);const smax=Math.max(...ML.map(x=>x[1].s));
+  const qComp=ML.filter(([,m])=>m.q>0);const melhor=qComp.length?qComp.slice().sort((a,b)=>b[1].a/b[1].q-a[1].a/a[1].q)[0]:null;const pior=qComp.length>1?qComp.slice().sort((a,b)=>a[1].a/a[1].q-b[1].a/b[1].q)[0]:null;
+  // tipos
+  const T={};S.forEach(x=>{T[x.tipo]=(T[x.tipo]||0)+x.segundos;});
+  let ang=0;const R=70,C=2*Math.PI*R;const segs=Object.entries(TIPOS).filter(([k])=>T[k]).map(([k,v])=>{const f=T[k]/tot,len=C*f;const el=`<circle cx="95" cy="95" r="${R}" fill="none" stroke="${v[3]}" stroke-width="26" stroke-dasharray="${len.toFixed(1)} ${(C-len).toFixed(1)}" stroke-dashoffset="${(-ang).toFixed(1)}" transform="rotate(-90 95 95)"/>`;ang+=len;return el;}).join('');
+  $('app').innerHTML=(cab||'')+`<div class="kpis">
+     <div class="kpi k-a"><div class="ico">⏱</div><div><span>Tempo total estudado</span><b>${hfmt(tot)}</b><small>${S.length} sessões · faltam ${faltam} dias para a UFU</small></div></div>
+     <div class="kpi"><div class="ico">📅</div><div><span>Esta semana</span><b>${hdec(semana)} <small>h</small></b><small>desde segunda-feira</small></div></div>
+     <div class="kpi"><div class="ico">🔥</div><div><span>Dias estudados</span><b>${dias}</b><small>${seq?`sequência atual: ${seq} dia${seq>1?'s':''} seguido${seq>1?'s':''}`:'comece uma sequência hoje'}</small></div></div>
+     <div class="kpi"><div class="ico">✏️</div><div><span>Questões feitas</span><b>${Q}</b><small><span style="color:#1BAF7A;font:inherit;text-transform:none;letter-spacing:0">${A} acertos</span> · <span style="color:#E5484D;font:inherit;text-transform:none;letter-spacing:0">${E} erros</span></small></div></div>
+     <div class="kpi">${anel(pct||0,pct==null?'var(--soft)':pct>=70?'#1BAF7A':pct>=50?'#C9C91A':'#E5484D')}<div><span>Aproveitamento</span><b>${pct==null?'—':pct+'%'}</b><small>${melhor?`melhor: ${esc(melhor[0])}`:'registre questões para ver'}${pior?` · atenção: ${esc(pior[0])}`:''}</small></div></div></div>
+   <div class="chart"><h3><i class="hi c"></i>Dias de estudo</h3><p class="sub">Cada quadradinho é um dia, de segunda a domingo. Quanto mais verde, mais tempo de estudo. O amarelo é o dia da prova.</p>
+     <div class="heat"><div class="grid">${heat}</div></div><div class="hleg">Menos <span class="c" style="background:var(--soft)"></span><span class="c l1"></span><span class="c l2"></span><span class="c l3"></span><span class="c l4" style="background:var(--verde)"></span> Mais</div></div>
+   <div class="duo"><div class="chart"><h3><i class="hi a"></i>Horas por semana</h3><p class="sub">As últimas 8 semanas (a amarela é a atual).</p>
+       <div class="wbars">${W.map((w,i)=>`<div class="wb${i===W.length-1?' cur':''}"><b>${hdec(w.s)}h</b><i style="height:${Math.max(2,Math.round(130*w.s/wmax))}px"></i><span>${dm(w.a)}</span></div>`).join('')}</div></div>
+     <div class="chart"><h3><i class="hi b"></i>Como você estuda</h3><p class="sub">Tempo por tipo de estudo.</p>
+       <div class="dwrap"><svg viewBox="0 0 190 190" class="donut"><circle cx="95" cy="95" r="${R}" fill="none" stroke="var(--soft)" stroke-width="26"/>${segs}<text x="95" y="92" text-anchor="middle" style="font:800 22px var(--display)">${hdec(tot)}h</text><text x="95" y="112" text-anchor="middle" style="font:600 10px var(--body);opacity:.7">NO TOTAL</text></svg>
+       <div class="legend">${Object.entries(TIPOS).map(([k,v])=>`<div class="lg"><i style="background:${v[3]}"></i><span>${v[0]}</span><b>${hfmt(T[k]||0)}</b><small>${Math.round(100*(T[k]||0)/tot)}%</small></div>`).join('')}</div></div></div></div>
+   <div class="chart"><h3><i class="hi a"></i>Desempenho por matéria</h3><p class="sub">Tempo de estudo, questões feitas, acertos (verde) e erros (vermelho) e o aproveitamento de cada matéria.</p>
+     <div style="overflow-x:auto"><table class="mt"><thead><tr><th>Matéria</th><th>Tempo</th><th class="opt"></th><th>Questões</th><th>Acertos × erros</th><th>Aproveitamento</th></tr></thead><tbody>
+     ${ML.map(([n,m])=>{const p=m.q?Math.round(100*m.a/m.q):null;const cor=CORM[n]||'#3A8CCB';return `<tr><td><span class="nm"><i style="background:${cor}"></i>${esc(n)}</span></td><td style="white-space:nowrap;font-weight:700">${hfmt(m.s)}</td><td class="opt" style="width:28%"><div class="tbar"><em style="width:${Math.round(100*m.s/smax)}%;background:${cor}"></em></div></td><td style="font-weight:700">${m.q||'—'}</td><td>${m.q?`<div class="ae" title="${m.a} acertos · ${m.e} erros"><span class="a" style="width:${100*m.a/m.q}%"></span><span class="e" style="width:${100*m.e/m.q}%"></span></div><small class="pend">${m.a} ✓ · ${m.e} ✗</small>`:'<small class="pend">sem questões</small>'}</td><td><span class="pc ${pcCls(p)}">${p==null?'—':p+'%'}</span></td></tr>`;}).join('')}</tbody></table></div></div>
+   <div class="chart"><h3><i class="hi c"></i>Atividade recente</h3><div class="hoje" style="margin-top:10px">${S.slice(-8).reverse().map(x=>{const [n,ic,,c]=TIPOS[x.tipo];const h=new Date(x.inicio);return `<div class="ses" style="--c:${c}"><span style="font-size:20px">${ic}</span><div class="tx"><b>${esc(x.materia)} · ${esc(n)}</b><span>${dm(h)} às ${String(h.getHours()).padStart(2,'0')}:${String(h.getMinutes()).padStart(2,'0')} · ${esc(x.assunto||'')}${x.questoes?` · ${x.acertos}/${x.questoes} acertos`:''}</span></div><span class="du">${hfmt(x.segundos)}</span></div>`;}).join('')}</div></div>`;
+  ligaCab();}
+let LALUNOS=null;
+function ligaCab(){const s=$('selAl');if(!s)return;s.onchange=()=>telaAlunos(s.value);$('alAnt').onclick=()=>{if(s.selectedIndex>0){s.selectedIndex--;s.onchange();}};$('alProx').onclick=()=>{if(s.selectedIndex<s.options.length-1){s.selectedIndex++;s.onchange();}};}
+async function telaAlunos(email){abas('tabAlunos');
+  if(!LALUNOS){const {data}=await SB.rpc('admin_lista');LALUNOS=(data||[]).filter(a=>a.email!==ADMIN&&a.email!==EXEMPLO).sort((a,b)=>(b.assessoria-a.assessoria)||(a.nome||a.email).localeCompare(b.nome||b.email,'pt-BR',{sensitivity:'base'}));}
+  if(!LALUNOS.length){$('app').innerHTML='<div class="card"><p class="pend">Nenhum aluno cadastrado.</p></div>';return;}
+  const al=email&&LALUNOS.find(a=>a.email===email)?email:LALUNOS[0].email;
+  const cab=`<div class="card dtop"><h2>Dashboard do aluno</h2><select id="selAl">${LALUNOS.map(a=>`<option value="${esc(a.email)}"${a.email===al?' selected':''}>${esc(a.nome||a.email)}${a.assessoria?'':' (Curso de Matemática)'}</option>`).join('')}</select><button class="btn" id="alAnt">‹</button><button class="btn" id="alProx">›</button></div>`;
+  history.replaceState(null,'','?aluno='+encodeURIComponent(al)+'#alunos');
+  telaPainel(al,cab);}
+entrar();
+</script>
+</body>
+</html>
