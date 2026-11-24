@@ -388,7 +388,7 @@ body{animation:fadein .25s ease}@keyframes fadein{from{opacity:0}to{opacity:1}}
 <div id="exBar" hidden><span id="exTxt"></span> <button type="button" id="exPuro"></button> <button type="button" id="exSair">Voltar aos mentorados</button><button type="button" id="exTroca" hidden></button></div>
 <main id="app"></main>
 
-<script>(function(){var V='1795551542';var K='bqufu-recarga-';
+<script>(function(){var V='1795553728';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -1379,6 +1379,31 @@ async function subirPlano(file,P,msg){msg('Lendo a planilha…');const X=await x
   for(let i=0;i<rows.length;i+=400){const {error}=await SB.from('m_plano').insert(rows.slice(i,i+400));if(error){msg('Erro: '+error.message);return;}}
   telaPlano();}
 
+/* ---------- mensalidade ---------- */
+const brl=v=>v==null||v===''?'':Number(v).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+function stVenc(v){if(!v)return null;const d=Math.round((pData(v)-pData(isoD(new Date())))/864e5);return {dias:d,tipo:d<0?'vencido':d===0?'hoje':d<=5?'vence':'ok'};}
+const telWa=t=>{let d=String(t||'').replace(/\D/g,'');if(!d)return '';if(d.length<=11)d='55'+d;return d;};
+function quandoVence(v){const s=stVenc(v),dt=brData(v);return s.dias<0?`venceu em ${dt}`:s.dias===0?`vence hoje (${dt})`:s.dias===1?`vence amanhã (${dt})`:`vence em ${dt}`;}
+function msgCobranca(a){const n=(a.nome||'').trim().split(/\s+/)[0];
+  return `Olá, ${n}! Tudo bem? Aqui é o Prof. Jazz. 😊\n\nPassando para avisar que o seu plano da Mentoria Individual precisa ser renovado: ele ${quandoVence(a.vencimento)}.\n\nO valor da renovação é de ${brl(a.valor)}.\n\nPara seguir com o seu plano de estudos, os nossos encontros e todo o acompanhamento, é só me responder por aqui que eu te passo os dados para o pagamento.\n\nVamos juntos rumo à aprovação! 💛`;}
+const linkWa=a=>{const t=telWa(a.whatsapp);return t?`https://wa.me/${t}?text=${encodeURIComponent(msgCobranca(a))}`:'';};
+function maisMes(v){const d=pData(v||isoD(new Date()));const x=new Date(d.getFullYear(),d.getMonth()+1,d.getDate());if(x.getDate()!==d.getDate())x.setDate(0);return isoD(x);}
+function pagar(a,depois){const prox=maisMes(a.vencimento);
+  const [d,fecha]=mdlg(`<div class="mtop" style="--c:#1BAF7A"><h3>Registrar pagamento</h3><p>${esc(a.nome)}</p></div><form class="mfm"><div class="m3"><label>Pago em<input type="date" name="pago" value="${isoD(new Date())}" required></label><label>Valor (R$)<input name="valor" inputmode="decimal" value="${a.valor!=null?String(a.valor).replace('.',','):''}"></label><label>Próximo vencimento<input type="date" name="prox" value="${prox}" required></label></div><p class="pend" style="margin:0">O próximo vencimento já vem um mês depois do atual. O aviso para você e para o aluno some até lá.</p><p class="mmsg"></p><div class="mbt"><button class="btn pri" type="submit">Salvar pagamento</button><button class="btn" type="button" data-fecha>Cancelar</button></div></form>`,'#1BAF7A');
+  const f=d.querySelector('form');f.onsubmit=async e=>{e.preventDefault();const val=parseFloat(String(f.valor.value).replace(/\./g,'').replace(',','.'))||null;
+    const a1=await SB.from('m_pagamentos').insert({email:a.email,pago_em:f.pago.value,valor:val,referente:a.vencimento||null});
+    const a2=await SB.from('mentorados').update({vencimento:f.prox.value}).eq('email',a.email);
+    if(a1.error||a2.error){d.querySelector('.mmsg').textContent=(a1.error||a2.error).message;return;}fecha();depois&&depois();};}
+function editaMensal(a,depois){
+  const [d,fecha]=mdlg(`<div class="mtop"><h3>Dados da mentoria</h3><p>${esc(a.nome)}</p></div><form class="mfm"><label>Nome completo<input name="nome" value="${esc(a.nome)}" required></label><div class="m3"><label>Valor mensal (R$)<input name="valor" inputmode="decimal" value="${a.valor!=null?String(a.valor).replace('.',','):''}" placeholder="700,00"></label><label>Próximo vencimento<input type="date" name="venc" value="${esc(a.vencimento||'')}"></label><label>WhatsApp<input name="whats" value="${esc(a.whatsapp||'')}" placeholder="(34) 99999-9999"></label></div><p class="pend" style="margin:0">O WhatsApp vem do perfil de estudos do aluno; preencha aqui se quiser usar outro número.</p><p class="mmsg"></p><div class="mbt"><button class="btn pri" type="submit">Salvar</button><button class="btn" type="button" data-fecha>Cancelar</button></div></form>`);
+  const f=d.querySelector('form');f.onsubmit=async e=>{e.preventDefault();const val=f.valor.value.trim()?parseFloat(f.valor.value.replace(/\./g,'').replace(',','.')):null;
+    const {error}=await SB.from('mentorados').update({nome:f.nome.value.trim(),valor:isNaN(val)?null:val,vencimento:f.venc.value||null,whatsapp:f.whats.value.trim()||null}).eq('email',a.email);
+    if(error){d.querySelector('.mmsg').textContent=error.message;return;}fecha();depois&&depois();};}
+function cobrancasHTML(L){const C=L.filter(a=>a.email!==EXEMPLO&&a.vencimento&&['vencido','hoje','vence'].includes(stVenc(a.vencimento).tipo)).sort((x,y)=>x.vencimento<y.vencimento?-1:1);
+  if(!C.length)return '';
+  return `<section class="cobr"><div class="cobh"><span class="hico" style="background:#E5484D">${ICO.cal}</span><div><b>Mensalidades para renovar</b><small>${C.length} aluno${C.length>1?'s':''} com a mentoria vencendo ou vencida</small></div></div>
+   <div class="cobl">${C.map(a=>{const s=stVenc(a.vencimento),lk=linkWa(a);return `<div class="cobi ${s.tipo}"><div class="cobt"><b>${esc(a.nome)}</b><span>${s.tipo==='vencido'?'⚠ Mentoria vencida':'⏳ Mentoria vencendo'}: ${quandoVence(a.vencimento)}${a.valor!=null?' · '+brl(a.valor):''}</span></div>
+     <div class="mbt">${lk?`<a class="btn wa" href="${lk}" target="_blank" rel="noopener">${ICO.zap} Cobrar no WhatsApp</a>`:'<span class="pend">sem WhatsApp no cadastro</span>'}<button class="btn" data-pg="${esc(a.email)}">✓ Registrar pagamento</button></div></div>`;}).join('')}</div></section>`;}
 /* ---------- mentorados (professor) ---------- */
 async function mLista(){const {data,error}=await SB.rpc('m_lista');if(error)throw error;MLISTA=data||[];return MLISTA;}
 async function telaMentorados(){abas('tabResp');$('app').innerHTML='<p class="pend">Carregando…</p>';
@@ -1388,30 +1413,37 @@ async function telaMentorados(){abas('tabResp');$('app').innerHTML='<p class="pe
   const prox=reais.filter(a=>a.proximo&&a.proximo<=semFim).length;
   const card=a=>{const pct=a.itens?Math.round(100*a.feitos/a.itens):0;
     return `<button class="mcard" data-e="${esc(a.email)}" data-n="${esc(a.nome)}"><span class="mav">${esc(iniciais(a.nome))}</span><span class="mci"><b>${esc(a.nome)}</b><small>${esc(a.email)}</small>
-      <span class="mtags">${a.email===EXEMPLO?'<i class="t am">para testar</i>':a.cadastrado?'<i class="t ok">já entrou</i>':'<i class="t">ainda não entrou</i>'}${a.checkup_em?'<i class="t ok">perfil enviado</i>':'<i class="t">perfil pendente</i>'}</span>
+      <span class="mtags">${(()=>{const v=stVenc(a.vencimento);return !v||a.email===EXEMPLO?'':v.tipo==='vencido'?`<i class="t ruim">vencida ${dm(pData(a.vencimento))}</i>`:v.tipo==='ok'?`<i class="t">vence ${dm(pData(a.vencimento))}</i>`:`<i class="t amv">vence ${dm(pData(a.vencimento))}</i>`;})()}${a.email===EXEMPLO?'<i class="t am">para testar</i>':a.cadastrado?'<i class="t ok">já entrou</i>':'<i class="t">ainda não entrou</i>'}${a.checkup_em?'<i class="t ok">perfil enviado</i>':'<i class="t">perfil pendente</i>'}</span>
       <span class="mbar"><em style="width:${pct}%"></em></span><small>${a.itens?`Plano: ${a.feitos} de ${a.itens} assuntos (${pct}%)`:'Plano ainda não montado'} · ${a.proximo?'próximo encontro '+dm(pData(a.proximo))+(a.proximo===hojeS?' (hoje)':''):'sem encontro marcado'}</small></span><span class="seta">›</span></button>`;};
   $('app').innerHTML=`<div class="intro"><h2>Mentoria individual</h2><p>Os seus alunos da mentoria individual. Clique num aluno para entrar na área dele: você vê tudo como ele vê e, além disso, monta o plano, marca os encontros e envia os materiais.</p></div>
+   ${cobrancasHTML(L)}
    <div class="mk"><div><b>${reais.length}</b><span>mentorados</span></div><div><b>${ent}</b><span>já entraram</span></div><div><b>${perf}</b><span>enviaram o perfil</span></div><div><b>${prox}</b><span>encontros nos próximos 7 dias</span></div></div>
    <div class="mgrid">${reais.map(card).join('')||'<div class="intro"><p class="pend" style="margin:0">Nenhum mentorado ainda. Cadastre o primeiro na aba Cadastro.</p></div>'}</div>
    ${ex?`<div class="mgrid" style="margin-top:6px">${card(ex)}</div>`:''}`;
-  $('app').querySelectorAll('.mcard').forEach(b=>b.onclick=()=>entraAluno(b.dataset.e,b.dataset.n));}
+  $('app').querySelectorAll('.mcard').forEach(b=>b.onclick=()=>entraAluno(b.dataset.e,b.dataset.n));
+  $('app').querySelectorAll('[data-pg]').forEach(b=>b.onclick=()=>pagar(L.find(a=>a.email===b.dataset.pg),telaMentorados));}
 async function telaCad(){abas('tabCad');$('app').innerHTML='<p class="pend">Carregando…</p>';
   let L;try{L=(await mLista()).filter(a=>a.email!==EXEMPLO);}catch(e){$('app').innerHTML=`<div class="aviso"><p>${esc(e.message)}</p></div>`;return;}
   const fdt=d=>d?new Date(d).toLocaleDateString('pt-BR'):'';
   $('app').innerHTML=`<div class="cadbox"><h3>Cadastrar aluno da mentoria individual</h3><p class="pend" style="margin:0">O aluno entra pela primeira vez em “Primeiro acesso? Crie sua senha”, com o e-mail cadastrado aqui. Ele cai direto na área da mentoria, com o Banco de Questões e a Sala de Estudos. Ele não vê nada das turmas do PREPARA UFU.</p>
     <form class="cadf" id="mAdd"><input id="mNome" type="text" placeholder="nome completo do aluno" required><input id="mEmail" type="email" placeholder="e-mail do aluno" required><button class="btn pri" type="submit">Cadastrar</button>
+    <label class="cadl">Valor mensal (R$)<input id="mValor" inputmode="decimal" placeholder="700,00"></label><label class="cadl">Próximo vencimento<input id="mVenc" type="date"></label>
     <label class="chk" style="grid-column:1/-1"><input type="checkbox" id="mCopia" checked> Já começar com uma cópia do plano de estudos da turma (você ajusta depois)</label></form><p class="cadmsg" id="cadMsg" role="status"></p></div>
-   <div class="cadbox"><h3>Alunos da mentoria (${L.length})</h3><div style="overflow:auto"><table class="cadt"><thead><tr><th>Aluno</th><th>Situação</th><th>Plano</th><th></th></tr></thead><tbody>${L.map(a=>`<tr><td><b>${esc(a.nome)}</b><br><span class="em" style="color:var(--muted);font-size:13px">${esc(a.email)}</span></td>
+   <div class="cadbox"><h3>Alunos da mentoria (${L.length})</h3><div style="overflow:auto"><table class="cadt"><thead><tr><th>Aluno</th><th>Situação</th><th>Mensalidade</th><th>Plano</th><th></th></tr></thead><tbody>${L.map(a=>`<tr><td><b>${esc(a.nome)}</b><br><span class="em" style="color:var(--muted);font-size:13px">${esc(a.email)}</span></td>
      <td>${a.cadastrado?`<span class="tg ok">já criou senha</span>${a.ultimo_acesso?`<br><span style="font-size:12px;color:var(--muted)">último acesso ${fdt(a.ultimo_acesso)}</span>`:''}`:'<span class="tg">ainda não entrou</span>'}</td>
+     <td>${a.valor!=null?`<b>${brl(a.valor)}</b>`:'<span style="color:var(--muted)">sem valor</span>'}<br>${a.vencimento?(()=>{const v=stVenc(a.vencimento);return `<span class="tg ${v.tipo==='vencido'?'ruim':v.tipo==='ok'?'':'amv'}">${v.tipo==='vencido'?'vencida em':'vence em'} ${dm(pData(a.vencimento))}</span>`;})():'<span style="font-size:12px;color:var(--muted)">sem vencimento</span>'}</td>
      <td>${a.itens?`${a.itens} assuntos`:'<span style="color:var(--muted)">—</span>'}</td>
-     <td style="white-space:nowrap;text-align:right"><button class="x" data-o="${esc(a.email)}" data-n="${esc(a.nome)}">Abrir</button>${a.cadastrado?`<button class="x" data-z="${esc(a.email)}">Zerar senha</button>`:''}<button class="x del" data-r="${esc(a.email)}">Remover</button></td></tr>`).join('')||'<tr><td colspan="4" class="pend">Nenhum aluno ainda.</td></tr>'}</tbody></table></div></div>`;
+     <td style="white-space:nowrap;text-align:right"><button class="x" data-o="${esc(a.email)}" data-n="${esc(a.nome)}">Abrir</button><button class="x" data-ed="${esc(a.email)}">Editar</button>${a.vencimento?`<button class="x" data-pg="${esc(a.email)}">Pagou</button>`:''}${a.cadastrado?`<button class="x" data-z="${esc(a.email)}">Zerar senha</button>`:''}<button class="x del" data-r="${esc(a.email)}">Remover</button></td></tr>`).join('')||'<tr><td colspan="5" class="pend">Nenhum aluno ainda.</td></tr>'}</tbody></table></div></div>`;
   const msgf=t=>{$('cadMsg').textContent=t;};
   $('mAdd').onsubmit=async ev=>{ev.preventDefault();const email=$('mEmail').value.trim().toLowerCase(),nome=$('mNome').value.trim().replace(/\s+/g,' ');
     if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){msgf('E-mail inválido.');return;}if(nome.split(' ').length<2){msgf('Escreva o nome completo do aluno.');return;}
-    msgf('Cadastrando…');const {error}=await SB.from('mentorados').insert({email,nome});if(error){msgf(/duplicate/i.test(error.message)?'Este e-mail já está na mentoria.':error.message);return;}
+    const val=$('mValor').value.trim()?parseFloat($('mValor').value.replace(/\./g,'').replace(',','.')):null;
+    msgf('Cadastrando…');const {error}=await SB.from('mentorados').insert({email,nome,valor:isNaN(val)?null:val,vencimento:$('mVenc').value||null});if(error){msgf(/duplicate/i.test(error.message)?'Este e-mail já está na mentoria.':error.message);return;}
     if($('mCopia').checked){const c=await SB.rpc('m_copiar_plano',{p_email:email,p_substituir:true});if(c.error){msgf('Aluno cadastrado, mas o plano não foi copiado: '+c.error.message);return;}}
     await telaCad();$('cadMsg').textContent='✓ '+nome+' cadastrado(a) na mentoria.';};
   $('app').querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>entraAluno(b.dataset.o,b.dataset.n));
+  $('app').querySelectorAll('[data-ed]').forEach(b=>b.onclick=()=>editaMensal(L.find(a=>a.email===b.dataset.ed),telaCad));
+  $('app').querySelectorAll('[data-pg]').forEach(b=>b.onclick=()=>pagar(L.find(a=>a.email===b.dataset.pg),telaCad));
   $('app').querySelectorAll('[data-z]').forEach(b=>b.onclick=async()=>{const e=b.dataset.z;if(!confirm('Zerar a senha de '+e+'? O aluno vai criar uma nova em “Primeiro acesso”.'))return;const {error}=await SB.rpc('admin_zerar_senha',{e});await telaCad();$('cadMsg').textContent=error?error.message:'Senha zerada: '+e;});
   $('app').querySelectorAll('[data-r]').forEach(b=>b.onclick=async()=>{const e=b.dataset.r;if(!confirm('Remover '+e+' da mentoria individual? Ele perde o acesso a esta área. O plano, os encontros e os materiais dele ficam guardados.'))return;const {error}=await SB.from('mentorados').delete().eq('email',e);await telaCad();$('cadMsg').textContent=error?error.message:'Removido da mentoria: '+e;});}
 async function telaDash(){abas('tabDash');
@@ -1432,10 +1464,13 @@ const ICO={
  grade:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18M15 3v18"/></svg>',
  perfil:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg>',
  grafico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6"/><rect x="12" y="8" width="3" height="10"/><rect x="17" y="5" width="3" height="13"/></svg>',
+ zap:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 21l2.1-5.4A8.4 8.4 0 1 1 21 11.5z"/></svg>',
+ alerta:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 7v6M12 17h.01"/></svg>',
  seta:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>'};
 async function telaInicio(){abas('tabInicio');$('app').innerHTML='<p class="pend">Carregando…</p>';
   const hoje=isoD(new Date());
-  const [enc,ck]=await Promise.all([SB.from('m_encontros').select('*').eq('email',ALVO).order('data').order('ini'),SB.from('checkup').select('respostas').eq('email',ALVO).maybeSingle()]);
+  const [enc,ck,mr]=await Promise.all([SB.from('m_encontros').select('*').eq('email',ALVO).order('data').order('ini'),SB.from('checkup').select('respostas').eq('email',ALVO).maybeSingle(),SB.from('mentorados').select('nome,valor,vencimento').eq('email',ALVO).maybeSingle()]);
+  const M=mr.data||{},sv=stVenc(M.vencimento),avisa=sv&&['vencido','hoje','vence'].includes(sv.tipo);
   let P=null;try{P=await carregaPlano(ALVO);}catch(e){}
   const E=enc.data||[],prox=E.find(e=>e.data>=hoje),nEnc=E.filter(e=>e.data<hoje).length;
   const nome=(((ck.data&&ck.data.respostas&&ck.data.respostas.nome)||ANOME||'').trim().split(/\s+/)[0]||'').toLowerCase().replace(/^./,c=>c.toUpperCase());
@@ -1468,9 +1503,13 @@ async function telaInicio(){abas('tabInicio');$('app').innerHTML='<p class="pend
   $('app').innerHTML=`<section class="mh2"><div class="mhx"><span class="hk2">Mentoria individual · Prof. Jazz</span><h2>${nome?'Olá, '+esc(nome)+'!':'Olá!'}</h2><p>Este é o seu espaço da mentoria: o plano de estudos feito só para você, o cronograma, os encontros e os materiais.</p>
       <div class="mpills"><span><b>${dias}</b> dias para a 1ª fase da UFU</span><span><b>${pctTot}%</b> do plano estudado</span><span><b>${nEnc}</b> encontro${nEnc===1?'':'s'} realizado${nEnc===1?'':'s'}</span></div></div>
     <div class="mhf"><picture><source srcset="../img/jazz.webp" type="image/webp"><img src="../img/jazz.png" alt="Prof. Jazz"></picture></div></section>
+   ${avisa?`<div class="mvenc ${sv.tipo}"><span class="hico">${ICO.alerta}</span><div><b>${sv.tipo==='vencido'?'A sua mentoria precisa ser renovada':sv.tipo==='hoje'?'A sua mentoria vence hoje':'A sua mentoria está perto de vencer'}</b><p>O seu plano da Mentoria Individual ${quandoVence(M.vencimento)}${M.valor!=null?` · renovação: <b>${brl(M.valor)}</b>`:''}. Para continuar com o seu plano de estudos, os encontros e o acompanhamento do Prof. Jazz, fale com ele para renovar.</p></div></div>`:''}
    ${ck.data?'':`<button class="mperf" data-go="form"><span class="hico" style="background:var(--amarelo);color:#16304F">${ICO.perfil}</span><div><b>Preencha o seu perfil de estudos</b><small>Leva uns 10 minutos. Com ele o Prof. Jazz monta o seu Cronograma Semanal.</small></div>${ICO.seta}</button>`}
    <div class="hgrid">${encH}${plano}</div>
    <div class="htiles">${tiles.map(([k,h,ic,t,d,c1,c2])=>`<${h?`a href="${h}"`:`button data-go="${k}"`} class="htile" style="--c1:${c1};--c2:${c2}"><span class="tic">${ic}</span><b>${t}</b><small>${d}</small><span class="tar">${ICO.seta}</span></${h?'a':'button'}>`).join('')}</div>`;
+  if(avisa&&!IS_ADMIN){const k='bqufu-aviso-venc-'+ALVO+'-'+isoD(new Date());let ja=null;try{ja=sessionStorage.getItem(k);}catch(e){}
+    if(!ja){try{sessionStorage.setItem(k,'1');}catch(e){}const nm=((M.nome||'').split(' ')[0]||'');
+      mdlg(`<div class="mtop" style="--c:${sv.tipo==='vencido'?'#E5484D':'#C9A227'}"><h3>${sv.tipo==='vencido'?'Hora de renovar a sua mentoria':'Sua mentoria está vencendo'}</h3><p>Mentoria Individual · Prof. Jazz</p></div><div class="mfm"><p style="margin:0;font-size:16px;line-height:1.55">${nm?esc(nm)+', o':'O'} seu plano da Mentoria Individual <b>${quandoVence(M.vencimento)}</b>.${M.valor!=null?` O valor da renovação é de <b>${brl(M.valor)}</b>.`:''}</p><p style="margin:0;color:var(--muted)">Para continuar com o seu plano de estudos, os encontros e todo o acompanhamento, fale com o Prof. Jazz para renovar. Seguimos juntos rumo à aprovação! 💛</p><div class="mbt"><button class="btn pri" data-fecha>Entendi</button></div></div>`,sv.tipo==='vencido'?'#E5484D':'#C9A227');}}
   const go={plano:()=>telaPlano(),form:telaForm,crono:telaCrono,mat:telaMat,enc:telaEnc,dash:telaDash};$('app').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go[b.dataset.go]());}
 
 /* ---------- encontros ---------- */
@@ -1709,8 +1748,21 @@ label.btn{display:inline-flex;align-items:center;cursor:pointer}
 .raiox{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 18px}.raiox summary{cursor:pointer;font:700 16px var(--display)}.raiox summary small{font-weight:500;color:var(--muted)}.rxb{display:flex;flex-direction:column;gap:16px;margin-top:14px}
 .tabs .hdp.am{border-color:var(--amarelo);color:var(--amarelo)}
 #snNome{flex:none;align-self:center;font:800 14px var(--display);color:#16304F;background:var(--amarelo);padding:6px 12px;border-radius:999px;margin-right:6px;white-space:nowrap}
+
+.cobr{background:var(--card);border:1px solid color-mix(in srgb,#E5484D 45%,var(--line));border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:14px}
+.cobh{display:flex;align-items:center;gap:14px}.cobh b{display:block;font:800 20px var(--display)}.cobh small{color:var(--muted)}
+.cobl{display:flex;flex-direction:column;gap:10px}.cobi{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;border-radius:14px;padding:12px 14px;border:1px solid var(--line);border-left:6px solid #C9A227;background:color-mix(in srgb,#C9A227 8%,var(--card))}
+.cobi.vencido{border-left-color:#E5484D;background:color-mix(in srgb,#E5484D 9%,var(--card))}.cobt b{display:block;font-size:16px}.cobt span{color:var(--muted);font-size:14px}
+.btn.wa{background:#1FA855;border-color:#1FA855;color:#fff;text-decoration:none;display:inline-flex;align-items:center;gap:7px}.btn.wa svg{width:17px;height:17px}
+.t.ruim{background:color-mix(in srgb,#E5484D 18%,transparent);color:#E5484D}.t.amv{background:color-mix(in srgb,#C9A227 20%,transparent);color:#C9A227}
+.tg.ruim{background:color-mix(in srgb,#E5484D 18%,transparent);color:#E5484D}.tg.amv{background:color-mix(in srgb,#C9A227 20%,transparent);color:#B8901C}
+.cadl{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600;color:var(--muted)}
+.cadl input{font:400 15px var(--body);padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);color-scheme:inherit}
+.mvenc{display:flex;gap:14px;align-items:flex-start;border-radius:18px;padding:16px 18px;background:color-mix(in srgb,#C9A227 14%,var(--card));border:1px solid color-mix(in srgb,#C9A227 55%,var(--line))}
+.mvenc .hico{background:#C9A227}.mvenc.vencido{background:color-mix(in srgb,#E5484D 12%,var(--card));border-color:color-mix(in srgb,#E5484D 55%,var(--line))}.mvenc.vencido .hico{background:#E5484D}
+.mvenc b{font:800 18px var(--display)}.mvenc p{margin:4px 0 0;line-height:1.5}
 </style>
 
-<script src="../js/presenca.js?v=1795551542" defer></script>
+<script src="../js/presenca.js?v=1795553728" defer></script>
 </body>
 </html>
