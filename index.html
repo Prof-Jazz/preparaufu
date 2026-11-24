@@ -143,8 +143,8 @@ body[data-tela]{animation:fadein .35s ease}@keyframes fadein{from{opacity:0}to{o
 <section id="areas" aria-label="Escolha a área"><img class="arhex" src="img/jazz-marca.png" alt="" aria-hidden="true">
   <div class="logos"><img class="j" src="bancodequestoes/logo/jazz_claro.png" alt="Jazz, Professor de Matemática"><span class="sep"></span><img class="p" src="bancodequestoes/logo/prepara_transp.png" alt="PREPARA UFU"></div>
   <h1 id="arTit">Olá! Para onde vamos?</h1><p class="lead">Escolha a área que você quer acessar agora. Dá para trocar depois.</p>
-  <div class="areas2"><button class="area tu" id="arTurma" type="button"><img class="ai" src="img/area-turmas.png" alt="" aria-hidden="true"><b>Turmas PREPARA UFU</b><small id="arTurmaTx">Assessoria e Curso de Matemática: Banco de Questões, Sala de Estudos, Agenda, Materiais, alunos, cadastro e assessores.</small><span class="ir">Entrar nas turmas ›</span></button>
-  <a class="area me" href="/mentoria/"><img class="ai" src="img/area-mentoria.png" alt="" aria-hidden="true"><b>Mentoria individual</b><small id="arMentTx">Os seus alunos da mentoria individual: plano de estudos de cada um, encontros, cronograma, materiais e dashboard.</small><span class="ir">Entrar na mentoria ›</span></a></div>
+  <div class="areas2"><button class="area tu" id="arTurma" type="button"><img class="ai" src="img/area-turmas2.png" alt="" aria-hidden="true"><b>Turmas PREPARA UFU</b><small id="arTurmaTx">Assessoria e Curso de Matemática: Banco de Questões, Sala de Estudos, Agenda, Materiais, alunos, cadastro e assessores.</small><span class="ir">Entrar nas turmas ›</span></button>
+  <a class="area me" href="/mentoria/"><img class="ai" src="img/area-mentoria2.png" alt="" aria-hidden="true"><b>Mentoria individual</b><small id="arMentTx">Os seus alunos da mentoria individual: plano de estudos de cada um, encontros, cronograma, materiais e dashboard.</small><span class="ir">Entrar na mentoria ›</span></a></div>
   <button id="arSair" type="button" class="lnk" style="align-self:flex-start;background:none;border:0;color:var(--muted);cursor:pointer;font:600 14px var(--body)">Sair</button>
 </section>
 <a id="trocaArea" href="/?area=escolher" hidden>Trocar de área</a>
@@ -224,7 +224,7 @@ $('sairTopo').onclick=async()=>{try{sessionStorage.removeItem('bqufu-area');sess
 inicio();
 })();
 </script>
-<script>(function(){var V='1795556137';var K='bqufu-recarga-';
+<script>(function(){var V='1795556147';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -234,6 +234,6 @@ confere(true);
 document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')confere(false);});
 window.addEventListener('focus',function(){confere(false);});
 setInterval(function(){if(document.visibilityState==='visible')confere(false);},180000);})();</script>
-<script src="js/presenca.js?v=1795556137" defer></script>
+<script src="js/presenca.js?v=1795556147" defer></script>
 </body>
 </html>
