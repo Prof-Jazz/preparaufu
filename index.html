@@ -2,6 +2,11 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#16304F">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Plataforma PREPARA UFU · Professor Jazz</title>
 <meta name="description" content="Plataforma PREPARA UFU do Professor Jazz: Banco de Questões UFU e Assessoria PREPARA UFU.">
@@ -178,7 +183,7 @@ $('sairTopo').onclick=async()=>{await SB.auth.signOut();history.replaceState(nul
 inicio();
 })();
 </script>
-<script>(function(){var V='1795489729';var K='bqufu-recarga-';
+<script>(function(){var V='1795489819';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
