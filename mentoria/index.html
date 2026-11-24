@@ -387,7 +387,7 @@ body{animation:fadein .25s ease}@keyframes fadein{from{opacity:0}to{opacity:1}}
 <div id="exBar" hidden><span id="exTxt"></span> <button type="button" id="exPuro"></button> <button type="button" id="exSair">Voltar aos mentorados</button><button type="button" id="exTroca" hidden></button></div>
 <main id="app"></main>
 
-<script>(function(){var V='1795549567';var K='bqufu-recarga-';
+<script>(function(){var V='1795549652';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -1297,7 +1297,7 @@ function telaGeral(){telaMentorados();}
 function telaResp(){telaMentorados();}
 function modoExemplo(on){if(on)entraAluno(EXEMPLO,'Aluno Exemplo da Mentoria');else saiAluno();}
 function entraAluno(email,nome){EXMODO=true;ALVO=email;ANOME=nome||email;try{sessionStorage.setItem('bqufu-mentoria-ver',JSON.stringify({email,nome:ANOME}));}catch(e){}menuM();telaInicio();window.scrollTo(0,0);}
-function saiAluno(){if(PURO){PURO=false;IS_ADMIN=true;}EXMODO=false;ALVO=EMAIL;ANOME='';try{sessionStorage.removeItem('bqufu-mentoria-ver');}catch(e){}menuM();telaMentorados();}
+function saiAluno(){if(PURO){PURO=false;IS_ADMIN=true;}try{sessionStorage.removeItem('bqufu-mentoria-puro');}catch(e){}EXMODO=false;ALVO=EMAIL;ANOME='';try{sessionStorage.removeItem('bqufu-mentoria-ver');}catch(e){}menuM();telaMentorados();}
 function mdlg(html,cor){const d=document.createElement('div');d.className='mdlg';d.innerHTML=`<div class="mbox" style="--c:${cor||'#16304F'}">${html}</div>`;document.body.appendChild(d);
   const fecha=()=>d.remove();d.onclick=e=>{if(e.target===d||e.target.closest('[data-fecha]'))fecha();};return [d,fecha];}
 
@@ -1432,7 +1432,7 @@ async function telaInicio(){abas('tabInicio');$('app').innerHTML='<p class="pend
   const [enc,ck]=await Promise.all([SB.from('m_encontros').select('*').eq('email',ALVO).order('data').order('ini'),SB.from('checkup').select('respostas').eq('email',ALVO).maybeSingle()]);
   let P=null;try{P=await carregaPlano(ALVO);}catch(e){}
   const E=enc.data||[],prox=E.find(e=>e.data>=hoje),nEnc=E.filter(e=>e.data<hoje).length;
-  const nome=((ck.data&&ck.data.respostas&&ck.data.respostas.nome)||ANOME||'').trim().split(/\s+/)[0]||''.toLowerCase().replace(/^./,c=>c.toUpperCase());
+  const nome=(((ck.data&&ck.data.respostas&&ck.data.respostas.nome)||ANOME||'').trim().split(/\s+/)[0]||'').toLowerCase().replace(/^./,c=>c.toUpperCase());
   const prova=new Date(2027,3,4),hd=new Date();hd.setHours(0,0,0,0);const dias=Math.max(0,Math.round((prova-hd)/864e5));
   const pctTot=P&&P.itens.length?Math.round(100*P.itens.filter(x=>P.feito.has(x.id)).length/P.itens.length):0;
   // card do plano
@@ -1535,8 +1535,8 @@ async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!se
   ALVO=EMAIL;
   $('tabResp').onclick=telaMentorados;$('tabCad').onclick=telaCad;$('tabGerais').onclick=telaGerais;$('tabInicio').onclick=telaInicio;$('tabRaio').onclick=telaRaio;$('tabDash').onclick=telaDash;$('tabPlano').onclick=()=>telaPlano();$('tabCrono').onclick=telaCrono;$('tabEnc').onclick=telaEnc;$('tabMat').onclick=telaMat;$('tabForm').onclick=telaForm;$('tabFaq').onclick=telaFaq;
   $('exSair').onclick=saiAluno;$('exTroca').onclick=saiAluno;
-  $('exPuro').onclick=()=>{const atual=MTABS.find(t=>$(t).classList.contains('on'));PURO=!PURO;IS_ADMIN=!PURO;menuM();const mapa={tabInicio:telaInicio,tabDash:telaDash,tabPlano:()=>telaPlano(),tabCrono:telaCrono,tabEnc:telaEnc,tabMat:telaMat,tabForm:telaForm,tabFaq:telaFaq};(mapa[atual]||telaInicio)();window.scrollTo(0,0);};
-  if(IS_ADMIN){let v=null;try{v=JSON.parse(sessionStorage.getItem('bqufu-mentoria-ver')||'null');}catch(e){}if(v&&v.email){entraAluno(v.email,v.nome);return;}menuM();telaMentorados();}
+  $('exPuro').onclick=()=>{const atual=MTABS.find(t=>$(t).classList.contains('on'));PURO=!PURO;IS_ADMIN=!PURO;try{PURO?sessionStorage.setItem('bqufu-mentoria-puro','1'):sessionStorage.removeItem('bqufu-mentoria-puro');}catch(e){}menuM();const mapa={tabInicio:telaInicio,tabDash:telaDash,tabPlano:()=>telaPlano(),tabCrono:telaCrono,tabEnc:telaEnc,tabMat:telaMat,tabForm:telaForm,tabFaq:telaFaq};(mapa[atual]||telaInicio)();window.scrollTo(0,0);};
+  if(IS_ADMIN){let v=null;try{v=JSON.parse(sessionStorage.getItem('bqufu-mentoria-ver')||'null');}catch(e){}if(v&&v.email){let pu=null;try{pu=sessionStorage.getItem('bqufu-mentoria-puro');}catch(e){}if(pu){PURO=true;IS_ADMIN=false;}entraAluno(v.email,v.nome);return;}menuM();telaMentorados();}
   else{const {data:me}=await SB.from('mentorados').select('nome').eq('email',EMAIL).maybeSingle();ANOME=me?me.nome:'';menuM();telaInicio();}}
 entrar();
 </script>
