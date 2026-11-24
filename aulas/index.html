@@ -175,7 +175,7 @@ textarea{min-height:70px;resize:vertical}
 <div id="exBar" hidden>Modo aluno exemplo — é assim que o aluno da turma <select id="exTurma"><option value="assessoria">Assessoria PREPARA UFU</option><option value="matematica">Curso de Matemática</option></select> vê esta página. <button type="button" id="exSair">Sair do modo exemplo</button></div>
 <main id="app"></main>
 
-<script>(function(){var V='1795488316';var K='bqufu-recarga-';
+<script>(function(){var V='1795489129';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -260,7 +260,7 @@ async function abrirArq(f,btn){const w=window.open('','_blank');if(btn)btn.disab
   if(w)w.location=data.signedUrl;else location.href=data.signedUrl;}
 const nomeSeguro=n=>n.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^\w.\-]+/g,'_').slice(-80);
 async function enviar(files,dono,id,prog){for(const [i,f] of [...files].entries()){
-    if(f.size>50*1048576){alert(f.name+' tem mais de 50 MB e não foi enviado.');continue;}
+    if(f.size>200*1048576){alert(f.name+' tem mais de 200 MB e não foi enviado.');continue;}
     if(prog)prog(`Enviando ${i+1} de ${files.length}: ${f.name}…`);
     const path=`${dono}/${id}/${Date.now()}-${nomeSeguro(f.name)}`;
     const up=await SB.storage.from('materiais').upload(path,f,{contentType:f.type||undefined,upsert:false});
@@ -272,7 +272,7 @@ async function apagarArq(f){await SB.storage.from('materiais').remove([f.path]);
 function linhaArq(f,adm){return `<div class="arq">${fic(f.nome)}<div class="tx"><b>${esc(f.nome)}</b><span>${tamanho(f.tamanho)}${f.criado_em?' · enviado em '+new Date(f.criado_em).toLocaleDateString('pt-BR'):''}</span></div><div class="bt"><button class="btn" data-abre="${f.id}">Abrir</button>${adm?`<button class="btn del" data-apaga="${f.id}">Excluir</button>`:''}</div></div>`;}
 function ligaArqs(root,depois){root.querySelectorAll('[data-abre]').forEach(b=>b.onclick=()=>abrirArq(ARQ.find(f=>f.id===b.dataset.abre),b));
   root.querySelectorAll('[data-apaga]').forEach(b=>b.onclick=async()=>{const f=ARQ.find(x=>x.id===b.dataset.apaga);if(!confirm('Excluir o arquivo “'+f.nome+'”?'))return;b.disabled=true;await apagarArq(f);await carregar();depois();});}
-function zonaUpload(el,dono,id,depois){el.innerHTML=`<div class="drop" tabindex="0"><b>+ Enviar arquivos</b><br><span style="font-size:13px">Clique ou arraste aqui PDFs, imagens, planilhas… (até 50 MB cada)</span><input type="file" multiple hidden></div><p class="pend up" style="margin:6px 0 0"></p>`;
+function zonaUpload(el,dono,id,depois){el.innerHTML=`<div class="drop" tabindex="0"><b>+ Enviar arquivos</b><br><span style="font-size:13px">Clique ou arraste aqui PDFs, imagens, planilhas… (até 200 MB cada)</span><input type="file" multiple hidden></div><p class="pend up" style="margin:6px 0 0"></p>`;
   const d=el.querySelector('.drop'),inp=el.querySelector('input'),pr=t=>el.querySelector('.up').textContent=t;
   const go=async fs=>{if(!fs.length)return;await enviar(fs,dono,id,pr);await carregar();depois();};
   d.onclick=()=>inp.click();d.onkeydown=e=>{if(e.key==='Enter')inp.click();};inp.onchange=()=>go(inp.files);
