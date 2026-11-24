@@ -68,6 +68,27 @@ select,input[type=number],input[type=text]{font:500 16px var(--body);padding:11p
 .escolha .ajuda{font-weight:500;font-size:12.5px;color:var(--muted)}
 .comecar{width:100%;font:800 19px var(--display);padding:16px;border-radius:16px;border:0;color:#16304F;background:var(--amarelo);cursor:pointer;margin-top:6px;box-shadow:0 10px 26px rgba(221,221,36,.25)}
 .comecar:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+.sala{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:16px;align-items:start}
+.cron{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:12px;box-shadow:var(--shadow)}
+.cronh{display:flex;align-items:center;justify-content:space-between;gap:10px;font:700 13px var(--body);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.visor{position:relative;overflow:hidden;border-radius:18px;padding:26px 18px 30px;text-align:center;color:#fff;background:linear-gradient(135deg,color-mix(in srgb,var(--c) 78%,#0B1020),#0E2238 85%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);transition:background .3s}
+.visor::before{content:'';position:absolute;left:-40px;top:-60px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.07)}
+.visor::after{content:'';position:absolute;right:-30px;bottom:-70px;width:180px;height:180px;border-radius:50%;border:16px solid rgba(255,255,255,.06)}
+.visor b{position:relative;display:block;font:800 clamp(52px,10vw,82px)/1 var(--display);font-variant-numeric:tabular-nums;letter-spacing:.01em;text-shadow:0 4px 20px rgba(0,0,0,.25)}
+.visor span{position:relative;display:inline-block;margin-top:10px;font:600 14px var(--body);color:rgba(255,255,255,.85);background:rgba(255,255,255,.12);padding:4px 12px;border-radius:999px}
+.visor .vbar{position:absolute;left:18px;right:18px;bottom:12px;height:5px;border-radius:9px;background:rgba(255,255,255,.15);overflow:hidden}.visor .vbar em{display:block;height:100%;width:0;background:var(--amarelo);border-radius:9px;transition:width .5s}
+.visor.pausa b{opacity:.55}
+.sessao{text-align:center}.sessao b{display:block;font:800 21px var(--display)}.sessao span{color:var(--muted)}
+.lbl{font:700 14px var(--body);margin-top:2px}
+.ajuda{font-size:12.5px;color:var(--muted);margin-top:-6px}
+.cron .tipos{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.cron .tipo{min-height:0;padding:14px 14px 13px 58px;border-radius:16px;justify-content:center}
+.cron .tipo .ic{top:50%;transform:translateY(-50%);left:14px;font-size:28px}
+.cron .tipo b{font-size:16.5px;line-height:1.15}.cron .tipo small{font-size:12px}
+.cron .tipo.on::after{width:26px;height:26px;font-size:15px;right:10px;top:10px}
+.cron .comecar{margin-top:4px}
+@media (max-width:860px){.sala{grid-template-columns:1fr}}
+@media (max-width:520px){.cron .tipo small{display:none}.cron .tipo{padding:16px 10px 16px 50px}.cron .tipo .ic{left:12px;font-size:24px}}
 /* cronômetro */
 .relogio{display:flex;flex-direction:column;align-items:center;gap:16px;padding:26px 18px;border-radius:24px;background:radial-gradient(600px 300px at 50% 0%,color-mix(in srgb,var(--c) 22%,transparent),transparent 70%),var(--card);border:1px solid var(--line)}
 .chip{display:inline-flex;align-items:center;gap:7px;background:var(--c);color:#fff;font:800 14px var(--body);padding:6px 14px;border-radius:999px}
@@ -151,7 +172,7 @@ select,input[type=number],input[type=text]{font:500 16px var(--body);padding:11p
 <div id="exBar" hidden>Modo aluno exemplo — é assim que o aluno vê. <button type="button" id="exSair">Sair do modo exemplo</button></div>
 <main id="app"><p class="pend">Carregando…</p></main>
 
-<script>(function(){var V='1795533811';var K='bqufu-recarga-';
+<script>(function(){var V='1795534001';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -217,50 +238,52 @@ let TICK=null;
 /* ---------- Sala de Estudos ---------- */
 async function telaSala(){abas('tabSala');clearInterval(TICK);$('app').innerHTML='<p class="pend">Carregando a sala de estudos…</p>';
   try{await carregaPlano();}catch(e){}
-  const s=lerS();if(s){desenhaRelogio(s);return;}
-  const esc_={tipo:null,materia:'',item:'',outro:''};
+  desenhaSala(lerS());}
+function desenhaSala(s){abas('tabSala');clearInterval(TICK);
+  const esc_={tipo:null,materia:'',item:''};
   const lst=semanas(),ca=semAtual();
-  const matsPlano=[...new Set(PLANO.map(x=>x.materia))];
-  const ordem=MATS.filter(m=>matsPlano.includes(m)||!['Inglês','Espanhol','Francês'].includes(m)||(m==='Francês'&&LINGUA==='Francês'));
-  const minhas=ordem.filter(m=>!(m==='Inglês'&&LINGUA==='Espanhol')&&!(m==='Espanhol'&&LINGUA==='Inglês'));
-  $('app').innerHTML=`<div class="card"><div class="passo"><b>1</b><h3>O que você vai fazer agora?</h3></div>
-     <div class="tipos" id="tipos">${Object.entries(TIPOS).map(([k,[n,ic,d,c]])=>`<button class="tipo" data-t="${k}" style="--c:${c}"><span class="ic">${ic}</span><b>${n}</b><small>${d}</small></button>`).join('')}</div></div>
-   <div class="card"><div class="passo"><b>2</b><h3>O que você vai estudar?</h3></div>
-     <div class="escolha"><label>Matéria<select id="sMat"><option value="">Escolha a matéria</option>${minhas.map(m=>`<option>${esc(m)}</option>`).join('')}</select></label>
-     <label>Assunto<select id="sAss" disabled><option value="">Escolha antes a matéria</option></select><span class="ajuda">Aparecem todos os assuntos do Plano de Estudos, de todas as semanas: pode adiantar conteúdo.</span></label></div>
-     <label id="lOutro" class="outro" hidden>Qual assunto?<input type="text" id="sOutro" placeholder="ex.: lista de exercícios de funções" maxlength="140"></label></div>
-   <button class="comecar" id="go" disabled>▶ Começar a estudar</button>
-   <div class="card" id="hojeBox"><h3 style="margin:0 0 10px;font:800 18px var(--display)">Hoje</h3><p class="pend" style="margin:0">Carregando…</p></div>`;
-  const pronto=()=>{$('go').disabled=!(esc_.tipo&&esc_.materia&&(esc_.item&&esc_.item!=='__outro'||(esc_.item==='__outro'&&$('sOutro').value.trim())));};
-  $('tipos').querySelectorAll('.tipo').forEach(b=>b.onclick=()=>{esc_.tipo=b.dataset.t;$('tipos').classList.add('esc');$('tipos').querySelectorAll('.tipo').forEach(x=>x.classList.toggle('on',x===b));pronto();});
-  $('sMat').onchange=()=>{esc_.materia=$('sMat').value;esc_.item='';const L=PLANO.filter(x=>x.materia===esc_.materia);
-    let h='<option value="">Escolha o assunto</option>';
-    lst.forEach((w,i)=>{const G=L.filter(x=>x.semana===w);if(!G.length)return;h+=`<optgroup label="Semana ${i+1} · ${dm(pData(w))}${i===ca?' (esta semana)':''}">${G.map(x=>`<option value="${x.id}">${esc(x.assunto)}${x.frente?' — '+esc(x.frente):''}</option>`).join('')}</optgroup>`;});
-    h+='<option value="__outro">Outro assunto (digitar)</option>';
-    $('sAss').innerHTML=h;$('sAss').disabled=!esc_.materia;
-    const atual=L.find(x=>x.semana===lst[ca]);if(atual){$('sAss').value=String(atual.id);esc_.item=String(atual.id);}
-    else if(!L.length){$('sAss').value='__outro';esc_.item='__outro';}
-    $('lOutro').hidden=esc_.item!=='__outro';pronto();};
-  $('sAss').onchange=()=>{esc_.item=$('sAss').value;$('lOutro').hidden=esc_.item!=='__outro';if(esc_.item==='__outro')$('sOutro').focus();pronto();};
-  $('sOutro').oninput=pronto;
-  $('go').onclick=()=>{const it=esc_.item!=='__outro'?PLANO.find(x=>String(x.id)===esc_.item):null;
-    const s={email:ALVO,tipo:esc_.tipo,materia:esc_.materia,assunto:it?it.assunto:$('sOutro').value.trim(),item:it?it.id:null,inicio:Date.now(),desde:Date.now(),acum:0,rodando:true};
-    gravaS(s);desenhaRelogio(s);};
+  const minhas=MATS.filter(m=>!(m==='Inglês'&&LINGUA==='Espanhol')&&!(m==='Espanhol'&&LINGUA==='Inglês')&&!(m==='Francês'&&LINGUA!=='Francês'));
+  const cor=s?TIPOS[s.tipo][3]:'#3A8CCB';
+  $('app').innerHTML=`<div class="sala"><section class="cron" id="cron" style="--c:${cor}">
+     <div class="cronh"><span>⏱ Cronômetro</span>${s?`<span class="chip">${TIPOS[s.tipo][1]} ${esc(TIPOS[s.tipo][0])}</span>`:''}</div>
+     <div class="visor${s?' ativo':''}" id="visor"><b id="tempo">00:00:00</b><span id="estado">Pronto para começar</span><i class="vbar"><em id="vbar"></em></i></div>
+     ${s?`<div class="sessao"><b>${esc(s.materia)}</b><span>${esc(s.assunto||'')}</span></div>
+       <div class="rbtns"><button class="btn" id="pp"></button><button class="btn fim" id="fim">■ Encerrar</button></div>
+       <p class="pend" style="margin:0;text-align:center">Pode fechar ou trocar de página: o cronômetro continua contando.</p>`
+     :`<div class="lbl">O que você vai fazer?</div>
+       <div class="tipos" id="tipos">${Object.entries(TIPOS).map(([k,[n,ic,d,c]])=>`<button class="tipo" data-t="${k}" style="--c:${c}"><span class="ic">${ic}</span><b>${n}</b><small>${d}</small></button>`).join('')}</div>
+       <label class="lbl" for="sMat">Matéria</label><select id="sMat"><option value="">Selecione a matéria</option>${minhas.map(m=>`<option>${esc(m)}</option>`).join('')}</select>
+       <label class="lbl" for="sAss">Assunto</label><select id="sAss" disabled><option value="">Escolha antes a matéria</option></select>
+       <span class="ajuda">Aparecem todos os assuntos do Plano de Estudos, de todas as semanas: pode adiantar conteúdo.</span>
+       <label id="lOutro" class="outro" hidden>Qual assunto?<input type="text" id="sOutro" placeholder="ex.: lista de exercícios de funções" maxlength="140"></label>
+       <button class="comecar" id="go" disabled>▶ Iniciar</button>`}
+   </section>
+   <aside class="card" id="hojeBox"><h3 style="margin:0 0 10px;font:800 18px var(--display)">Hoje</h3><p class="pend" style="margin:0">Carregando…</p></aside></div>`;
+  if(s){
+    const atual=()=>{const t=decorrido(s)/1000;$('tempo').textContent=hms(t);$('vbar').style.width=(100*(t%3600)/3600).toFixed(1)+'%';
+      $('estado').textContent=s.rodando?'Estudando…':'Pausado';$('estado').className=s.rodando?'pulse':'';$('visor').classList.toggle('pausa',!s.rodando);
+      $('pp').textContent=s.rodando?'❚❚ Pausar':'▶ Continuar';};
+    TICK=setInterval(atual,500);atual();
+    $('pp').onclick=()=>{if(s.rodando){s.acum=decorrido(s);s.rodando=false;}else{s.desde=Date.now();s.rodando=true;}gravaS(s);atual();};
+    $('fim').onclick=()=>encerrar(s);
+  }else{
+    const pronto=()=>{$('go').disabled=!(esc_.tipo&&esc_.materia&&esc_.item&&(esc_.item!=='__outro'||$('sOutro').value.trim()));
+      $('estado').textContent=$('go').disabled?'Pronto para começar':'Tudo certo: aperte Iniciar';};
+    $('tipos').querySelectorAll('.tipo').forEach(b=>b.onclick=()=>{esc_.tipo=b.dataset.t;$('tipos').classList.add('esc');$('tipos').querySelectorAll('.tipo').forEach(x=>x.classList.toggle('on',x===b));$('cron').style.setProperty('--c',TIPOS[esc_.tipo][3]);pronto();});
+    $('sMat').onchange=()=>{esc_.materia=$('sMat').value;esc_.item='';const L=PLANO.filter(x=>x.materia===esc_.materia);
+      let h='<option value="">Selecione o assunto</option>';
+      lst.forEach((w,i)=>{const G=L.filter(x=>x.semana===w);if(!G.length)return;h+=`<optgroup label="Semana ${i+1} · ${dm(pData(w))}${i===ca?' (esta semana)':''}">${G.map(x=>`<option value="${x.id}">${esc(x.assunto)}${x.frente?' — '+esc(x.frente):''}</option>`).join('')}</optgroup>`;});
+      h+='<option value="__outro">Outro assunto (digitar)</option>';
+      $('sAss').innerHTML=h;$('sAss').disabled=!esc_.materia;
+      const atualW=L.find(x=>x.semana===lst[ca]);if(atualW){$('sAss').value=String(atualW.id);esc_.item=String(atualW.id);}else if(esc_.materia&&!L.length){$('sAss').value='__outro';esc_.item='__outro';}
+      $('lOutro').hidden=esc_.item!=='__outro';pronto();};
+    $('sAss').onchange=()=>{esc_.item=$('sAss').value;$('lOutro').hidden=esc_.item!=='__outro';if(esc_.item==='__outro')$('sOutro').focus();pronto();};
+    $('sOutro').oninput=pronto;
+    $('go').onclick=()=>{const it=esc_.item!=='__outro'?PLANO.find(x=>String(x.id)===esc_.item):null;
+      const n={email:ALVO,tipo:esc_.tipo,materia:esc_.materia,assunto:it?it.assunto:$('sOutro').value.trim(),item:it?it.id:null,inicio:Date.now(),desde:Date.now(),acum:0,rodando:true};
+      gravaS(n);desenhaSala(n);};}
   desenhaHoje();}
-function desenhaRelogio(s){abas('tabSala');const [n,ic,,c]=TIPOS[s.tipo];
-  $('app').innerHTML=`<div class="relogio" style="--c:${c}"><span class="chip">${ic} ${esc(n)}</span><div class="rmat"><b>${esc(s.materia)}</b><span>${esc(s.assunto||'')}</span></div>
-    <div class="dial" id="dial"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="88" fill="none" stroke="var(--soft)" stroke-width="12"/><circle id="arc" cx="100" cy="100" r="88" fill="none" stroke="${c}" stroke-width="12" stroke-linecap="round" transform="rotate(-90 100 100)" stroke-dasharray="0 553"/>${Array.from({length:12},(_,i)=>{const a=i*30*Math.PI/180;return `<circle cx="${100+76*Math.sin(a)}" cy="${100-76*Math.cos(a)}" r="${i%3?1.6:2.6}" fill="var(--muted)" opacity=".6"/>`;}).join('')}</svg>
-      <div class="tm"><b id="tempo">00:00:00</b><span id="estado"></span></div></div>
-    <div class="rbtns"><button class="btn" id="pp"></button><button class="btn fim" id="fim">■ Encerrar</button></div>
-    <p class="pend" style="margin:0;text-align:center">Pode fechar ou trocar de página: o cronômetro continua contando e você volta para ele aqui.</p></div>
-   <div class="card" id="hojeBox"><h3 style="margin:0 0 10px;font:800 18px var(--display)">Hoje</h3><p class="pend" style="margin:0">Carregando…</p></div>`;
-  const atual=()=>{const t=decorrido(s)/1000;$('tempo').textContent=hms(t);const frac=(t%3600)/3600;$('arc').setAttribute('stroke-dasharray',(553*frac).toFixed(1)+' 553');
-    $('estado').textContent=s.rodando?'estudando… (anel = minutos da hora)':'pausado';$('estado').className=s.rodando?'pulse':'';$('dial').classList.toggle('pausa',!s.rodando);
-    $('pp').textContent=s.rodando?'❚❚ Pausar':'▶ Continuar';};
-  clearInterval(TICK);TICK=setInterval(atual,500);atual();
-  $('pp').onclick=()=>{if(s.rodando){s.acum=decorrido(s);s.rodando=false;}else{s.desde=Date.now();s.rodando=true;}gravaS(s);atual();};
-  $('fim').onclick=()=>encerrar(s);
-  desenhaHoje();}
+function desenhaRelogio(s){desenhaSala(s);}
 function encerrar(s){const seg=Math.round(decorrido(s)/1000);if(s.rodando){s.acum=decorrido(s);s.rodando=false;gravaS(s);}
   const [n,ic,,c]=TIPOS[s.tipo];const pedeQ=s.tipo==='questoes'||s.tipo==='correcao';
   const d=document.createElement('div');d.className='dlg';d.innerHTML=`<div class="box" style="--c:${c}"><div class="top"><h3>${ic} Sessão encerrada: ${hfmt(seg)}</h3><p>${esc(s.materia)} · ${esc(s.assunto||'')}</p></div>
