@@ -173,7 +173,7 @@ select,input[type=number],input[type=text]{font:500 16px var(--body);padding:11p
 <div id="exBar" hidden>Modo aluno exemplo — é assim que o aluno vê. <button type="button" id="exSair">Sair do modo exemplo</button></div>
 <main id="app"><p class="pend">Carregando…</p></main>
 
-<script>(function(){var V='1795534273';var K='bqufu-recarga-';
+<script>(function(){var V='1795534525';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -193,6 +193,8 @@ const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
 const SB=supabase.createClient('https://ygdlbhoqyqjsqoyyfizk.supabase.co','sb_publishable_jB2I59Ruw4MaMT63KLWtSA_O-DMf63b');
 const ADMIN='jesrrael.santos@gmail.com',EXEMPLO='exemplo@preparaufu.com.br';
 let EMAIL='',REAL_ADMIN=false,ASSESSORIA=false,ALVO='',EXMODO=false,PLANO=null,LINGUA='';
+const tlist=t=>String(t||'').split(',').filter(k=>TIPOS[k]);
+const TI=t=>{const L=tlist(t);if(!L.length)L.push('teoria');return [L.map(k=>TIPOS[k][0]).join(' + '),L.map(k=>TIPOS[k][1]).join(''),'',TIPOS[L[0]][3]];};
 const TIPOS={teoria:['Teoria','📖','Assistir aula, ler e resumir','#3A8CCB'],questoes:['Questões','✏️','Resolver listas e provas','#EB6834'],revisao:['Revisão','🔁','Flashcards, Anki, caderno de erros','#1BAF7A'],correcao:['Correção de simulado','✅','Corrigir e entender os erros','#7B4FC9']};
 const MATS=['Matemática','Física','Química','Biologia','Português','Literatura','Redação','História','Geografia','Filosofia','Sociologia','Inglês','Espanhol','Francês'];
 const CORM={'Matemática':'#D9480F','Física':'#1864AB','Química':'#5F3DC4','Biologia':'#2B8A3E','Português':'#C92A2A','Literatura':'#A61E4D','Redação':'#C2255C','História':'#7F4F24','Geografia':'#5C7A0A','Filosofia':'#495057','Sociologia':'#8C6500','Inglês':'#0B7285','Espanhol':'#0B7285','Francês':'#0B7285'};
@@ -241,17 +243,17 @@ async function telaSala(){abas('tabSala');clearInterval(TICK);$('app').innerHTML
   try{await carregaPlano();}catch(e){}
   desenhaSala(lerS());}
 function desenhaSala(s){abas('tabSala');clearInterval(TICK);
-  const esc_={tipo:null,materia:'',item:''};
+  const esc_={tipos:[],materia:'',item:''};
   const lst=semanas(),ca=semAtual();
   const minhas=MATS.filter(m=>!(m==='Inglês'&&LINGUA==='Espanhol')&&!(m==='Espanhol'&&LINGUA==='Inglês')&&!(m==='Francês'&&LINGUA!=='Francês'));
-  const cor=s?TIPOS[s.tipo][3]:'#3A8CCB';
+  const cor=s?TI(s.tipo)[3]:'#3A8CCB';
   $('app').innerHTML=`<div class="sala"><section class="cron" id="cron" style="--c:${cor}">
-     <div class="cronh"><span>⏱ Cronômetro</span>${s?`<span class="chip">${TIPOS[s.tipo][1]} ${esc(TIPOS[s.tipo][0])}</span>`:''}</div>
+     <div class="cronh"><span>⏱ Cronômetro</span>${s?`<span class="chip">${TI(s.tipo)[1]} ${esc(TI(s.tipo)[0])}</span>`:''}</div>
      <div class="visor${s?' ativo':''}" id="visor"><b id="tempo">00:00:00</b><span id="estado">Pronto para começar</span><i class="vbar"><em id="vbar"></em></i></div>
      ${s?`<div class="sessao"><b>${esc(s.materia)}</b><span>${esc(s.assunto||'')}</span></div>
        <div class="rbtns"><button class="btn" id="pp"></button><button class="btn fim" id="fim">■ Encerrar</button></div>
        <p class="pend" style="margin:0;text-align:center">Pode fechar ou trocar de página: o cronômetro continua contando.</p>`
-     :`<div class="lbl">O que você vai fazer?</div>
+     :`<div class="lbl">O que você vai fazer? <span style="font-weight:500;color:var(--muted)">(pode marcar mais de um)</span></div>
        <div class="tipos" id="tipos">${Object.entries(TIPOS).map(([k,[n,ic,d,c]])=>`<button class="tipo" data-t="${k}" style="--c:${c}"><span class="ic">${ic}</span><b>${n}</b><small>${d}</small></button>`).join('')}</div>
        <label class="lbl" for="sMat">Matéria</label><select id="sMat"><option value="">Selecione a matéria</option>${minhas.map(m=>`<option>${esc(m)}</option>`).join('')}</select>
        <label class="lbl" for="sAss">Assunto</label><select id="sAss" disabled><option value="">Escolha antes a matéria</option></select>
@@ -268,9 +270,9 @@ function desenhaSala(s){abas('tabSala');clearInterval(TICK);
     $('pp').onclick=()=>{if(s.rodando){s.acum=decorrido(s);s.rodando=false;}else{s.desde=Date.now();s.rodando=true;}gravaS(s);atual();};
     $('fim').onclick=()=>encerrar(s);
   }else{
-    const pronto=()=>{$('go').disabled=!(esc_.tipo&&esc_.materia&&esc_.item&&(esc_.item!=='__outro'||$('sOutro').value.trim()));
+    const pronto=()=>{$('go').disabled=!(esc_.tipos.length&&esc_.materia&&esc_.item&&(esc_.item!=='__outro'||$('sOutro').value.trim()));
       $('estado').textContent=$('go').disabled?'Pronto para começar':'Tudo certo: aperte Iniciar';};
-    $('tipos').querySelectorAll('.tipo').forEach(b=>b.onclick=()=>{esc_.tipo=b.dataset.t;$('tipos').classList.add('esc');$('tipos').querySelectorAll('.tipo').forEach(x=>x.classList.toggle('on',x===b));$('cron').style.setProperty('--c',TIPOS[esc_.tipo][3]);pronto();});
+    $('tipos').querySelectorAll('.tipo').forEach(b=>b.onclick=()=>{b.classList.toggle('on');esc_.tipos=[...$('tipos').querySelectorAll('.tipo.on')].map(x=>x.dataset.t);$('tipos').classList.toggle('esc',esc_.tipos.length>0);$('cron').style.setProperty('--c',esc_.tipos.length?TIPOS[esc_.tipos[0]][3]:'#3A8CCB');pronto();});
     $('sMat').onchange=()=>{esc_.materia=$('sMat').value;esc_.item='';const L=PLANO.filter(x=>x.materia===esc_.materia);
       let h='<option value="">Selecione o assunto</option>';
       lst.forEach((w,i)=>{const G=L.filter(x=>x.semana===w);if(!G.length)return;h+=`<optgroup label="Semana ${i+1} · ${dm(pData(w))}${i===ca?' (esta semana)':''}">${G.map(x=>`<option value="${x.id}">${esc(x.assunto)}${x.frente?' — '+esc(x.frente):''}</option>`).join('')}</optgroup>`;});
@@ -281,12 +283,12 @@ function desenhaSala(s){abas('tabSala');clearInterval(TICK);
     $('sAss').onchange=()=>{esc_.item=$('sAss').value;$('lOutro').hidden=esc_.item!=='__outro';if(esc_.item==='__outro')$('sOutro').focus();pronto();};
     $('sOutro').oninput=pronto;
     $('go').onclick=()=>{const it=esc_.item!=='__outro'?PLANO.find(x=>String(x.id)===esc_.item):null;
-      const n={email:ALVO,tipo:esc_.tipo,materia:esc_.materia,assunto:it?it.assunto:$('sOutro').value.trim(),item:it?it.id:null,inicio:Date.now(),desde:Date.now(),acum:0,rodando:true};
+      const n={email:ALVO,tipo:esc_.tipos.join(','),materia:esc_.materia,assunto:it?it.assunto:$('sOutro').value.trim(),item:it?it.id:null,inicio:Date.now(),desde:Date.now(),acum:0,rodando:true};
       gravaS(n);desenhaSala(n);};}
   desenhaHoje();}
 function desenhaRelogio(s){desenhaSala(s);}
 function encerrar(s){const seg=Math.round(decorrido(s)/1000);if(s.rodando){s.acum=decorrido(s);s.rodando=false;gravaS(s);}
-  const [n,ic,,c]=TIPOS[s.tipo];const pedeQ=s.tipo==='questoes'||s.tipo==='correcao';
+  const [n,ic,,c]=TI(s.tipo);const pedeQ=tlist(s.tipo).some(k=>k==='questoes'||k==='correcao');
   const d=document.createElement('div');d.className='dlg';d.innerHTML=`<div class="box" style="--c:${c}"><div class="top"><h3>${ic} Sessão encerrada: ${hfmt(seg)}</h3><p>${esc(s.materia)} · ${esc(s.assunto||'')}</p></div>
    <form class="bd"><div><b style="font-size:15px">Questões ${pedeQ?'':'(se você fez alguma)'}</b><p class="pend" style="margin:2px 0 8px">Quantas você fez, acertou e errou nesta sessão?</p>
     <div class="qs"><label>Feitas<input type="number" name="q" min="0" max="999" inputmode="numeric" value="${pedeQ?'':0}"></label><label class="ac">Acertos<input type="number" name="a" min="0" max="999" inputmode="numeric" value="${pedeQ?'':0}"></label><label class="er">Erros<input type="number" name="e" min="0" max="999" inputmode="numeric" value="${pedeQ?'':0}"></label></div></div>
@@ -313,7 +315,7 @@ async function desenhaHoje(){const ini=new Date();ini.setHours(0,0,0,0);
   box.innerHTML=`<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px"><h3 style="margin:0;font:800 18px var(--display)">Hoje</h3></div>
    <div class="hstat"><div><b>${L.length?hfmt(tot):'0 min'}</b><span>estudados</span></div><div><b>${q}</b><span>questões</span></div><div><b>${q?Math.round(100*a/q)+'%':'—'}</b><span>de acerto</span></div></div>
    ${L.length?'':'<p class="pend" style="margin:12px 2px 0">Nenhuma sessão hoje. Quando você encerrar uma sessão, ela aparece aqui.</p>'}
-   <div class="hoje">${L.map(x=>{const [n,ic,,c]=TIPOS[x.tipo];const h=new Date(x.inicio);return `<div class="ses" style="--c:${c}"><span style="font-size:20px">${ic}</span><div class="tx"><b>${esc(x.materia)} · ${esc(n)}</b><span>${String(h.getHours()).padStart(2,'0')}:${String(h.getMinutes()).padStart(2,'0')} · ${esc(x.assunto||'')}${x.questoes?` · ${x.acertos}/${x.questoes} acertos`:''}</span></div><span class="du">${hfmt(x.segundos)}</span><button class="del" data-id="${x.id}" title="Apagar sessão">×</button></div>`;}).join('')}</div>`;
+   <div class="hoje">${L.map(x=>{const [n,ic,,c]=TI(x.tipo);const h=new Date(x.inicio);return `<div class="ses" style="--c:${c}"><span style="font-size:20px">${ic}</span><div class="tx"><b>${esc(x.materia)} · ${esc(n)}</b><span>${String(h.getHours()).padStart(2,'0')}:${String(h.getMinutes()).padStart(2,'0')} · ${esc(x.assunto||'')}${x.questoes?` · ${x.acertos}/${x.questoes} acertos`:''}</span></div><span class="du">${hfmt(x.segundos)}</span><button class="del" data-id="${x.id}" title="Apagar sessão">×</button></div>`;}).join('')}</div>`;
   box.querySelectorAll('.del').forEach(b=>b.onclick=async()=>{if(!confirm('Apagar esta sessão do seu histórico?'))return;await SB.from('sessoes').delete().eq('id',b.dataset.id);desenhaHoje();});}
 
 /* ---------- Dashboard ---------- */
@@ -348,7 +350,7 @@ async function telaPainel(email,cab){if(!cab)abas('tabPainel');$('app').innerHTM
   const ML=S.length?Object.entries(M).sort((a,b)=>b[1].s-a[1].s):Object.keys(CORM).filter(n=>!['Inglês','Espanhol','Francês'].includes(n)||n===(LINGUA||'Inglês')).map(n=>[n,{s:0,q:0,a:0,e:0}]);const smax=Math.max(1,...ML.map(x=>x[1].s));
   const qComp=ML.filter(([,m])=>m.q>0);const melhor=qComp.length?qComp.slice().sort((a,b)=>b[1].a/b[1].q-a[1].a/a[1].q)[0]:null;const pior=qComp.length>1?qComp.slice().sort((a,b)=>a[1].a/a[1].q-b[1].a/b[1].q)[0]:null;
   // tipos
-  const T={};S.forEach(x=>{T[x.tipo]=(T[x.tipo]||0)+x.segundos;});
+  const T={};S.forEach(x=>{const L=tlist(x.tipo);L.forEach(k=>{T[k]=(T[k]||0)+x.segundos/L.length;});});
   let ang=0;const R=70,C=2*Math.PI*R;const segs=Object.entries(TIPOS).filter(([k])=>T[k]).map(([k,v])=>{const f=T[k]/tot,len=C*f;const el=`<circle cx="95" cy="95" r="${R}" fill="none" stroke="${v[3]}" stroke-width="26" stroke-dasharray="${len.toFixed(1)} ${(C-len).toFixed(1)}" stroke-dashoffset="${(-ang).toFixed(1)}" transform="rotate(-90 95 95)"/>`;ang+=len;return el;}).join('');
   $('app').innerHTML=(cab||'')+vazio+`<div class="kpis">
      <div class="kpi k-a"><div class="ico">⏱</div><div><span>Tempo total estudado</span><b>${hfmt(tot)}</b><small>${S.length} sessões · faltam ${faltam} dias para a UFU</small></div></div>
@@ -360,13 +362,13 @@ async function telaPainel(email,cab){if(!cab)abas('tabPainel');$('app').innerHTM
      <div class="heat"><div class="grid">${heat}</div></div><div class="hleg">Menos <span class="c" style="background:var(--soft)"></span><span class="c l1"></span><span class="c l2"></span><span class="c l3"></span><span class="c l4" style="background:var(--verde)"></span> Mais</div></div>
    <div class="duo"><div class="chart"><h3><i class="hi a"></i>Horas por semana</h3><p class="sub">As últimas 8 semanas (a amarela é a atual).</p>
        <div class="wbars">${W.map((w,i)=>`<div class="wb${i===W.length-1?' cur':''}"><b>${hdec(w.s)}h</b><i style="height:${Math.max(2,Math.round(130*w.s/wmax))}px"></i><span>${dm(w.a)}</span></div>`).join('')}</div></div>
-     <div class="chart"><h3><i class="hi b"></i>Como você estuda</h3><p class="sub">Tempo por tipo de estudo.</p>
+     <div class="chart"><h3><i class="hi b"></i>Como você estuda</h3><p class="sub">Tempo por tipo de estudo (sessão com mais de um tipo divide o tempo entre eles).</p>
        <div class="dwrap"><svg viewBox="0 0 190 190" class="donut"><circle cx="95" cy="95" r="${R}" fill="none" stroke="var(--soft)" stroke-width="26"/>${segs}<text x="95" y="92" text-anchor="middle" style="font:800 22px var(--display)">${hdec(tot)}h</text><text x="95" y="112" text-anchor="middle" style="font:600 10px var(--body);opacity:.7">NO TOTAL</text></svg>
        <div class="legend">${Object.entries(TIPOS).map(([k,v])=>`<div class="lg"><i style="background:${v[3]}"></i><span>${v[0]}</span><b>${hfmt(T[k]||0)}</b><small>${tot?Math.round(100*(T[k]||0)/tot):0}%</small></div>`).join('')}</div></div></div></div>
    <div class="chart"><h3><i class="hi a"></i>Desempenho por matéria</h3><p class="sub">Tempo de estudo, questões feitas, acertos (verde) e erros (vermelho) e o aproveitamento de cada matéria.</p>
      <div style="overflow-x:auto"><table class="mt"><thead><tr><th>Matéria</th><th>Tempo</th><th class="opt"></th><th>Questões</th><th>Acertos × erros</th><th>Aproveitamento</th></tr></thead><tbody>
      ${ML.map(([n,m])=>{const p=m.q?Math.round(100*m.a/m.q):null;const cor=CORM[n]||'#3A8CCB';return `<tr><td><span class="nm"><i style="background:${cor}"></i>${esc(n)}</span></td><td style="white-space:nowrap;font-weight:700">${hfmt(m.s)}</td><td class="opt" style="width:28%"><div class="tbar"><em style="width:${Math.round(100*m.s/smax)}%;background:${cor}"></em></div></td><td style="font-weight:700">${m.q||'—'}</td><td>${m.q?`<div class="ae" title="${m.a} acertos · ${m.e} erros"><span class="a" style="width:${100*m.a/m.q}%"></span><span class="e" style="width:${100*m.e/m.q}%"></span></div><small class="pend">${m.a} ✓ · ${m.e} ✗</small>`:'<small class="pend">sem questões</small>'}</td><td><span class="pc ${pcCls(p)}">${p==null?'—':p+'%'}</span></td></tr>`;}).join('')}</tbody></table></div></div>
-   <div class="chart"><h3><i class="hi c"></i>Atividade recente</h3><div class="hoje" style="margin-top:10px">${S.length?'':'<p class="pend">Nenhuma sessão registrada ainda. As últimas sessões aparecem aqui.</p>'}${S.slice(-8).reverse().map(x=>{const [n,ic,,c]=TIPOS[x.tipo];const h=new Date(x.inicio);return `<div class="ses" style="--c:${c}"><span style="font-size:20px">${ic}</span><div class="tx"><b>${esc(x.materia)} · ${esc(n)}</b><span>${dm(h)} às ${String(h.getHours()).padStart(2,'0')}:${String(h.getMinutes()).padStart(2,'0')} · ${esc(x.assunto||'')}${x.questoes?` · ${x.acertos}/${x.questoes} acertos`:''}</span></div><span class="du">${hfmt(x.segundos)}</span></div>`;}).join('')}</div></div>`;
+   <div class="chart"><h3><i class="hi c"></i>Atividade recente</h3><div class="hoje" style="margin-top:10px">${S.length?'':'<p class="pend">Nenhuma sessão registrada ainda. As últimas sessões aparecem aqui.</p>'}${S.slice(-8).reverse().map(x=>{const [n,ic,,c]=TI(x.tipo);const h=new Date(x.inicio);return `<div class="ses" style="--c:${c}"><span style="font-size:20px">${ic}</span><div class="tx"><b>${esc(x.materia)} · ${esc(n)}</b><span>${dm(h)} às ${String(h.getHours()).padStart(2,'0')}:${String(h.getMinutes()).padStart(2,'0')} · ${esc(x.assunto||'')}${x.questoes?` · ${x.acertos}/${x.questoes} acertos`:''}</span></div><span class="du">${hfmt(x.segundos)}</span></div>`;}).join('')}</div></div>`;
   ligaCab();if($('irSala'))$('irSala').onclick=telaSala;}
 let LALUNOS=null;
 function ligaCab(){const s=$('selAl');if(!s)return;s.onchange=()=>telaAlunos(s.value);$('alAnt').onclick=()=>{if(s.selectedIndex>0){s.selectedIndex--;s.onchange();}};$('alProx').onclick=()=>{if(s.selectedIndex<s.options.length-1){s.selectedIndex++;s.onchange();}};}

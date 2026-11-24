@@ -33,6 +33,7 @@ h1 span{color:var(--amarelo)}
 .op .ic{flex:none;width:54px;height:54px;border-radius:14px;display:grid;place-items:center}
 .op.banco .ic{background:var(--azul)}
 .op.ass .ic{background:var(--amarelo)}
+.op.sala .ic{background:linear-gradient(135deg,#EB6834,#E5484D)}
 .op svg{width:28px;height:28px}
 .op b{display:block;font:700 19px var(--display)}
 .op small{display:block;color:var(--muted);font-size:14px;line-height:1.35;margin-top:2px}
@@ -41,7 +42,7 @@ h1 span{color:var(--amarelo)}
 .op.ass:hover{border-color:var(--amarelo)}
 .sub{margin:24px 0 10px;font:700 13px var(--body);letter-spacing:.08em;text-transform:uppercase;color:#9AA1BD;display:flex;align-items:center;gap:10px;max-width:540px}
 .sub::after{content:"";flex:1;height:1px;background:#2B3654}
-.dupla{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:540px}
+.dupla{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;max-width:540px}
 .mini{display:flex;flex-direction:column;gap:8px;text-decoration:none;color:var(--ink);background:rgba(21,28,46,.78);border:1px solid #2B3654;border-radius:16px;padding:15px 16px;transition:transform .15s,border-color .15s,background .15s;backdrop-filter:blur(4px)}
 .mini:hover,.mini:focus-visible{transform:translateY(-2px);border-color:var(--azul);background:rgba(30,40,66,.9);outline:none}
 .mini .ic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center}
@@ -107,7 +108,7 @@ body[data-tela]{animation:fadein .35s ease}@keyframes fadein{from{opacity:0}to{o
     <span class="kicker">Vestibular UFU 2027-2</span>
     <h1>Plataforma <span>PREPARA UFU</span></h1>
     <p class="lead">Área exclusiva dos alunos do <b>Professor Jazz</b>. Entre com o e-mail que foi liberado para você.</p>
-    <div class="itens"><span><i style="background:var(--azul)"></i>Banco de Questões UFU</span><span><i style="background:var(--amarelo)"></i>Assessoria PREPARA UFU</span><span><i style="background:#E5484D"></i>Aulas ao vivo</span><span><i style="background:#1BAF7A"></i>Materiais</span></div>
+    <div class="itens"><span><i style="background:#EB6834"></i>Sala de Estudos</span><span><i style="background:var(--azul)"></i>Banco de Questões UFU</span><span><i style="background:var(--amarelo)"></i>Assessoria PREPARA UFU</span><span><i style="background:#E5484D"></i>Aulas ao vivo</span><span><i style="background:#1BAF7A"></i>Materiais</span></div>
   </div>
   <div class="cartao"><div class="faixa"></div>
     <form id="gForm" autocomplete="on">
@@ -130,6 +131,9 @@ body[data-tela]{animation:fadein .35s ease}@keyframes fadein{from{opacity:0}to{o
     <h1>Seja bem-vindo à plataforma <span>PREPARA UFU</span></h1>
     <p class="lead">Eu sou o <b>Professor Jazz</b>. Escolha abaixo o que você quer acessar.</p>
     <nav class="opcoes" aria-label="Escolha o acesso">
+      <a class="op sala" href="estudos/">
+        <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg></span>
+        <span><b>Sala de Estudos</b><small>Cronômetro para as suas sessões de estudo e o seu dashboard com horas, questões e aproveitamento.</small></span><span class="seta" aria-hidden="true">›</span></a>
       <a class="op banco" href="bancodequestoes/">
         <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 7h7M9 11h5"/></svg></span>
         <span><b>Banco de Questões UFU</b><small>Questões das provas da UFU de 2015 a 2026, com gabarito, filtros e listas em PDF e Word.</small></span><span class="seta" aria-hidden="true">›</span></a>
@@ -137,9 +141,9 @@ body[data-tela]{animation:fadein .35s ease}@keyframes fadein{from{opacity:0}to{o
         <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#16304F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h3M13 14h3M8 18h3"/></svg></span>
         <span><b>Assessoria PREPARA UFU</b><small>Seu Cronograma Semanal personalizado e o perfil de estudos, acompanhados pelo Prof. Jazz.</small></span><span class="seta" aria-hidden="true">›</span></a>
     </nav>
-    <div class="sub">Estudo, aulas ao vivo e materiais</div>
+    <div class="sub">Aulas ao vivo e materiais</div>
     <nav class="dupla" aria-label="Aulas e materiais">
-      <a class="mini se" href="estudos/"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#16304F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg></span><b>Sala de Estudos</b><small>Cronômetro de estudo e o seu dashboard.</small></a><a class="mini ag" href="aulas/#agenda"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></span><b>Agenda das aulas</b><small>Calendário do curso e o link de cada aula ao vivo.</small></a>
+      <a class="mini ag" href="aulas/#agenda"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></span><b>Agenda das aulas</b><small>Calendário do curso e o link de cada aula ao vivo.</small></a>
       <a class="mini mt" href="aulas/#materiais"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></span><b>Materiais</b><small>PDFs, imagens e planejamentos do PREPARA UFU.</small></a>
     </nav>
     <p class="rod">Acesso com o e-mail liberado pelo Prof. Jazz.</p>
@@ -183,7 +187,7 @@ $('sairTopo').onclick=async()=>{await SB.auth.signOut();history.replaceState(nul
 inicio();
 })();
 </script>
-<script>(function(){var V='1795534273';var K='bqufu-recarga-';
+<script>(function(){var V='1795534525';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
