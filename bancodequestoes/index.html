@@ -222,7 +222,7 @@ td.h{font-weight:700}.z{color:var(--line)}
     <p class="msg" id="pdfMsg" role="status"></p>
   </aside>
 </div>
-<script>(function(){var V='1795489129';var K='bqufu-recarga-';
+<script>(function(){var V='1795489641';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -567,13 +567,13 @@ $('gForm').onsubmit=async ev=>{ev.preventDefault();const email=$('gEmail').value
       if(error){if(/invalid/i.test(error.message))throw new Error('E-mail ou senha incorretos. Se é seu primeiro acesso, clique em “Primeiro acesso? Crie sua senha”.');throw error;}}
     gm('');await entrar();
   }catch(e){gm(e.message||'Não foi possível entrar.');}finally{$('gBtn').disabled=false;}};
-async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!session){$('gate').hidden=false;return;}
+async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!session){location.replace('/?volta='+encodeURIComponent(location.pathname+location.hash));return;}
   const {data:ok}=await SB.rpc('is_allowed');
   if(!ok){await SB.auth.signOut();$('gate').hidden=false;gm('Seu acesso não está liberado. Fale com o Prof. Jazz.');return;}
   $('gate').hidden=true;$('admBtn').hidden=true;
   $('ckBtn').hidden=false;document.querySelectorAll('.lkAul').forEach(a=>a.hidden=false);
   if(!iniciado){iniciado=true;$('viewQ').innerHTML='<div class="empty">Carregando o banco de questões…</div>';await iniciar();}}
-$('sairBtn').onclick=async()=>{await SB.auth.signOut();location.reload();};
+$('sairBtn').onclick=async()=>{await SB.auth.signOut();location.href='/';};
 /* painel do professor */
 let AL=[];const am=t=>$('admMsg').textContent=t;
 const fdt=d=>d?new Date(d).toLocaleDateString('pt-BR'):'';
