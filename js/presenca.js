@@ -5,7 +5,7 @@
       if(typeof SB==='undefined'||!SB)return;
       var s=null;try{s=JSON.parse(localStorage.getItem('bqufu-sessao')||'null');}catch(e){}
       SB.auth.getSession().then(function(r){
-        if(!r||!r.data||!r.data.session)return;
+        if(!r||!r.data||!r.data.session){try{Object.keys(sessionStorage).filter(function(x){return x.indexOf('bqufu-aviso-venc-')===0;}).forEach(function(x){sessionStorage.removeItem(x);});}catch(e){}return;}
         var est=!!(s&&s.rodando);
         SB.rpc('ping',{p_estudando:est,p_materia:s?s.materia:null,p_tipo:s?s.tipo:null,p_desde:s?new Date(s.inicio).toISOString():null}).then(function(){},function(){});
       });
