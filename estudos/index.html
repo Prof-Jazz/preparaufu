@@ -237,7 +237,7 @@ select,input[type=number],input[type=text]{font:500 16px var(--body);padding:11p
 <div id="exBar" hidden>Modo aluno exemplo — é assim que o aluno vê. <button type="button" id="exSair">Sair do modo exemplo</button></div>
 <main id="app"><p class="pend">Carregando…</p></main>
 
-<script>(function(){var V='1795632370';var K='bqufu-recarga-';
+<script>(function(){var V='1795640358';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -256,6 +256,7 @@ const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
   set(m||'dark');$('theme').onclick=()=>set(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');})();
 const SB=supabase.createClient('https://ygdlbhoqyqjsqoyyfizk.supabase.co','sb_publishable_jB2I59Ruw4MaMT63KLWtSA_O-DMf63b');
 const ADMIN='jesrrael.santos@gmail.com',EXEMPLO='exemplo@preparaufu.com.br';
+let REC=[];
 let EMAIL='',REAL_ADMIN=false,STAFF=false,MENTORADO=false,MVER=false,ASSESSORIA=false,ALVO='',EXMODO=false,PLANO=null,LINGUA='';
 const tlist=t=>String(t||'').split(',').filter(k=>TIPOS[k]);
 const TI=t=>{const L=tlist(t);if(!L.length)L.push('teoria');return [L.map(k=>TIPOS[k][0]).join(' + '),L.map(k=>TIPOS[k][1]).join(''),'',TIPOS[L[0]][3]];};
@@ -281,6 +282,7 @@ async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!se
   const [ok,as,pp,ar]=await Promise.all([SB.rpc('is_allowed'),SB.rpc('is_assessoria'),SB.rpc('meu_papel'),SB.rpc('minhas_areas')]);STAFF=REAL_ADMIN||pp.data==='assessor';MENTORADO=!REAL_ADMIN&&!!(ar.data&&ar.data.mentoria);
   if(!ok.data){try{localStorage.removeItem('bqufu-sig-v2');}catch(e){}await SB.auth.signOut();location.href='/';return;}
   ASSESSORIA=!!as.data||MENTORADO;ALVO=EMAIL;
+  if(!ASSESSORIA){try{const rr=await SB.rpc('meus_recursos');REC=rr.data||[];}catch(e){}}
   let ex=null,mv=null;try{ex=sessionStorage.getItem('bqufu-exemplo');if(sessionStorage.getItem('bqufu-mentoria-puro'))mv=JSON.parse(sessionStorage.getItem('bqufu-mentoria-ver')||'null');}catch(e){}
   if(REAL_ADMIN&&mv&&mv.email){EXMODO=true;ALVO=mv.email;MENTORADO=true;ASSESSORIA=true;MVER=true;}
   else if(REAL_ADMIN&&ex){EXMODO=true;ALVO=EXEMPLO;}
@@ -296,7 +298,7 @@ async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!se
   else if(location.hash==='#painel'&&$('tabPainel').hidden===false)telaPainel(ALVO);
   else telaSala();
   if(location.hash==='#mensagens'){history.replaceState(null,'','#sala');setTimeout(()=>{if(typeof abreCaixa==='function')abreCaixa();},900);}}
-function menus(){const adm=REAL_ADMIN&&!EXMODO,stf=STAFF&&!EXMODO;$('tabPainel').hidden=!(ASSESSORIA&&!stf);$('tabPainel').textContent='Meu Dashboard';$('tabAlunos').hidden=!stf;$('tabDen').hidden=!adm;$('tabEx').hidden=!adm;$('exBar').hidden=!EXMODO||MVER;}
+function menus(){const adm=REAL_ADMIN&&!EXMODO,stf=STAFF&&!EXMODO;$('tabPainel').hidden=!((ASSESSORIA||REC.includes('dash'))&&!stf);$('tabPainel').textContent='Meu Dashboard';$('tabAlunos').hidden=!stf;$('tabDen').hidden=!adm;$('tabEx').hidden=!adm;$('exBar').hidden=!EXMODO||MVER;}
 const abas=on=>['tabSala','tabPainel','tabAlunos','tabDen'].forEach(t=>$(t).classList.toggle('on',t===on));
 
 async function carregaPlano(){if(PLANO)return;
@@ -428,7 +430,7 @@ function encerrar(s){const seg=Math.round(decorrido(s)/1000);if(s.rodando){s.acu
     let r=await SB.from('sessoes').insert(row);if(r.error&&/plano_item|foreign key/i.test(r.error.message)){row.plano_item=null;r=await SB.from('sessoes').insert(row);}if(r.error){msg('Não foi possível salvar: '+r.error.message);bt.disabled=false;return;}
     if(f.mk&&f.mk.checked)await SB.from(MENTORADO?'m_plano_feito':'plano_feito').insert({email:s.email,item:s.item});
     gravaS(null);d.remove();telaSala();};}
-function ASSESSORIA_ALVO(){return EXMODO||ASSESSORIA;}
+function ASSESSORIA_ALVO(){return EXMODO||ASSESSORIA||REC.includes('plano');}
 async function desenhaHoje(){const ini=new Date();ini.setHours(0,0,0,0);
   const {data}=await SB.from('sessoes').select('*').eq('email',ALVO).gte('inicio',ini.toISOString()).order('inicio',{ascending:false});
   const box=$('hojeBox');if(!box)return;const L=data||[];const tot=L.reduce((t,x)=>t+x.segundos,0),q=L.reduce((t,x)=>t+x.questoes,0),a=L.reduce((t,x)=>t+x.acertos,0);
@@ -576,6 +578,6 @@ async function telaDen(){abas('tabDen');$('app').innerHTML='<p class="pend">Carr
   $('app').querySelectorAll('[data-r]').forEach(b=>b.onclick=async()=>{await SB.rpc('admin_resolver',{p_id:+b.dataset.id,p:b.dataset.r==='1'});telaDen();});}
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795632370" defer></script>
+<script src="../js/presenca.js?v=1795640358" defer></script>
 </body>
 </html>
