@@ -29,9 +29,10 @@
 .dlg .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .sug{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:rgba(27,175,122,.1);border:1px solid rgba(27,175,122,.45);border-radius:12px;padding:10px 12px;font-size:13.5px}
 .sug span{flex:1;min-width:220px}
-.blk.sugst{background:transparent;border:2px dashed var(--c);border-left-width:4px;border-left-style:solid;opacity:.9;box-shadow:none}
+.blk.sugst{background:color-mix(in srgb,var(--c) 30%,transparent);border:2px dashed var(--c);border-left-width:5px;border-left-style:solid;box-shadow:none}
 .blk.sugst em{font-style:normal;font:700 10.5px var(--body);text-transform:uppercase;letter-spacing:.04em;background:var(--c);color:#fff;padding:1px 6px;border-radius:999px;margin-left:4px}
-.blk.sugst:hover{opacity:1;background:color-mix(in srgb,var(--c) 14%,transparent)}
+.blk.sugst:hover{background:color-mix(in srgb,var(--c) 45%,transparent)}
+.blk:not(.sugst):not(.aula){background:var(--c);color:#fff}.blk:not(.sugst):not(.aula) small{color:rgba(255,255,255,.85)}.blk:not(.sugst):not(.aula) b::before{content:'✓ '}
 </style>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Aulas e materiais · PREPARA UFU</title>
@@ -206,7 +207,7 @@ textarea{min-height:70px;resize:vertical}
 <div id="exBar" hidden>Modo aluno exemplo — é assim que o aluno da turma <select id="exTurma"><option value="assessoria">Assessoria PREPARA UFU</option><option value="matematica">Curso de Matemática</option></select> vê esta página. <button type="button" id="exSair">Sair do modo exemplo</button></div>
 <main id="app"></main>
 
-<script>(function(){var V='1795632122';var K='bqufu-recarga-';
+<script>(function(){var V='1795632370';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -277,7 +278,7 @@ async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!se
     $('tabEx').onclick=()=>exemplo('assessoria');$('exSair').onclick=()=>exemplo(null);$('exTurma').onchange=()=>exemplo($('exTurma').value);aplicaEx();}
   if(location.hash==='#materiais')telaMat();else telaAgenda();}
 function aplicaEx(){IS_ADMIN=REAL_ADMIN&&!EXT;$('exBar').hidden=!EXT;$('tabEx').hidden=!REAL_ADMIN||!!EXT;if(EXT)$('exTurma').value=EXT;}
-function exemplo(t){EXT=t;try{t?sessionStorage.setItem('bqufu-exemplo',t):sessionStorage.removeItem('bqufu-exemplo');}catch(e){}aplicaEx();
+function exemplo(t){EXT=t;PLANO_A=null;CRONO_A=[];try{t?sessionStorage.setItem('bqufu-exemplo',t):sessionStorage.removeItem('bqufu-exemplo');}catch(e){}aplicaEx();
   if($('tabMat').classList.contains('on'))telaMat();else telaAgenda();}
 $('sair').onclick=async()=>{try{localStorage.removeItem('bqufu-sig-v2');}catch(e){}await SB.auth.signOut();location.href='/';};
 const abas=on=>['tabAg','tabMat'].forEach(t=>$(t).classList.toggle('on',t===on));
@@ -343,18 +344,19 @@ function desenhaAgenda(){
 
 /* ===== planejamento pessoal de estudos no dia ===== */
 const MATS_A=['Matemática','Física','Química','Biologia','Português','Literatura','Redação','História','Geografia','Filosofia','Sociologia','Inglês','Espanhol','Francês'];
-const CORM_A={'Revisão geral':'#1BAF7A','Simulado':'#7B4FC9','Matemática':'#D9480F','Física':'#1864AB','Química':'#5F3DC4','Biologia':'#2B8A3E','Português':'#C92A2A','Literatura':'#A61E4D','Redação':'#C2255C','História':'#7F4F24','Geografia':'#5C7A0A','Filosofia':'#495057','Sociologia':'#9C6644','Inglês':'#0B7285','Espanhol':'#E67700','Francês':'#364FC7'};
+const CORM_A={'Revisão geral':'#1BAF7A','Simulado':'#7B4FC9','Matemática':'#D9480F','Física':'#1864AB','Química':'#5F3DC4','Biologia':'#2B8A3E','Português':'#C92A2A','Literatura':'#A61E4D','Redação':'#C2255C','História':'#7F4F24','Geografia':'#5C7A0A','Filosofia':'#495057','Sociologia':'#8C6500','Inglês':'#0B7285','Espanhol':'#0B7285','Francês':'#0B7285'};
 const matSalaA=x=>x.materia==='Português'&&/^literatura/i.test(x.frente||'')?'Literatura':x.materia==='Português'&&/^reda/i.test(x.frente||'')?'Redação':x.materia;
 const durTxt=m=>m<60?m+' min':Math.floor(m/60)+' h'+(m%60?' '+String(m%60).padStart(2,'0'):'');
 const hhmm=m=>String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
-const minDe=t=>{const [h,mm]=String(t||'0:0').split(':').map(Number);return h*60+(mm||0);};
-async function carregaPlanoA(){if(PLANO_A)return;try{const [p,c,k]=await Promise.all([SB.from('plano_itens').select('id,semana,materia,frente,assunto').order('id'),SB.from('checkup').select('respostas').eq('email',EMAIL).maybeSingle(),SB.from('cronograma').select('blocos').eq('email',EMAIL).maybeSingle()]);
+const minDe=t=>{if(typeof t==='number')return t;const z=String(t||'0');if(/^\d+$/.test(z))return +z;const [h,mm]=z.split(':').map(Number);return h*60+(mm||0);};
+async function carregaPlanoA(){if(PLANO_A)return;try{const [p,c,k]=await Promise.all([SB.from('plano_itens').select('id,semana,materia,frente,assunto').order('id'),SB.from('checkup').select('respostas').eq('email',EXT?'exemplo@preparaufu.com.br':EMAIL).maybeSingle(),SB.from('cronograma').select('blocos').eq('email',EXT?'exemplo@preparaufu.com.br':EMAIL).maybeSingle()]);
   PLANO_A=p.data||[];LINGUA_A=(c.data&&c.data.respostas&&c.data.respostas.lingua)||'';CRONO_A=(k.data&&Array.isArray(k.data.blocos))?k.data.blocos:[];}catch(e){PLANO_A=PLANO_A||[];}}
+const CORD_A={MAT:'#D9480F',FIS:'#1864AB',QUI:'#5F3DC4',BIO:'#2B8A3E',LP:'#C92A2A',LIT:'#A61E4D',LE:'#0B7285',HIS:'#7F4F24',GEO:'#5C7A0A',FIL:'#495057',SOC:'#8C6500',RED:'#C2255C',REV:'#1BAF7A',SIM:'#7B4FC9'};
 const KMAT={MAT:'Matemática',FIS:'Física',QUI:'Química',BIO:'Biologia',LP:'Português',LIT:'Literatura',HIS:'História',GEO:'Geografia',FIL:'Filosofia',SOC:'Sociologia',RED:'Redação',REV:'Revisão geral',SIM:'Simulado'};
 const matDoBloco=b=>b.k==='LE'?(LINGUA_A||'Inglês'):KMAT[b.k]||null;
 const DSA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 function sugestoes(k){const d=parse(k),dia=DSA[d.getDay()];const P=MEUS.filter(x=>x.data===k);
-  return CRONO_A.filter(b=>b.d===dia&&b.ini&&b.fim).map(b=>({ini:minDe(b.ini),fim:minDe(b.fim),materia:matDoBloco(b),label:b.label||''}))
+  return CRONO_A.filter(b=>b.d===dia&&b.ini!=null&&b.fim!=null).map(b=>({ini:minDe(b.ini),fim:minDe(b.fim),materia:matDoBloco(b),k:b.k,label:b.label||''}))
     .filter(b=>b.materia&&b.fim>b.ini&&!P.some(x=>{const i=minDe(x.ini),f=i+x.dur;return i<b.fim&&f>b.ini;})).sort((a,b)=>a.ini-b.ini);}
 function topicoSemana(k,m){const sems=[...new Set(PLANO_A.map(z=>z.semana))].sort();const w=sems.filter(x=>x<=k).pop()||sems[0];return PLANO_A.find(z=>z.semana===w&&matSalaA(z)===m)||null;}
 const HPX=46;
@@ -368,7 +370,7 @@ async function abreDia(k){await carregaPlanoA();const d=parse(k);
       <div class="diatop"><span>${P.length?`<b>${durTxt(tot)}</b> planejad${tot===1?'o':'os'} em ${P.length} estudo${P.length>1?'s':''}`:'Nenhum estudo planejado ainda. Clique em um horário para adicionar.'}</span><button class="btn pri" id="diaAdd">+ Adicionar estudo</button></div>
       <div class="tl" id="tl"><div class="tlg">${Array.from({length:24},(_,h)=>`<div class="hr" data-h="${h}"><span>${String(h).padStart(2,'0')}:00</span></div>`).join('')}
       ${L.filter(a=>a.ini).map(a=>{const i=minDe(a.ini),f=a.fim?minDe(a.fim):i+90;return `<div class="blk aula" style="top:${i*HPX/60}px;height:${Math.max(20,(f-i)*HPX/60)}px" data-aula="${a.id}"><b>${esc(titulo(a))}</b><small>${hhmm(i)}–${hhmm(f)}</small></div>`;}).join('')}
-      ${sugestoes(k).map((b,j)=>`<div class="blk sugst" style="top:${b.ini*HPX/60}px;height:${Math.max(20,(b.fim-b.ini)*HPX/60)}px;--c:${CORM_A[b.materia]||'#1BAF7A'}" data-s="${j}"><b>${esc(b.materia)} <em>sugerido</em></b><small>${hhmm(b.ini)}–${hhmm(b.fim)} · clique para escolher o assunto</small></div>`).join('')}
+      ${sugestoes(k).map((b,j)=>`<div class="blk sugst" style="top:${b.ini*HPX/60}px;height:${Math.max(20,(b.fim-b.ini)*HPX/60)}px;--c:${CORD_A[b.k]||CORM_A[b.materia]||'#1BAF7A'}" data-s="${j}"><b>${esc(b.materia)} <em>sugerido</em></b><small>${hhmm(b.ini)}–${hhmm(b.fim)} · clique para escolher o tópico</small></div>`).join('')}
       ${P.map(x=>{const i=minDe(x.ini),cor=CORM_A[x.materia]||'#3A8CCB';return `<div class="blk${x.dur<45?' curto':''}" style="top:${i*HPX/60}px;height:${Math.max(20,x.dur*HPX/60)}px;--c:${cor}" data-p="${x.id}"><b>${esc(x.materia)}</b><small>${hhmm(i)}–${hhmm(i+x.dur)} · ${durTxt(x.dur)}${x.assunto?' · '+esc(x.assunto):''}</small></div>`;}).join('')}</div></div>`;
     bd.querySelectorAll('[data-aula]').forEach(b=>b.onclick=ev=>{ev.stopPropagation();verEvento(AULAS.find(a=>a.id===b.dataset.aula));});
     bd.querySelectorAll('[data-p]').forEach(b=>b.onclick=ev=>{ev.stopPropagation();formEstudo(k,MEUS.find(x=>x.id===b.dataset.p),null,desenha);});
@@ -498,6 +500,6 @@ function editarPasta(p){const nova=!p;p=p||{nome:'',descricao:'',turmas:['assess
     if(L.length)await SB.storage.from('materiais').remove(L.map(x=>x.path));if(p.capa)await SB.storage.from('capas').remove([p.capa]);const {error}=await SB.from('pastas').delete().eq('id',p.id);if(error){msg(error.message);return;}fecha();await carregar();desenhaPastas();};}
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795632122" defer></script>
+<script src="../js/presenca.js?v=1795632370" defer></script>
 </body>
 </html>
