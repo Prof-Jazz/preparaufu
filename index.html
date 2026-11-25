@@ -228,7 +228,7 @@ $('sairTopo').onclick=async()=>{try{Object.keys(sessionStorage).filter(x=>x.star
 inicio();
 })();
 </script>
-<script>(function(){var V='1795626759';var K='bqufu-recarga-';
+<script>(function(){var V='1795628047';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -238,6 +238,6 @@ confere(true);
 document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')confere(false);});
 window.addEventListener('focus',function(){confere(false);});
 setInterval(function(){if(document.visibilityState==='visible')confere(false);},180000);})();</script>
-<script src="js/presenca.js?v=1795626759" defer></script>
+<script src="js/presenca.js?v=1795628047" defer></script>
 </body>
 </html>

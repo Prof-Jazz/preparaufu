@@ -114,6 +114,16 @@ main.va{max-width:1240px}
 .mod{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
 .mod>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:14px 18px;font:700 15px var(--body);text-transform:uppercase;letter-spacing:.02em}
 .mod>summary::-webkit-details-marker{display:none}
+.mod>summary .gn{display:inline-flex;align-items:center;gap:8px;min-height:24px}
+.mod>summary .gren{background:none;border:1px solid var(--line);color:var(--muted);width:30px;height:30px;border-radius:8px;display:grid;place-items:center;cursor:pointer;padding:0}
+.mod>summary .gren[hidden]{display:none}
+.mod>summary .gn:empty{display:none}
+.mod>summary .gren:hover{color:var(--amarelo);border-color:var(--amarelo)}
+.mod>summary .gren svg{width:15px;height:15px}
+.mod>summary .gin{font:600 15px var(--body);padding:6px 10px;border:1px solid var(--azul);border-radius:8px;background:var(--bg);color:var(--ink);width:min(420px,50vw);text-transform:none}
+.mod>summary .gok,.mod>summary .gno{font:600 13px var(--body);border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:6px 11px;border-radius:8px;cursor:pointer;text-transform:none}
+.mod>summary .gok{background:var(--azul);border-color:var(--azul);color:#fff}
+
 .mod>summary .cnt{margin-left:auto;background:var(--soft);color:var(--muted);font:700 12px var(--body);padding:3px 10px;border-radius:999px;text-transform:none}
 .mod>summary .cnt.ok{background:var(--verde);color:#fff}
 .mod>summary::after{content:'›';font-size:22px;color:var(--muted);transform:rotate(90deg);transition:transform .15s}
@@ -223,7 +233,7 @@ main.va{max-width:1240px}
 </header>
 <main id="app" class="va"><p class="pend">Carregando…</p></main>
 
-<script>(function(){var V='1795626759';var K='bqufu-recarga-';
+<script>(function(){var V='1795628047';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -325,7 +335,7 @@ function telaCurso(id){const c=CURSOS.find(x=>x.id===id);document.title=c.titulo
       <div class="pr"><div class="pbar"><i style="width:${p}%"></i></div><span>${f} de ${plural(n,'aula concluída','aulas concluídas')} · ${p}%</span></div>
       <div class="acts">${n?`<button class="btn pri" id="cGo">${f?'Continuar':'Começar'} de onde parei</button>`:''}${IS_ADMIN?'<button class="btn" id="cNova">+ Nova aula</button><button class="btn" id="cEd">Editar seção</button>':''}</div></div></section>
     ${n?M.map((g,i)=>{const fe=g.itens.filter(a=>FEITO.has(a.id)).length;
-      return `<details class="mod" open><summary>${esc(g.k||(M.length>1?'Outras aulas':'Aulas'))}<span class="cnt${fe===g.itens.length?' ok':''}">${fe}/${g.itens.length}</span></summary>
+      return `<details class="mod" open><summary><span class="gn">${esc(g.k)}</span>${IS_ADMIN?`<button type="button" class="gren" data-g="${i}" title="Renomear este grupo" aria-label="Renomear este grupo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>`:''}<span class="cnt${fe===g.itens.length?' ok':''}">${fe}/${g.itens.length}</span></summary>
       <div class="agrid">${g.itens.map(a=>{const v=ytId(a.video);
         return `<a class="ac" href="#a/${a.id}"><div class="th" style="background-image:url('${esc(thumb(v))}')"><span class="pl">${IC.play}</span>${FEITO.has(a.id)?'<span class="ok">✓ Concluída</span>':''}</div>
         ${IS_ADMIN?`<button class="ed" data-ed="${a.id}">Editar</button>`:''}
@@ -334,6 +344,15 @@ function telaCurso(id){const c=CURSOS.find(x=>x.id===id);document.title=c.titulo
   if($('cGo'))$('cGo').onclick=()=>{const a=proxDe(id);if(a)ir('a/'+a.id);};
   if($('cNova'))$('cNova').onclick=()=>editaAula(null,id);
   if($('cEd'))$('cEd').onclick=()=>editaCurso(c);
+  app.querySelectorAll('.gren').forEach(b=>b.onclick=ev=>{ev.preventDefault();ev.stopPropagation();const g=M[+b.dataset.g],sm=b.closest('summary'),gn=sm.querySelector('.gn');
+    gn.innerHTML=`<input type="text" class="gin" maxlength="100" placeholder="Sem nome (deixe vazio)" value="${esc(g.k)}"><button type="button" class="gok">Salvar</button><button type="button" class="gno">Cancelar</button>`;b.hidden=true;
+    const inp=gn.querySelector('.gin');inp.focus();inp.select();
+    gn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();});inp.addEventListener('keyup',e=>{e.preventDefault();e.stopPropagation();});
+    const salva=async()=>{const nome=inp.value.trim();gn.querySelector('.gok').disabled=true;
+      const r=await SB.from('va_aulas').update({modulo:nome||null}).in('id',g.itens.map(a=>a.id));
+      if(r.error){alertaErro(r.error);gn.querySelector('.gok').disabled=false;return;}await carregar();telaCurso(id);};
+    gn.querySelector('.gok').onclick=e=>{e.preventDefault();salva();};gn.querySelector('.gno').onclick=e=>{e.preventDefault();telaCurso(id);};
+    inp.onkeydown=e=>{e.stopPropagation();if(e.key==='Enter'){e.preventDefault();salva();}else if(e.key==='Escape')telaCurso(id);};});
   app.querySelectorAll('[data-ed]').forEach(b=>b.onclick=ev=>{ev.preventDefault();ev.stopPropagation();editaAula(AULAS.find(a=>a.id===b.dataset.ed),id);});
 }
 
@@ -498,7 +517,7 @@ async function editaAula(a,cid){const novo=!a;const L=aulasDe(cid);
   const mods=[...new Set(L.map(x=>(x.modulo||'').trim()).filter(Boolean))];
   const d=dialogo(novo?'Nova aula':'Editar aula',esc(CURSOS.find(c=>c.id===cid).titulo),`
     <label class="f">Título da aula<input type="text" name="titulo" required maxlength="140" value="${esc(a.titulo)}" placeholder="Aula 01 – Teoria – Equações do primeiro grau"></label>
-    <label class="f">Módulo (agrupa as aulas)<input type="text" name="modulo" list="mods" maxlength="100" value="${esc(a.modulo||'')}" placeholder="Módulo 01 – Conjuntos numéricos"><datalist id="mods">${mods.map(m=>`<option value="${esc(m)}">`).join('')}</datalist></label>
+    <label class="f">Grupo (título da linha de aulas; pode ficar vazio)<input type="text" name="modulo" list="mods" maxlength="100" value="${esc(a.modulo||'')}" placeholder="Módulo 01 – Conjuntos numéricos"><datalist id="mods">${mods.map(m=>`<option value="${esc(m)}">`).join('')}</datalist></label>
     <label class="f">Link do vídeo no YouTube<input type="text" name="video" value="${esc(a.video||'')}" placeholder="https://youtu.be/…"></label>
     <div class="ytp" id="ytp"></div>
     <p class="dica">O vídeo pode ficar como <b>Não listado</b> no YouTube, com a opção “Permitir incorporação” ligada. A miniatura do próprio vídeo aparece para o aluno.</p>
@@ -531,6 +550,6 @@ async function editaAula(a,cid){const novo=!a;const L=aulasDe(cid);
 }
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795626759" defer></script>
+<script src="../js/presenca.js?v=1795628047" defer></script>
 </body>
 </html>
