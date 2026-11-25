@@ -20,7 +20,7 @@
         SB.rpc('minhas_areas').then(function(x){var a=x&&x.data;if(!a||!a.mentoria||a.papel==='admin')return;
           var navs=document.querySelectorAll('header nav');
           navs.forEach(function(nav){
-            if(!a.turma){nav.querySelectorAll('a').forEach(function(l){var h=l.getAttribute('href')||'';if(/aulas\/|assessoria/.test(h))l.style.display='none';});}
+            if(!a.turma){nav.querySelectorAll('a').forEach(function(l){var h=l.getAttribute('href')||'';if(/(^|[.\/])aulas\/|assessoria/.test(h))l.style.display='none';});}
             if(!nav.querySelector('a[href="/mentoria/"]')){var l=document.createElement('a');l.href='/mentoria/';l.textContent='Minha Mentoria';var c=nav.querySelector('a');if(c)l.className=c.className;var sair=nav.querySelector('#sair,button:last-child');if(sair&&sair.parentNode===nav)nav.insertBefore(l,sair);else nav.appendChild(l);}
           });
         },function(){});
@@ -78,7 +78,7 @@
       var pu=sessionStorage.getItem('bqufu-mentoria-puro'),v=JSON.parse(sessionStorage.getItem('bqufu-mentoria-ver')||'null');
       if(!pu||!v||!v.email)return;
       document.querySelectorAll('header nav').forEach(function(nav){
-        nav.querySelectorAll('a').forEach(function(l){var h=l.getAttribute('href')||'';if(/aulas\/|assessoria|area=escolher/.test(h))l.style.display='none';});
+        nav.querySelectorAll('a').forEach(function(l){var h=l.getAttribute('href')||'';if(/(^|[.\/])aulas\/|assessoria|area=escolher/.test(h))l.style.display='none';});
         var c=nav.querySelector('a');var sair=nav.querySelector('#sair,button:last-child');
         var m=document.createElement('a');m.href='/mentoria/';m.textContent='Minha Mentoria';if(c)m.className=c.className;
         var b=document.createElement('a');b.href='/mentoria/';b.textContent='Sair do modo aluno';if(c)b.className=c.className;b.style.borderColor='#DDDD24';b.style.color='#DDDD24';

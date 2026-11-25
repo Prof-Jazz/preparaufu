@@ -175,12 +175,12 @@ textarea{min-height:70px;resize:vertical}
 <header>
   <a class="logos" href="/" title="Início da plataforma PREPARA UFU"><img class="j" src="../bancodequestoes/logo/jazz_claro.png" alt="Jazz, Professor de Matemática"><span class="sep"></span><img class="p" src="../bancodequestoes/logo/prepara_transp.png" alt="Prepara UFU"></a>
   <div class="ttl"><h1>Aulas e materiais</h1><p>Agenda das aulas ao vivo e materiais do PREPARA UFU</p></div>
-  <nav class="tabs"><button class="theme" id="theme" aria-label="Alternar modo diurno e noturno" title="Modo diurno / noturno"><span class="sun">☀</span><span class="moon">☾</span></button><button id="tabAg" class="on">Agenda</button><button id="tabMat">Materiais</button><a href="../estudos/">Sala de Estudos</a><a href="../bancodequestoes/">Banco de Questões</a><a class="am" href="../assessoria/">Assessoria</a><button id="tabEx" hidden>Ver como aluno</button><button id="sair">Sair</button></nav>
+  <nav class="tabs"><button class="theme" id="theme" aria-label="Alternar modo diurno e noturno" title="Modo diurno / noturno"><span class="sun">☀</span><span class="moon">☾</span></button><button id="tabAg" class="on">Agenda</button><button id="tabMat">Materiais</button><a href="../minhasaulas/">Minhas Aulas</a><a href="../estudos/">Sala de Estudos</a><a href="../bancodequestoes/">Banco de Questões</a><a class="am" href="../assessoria/">Assessoria</a><button id="tabEx" hidden>Ver como aluno</button><button id="sair">Sair</button></nav>
 </header>
 <div id="exBar" hidden>Modo aluno exemplo — é assim que o aluno da turma <select id="exTurma"><option value="assessoria">Assessoria PREPARA UFU</option><option value="matematica">Curso de Matemática</option></select> vê esta página. <button type="button" id="exSair">Sair do modo exemplo</button></div>
 <main id="app"></main>
 
-<script>(function(){var V='1795617696';var K='bqufu-recarga-';
+<script>(function(){var V='1795625434';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -394,6 +394,6 @@ function editarPasta(p){const nova=!p;p=p||{nome:'',descricao:'',turmas:['assess
     if(L.length)await SB.storage.from('materiais').remove(L.map(x=>x.path));if(p.capa)await SB.storage.from('capas').remove([p.capa]);const {error}=await SB.from('pastas').delete().eq('id',p.id);if(error){msg(error.message);return;}fecha();await carregar();desenhaPastas();};}
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795617696" defer></script>
+<script src="../js/presenca.js?v=1795625434" defer></script>
 </body>
 </html>
