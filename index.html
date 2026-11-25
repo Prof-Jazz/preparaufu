@@ -7,6 +7,8 @@
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
 <meta name="theme-color" content="#16304F">
+<script type="speculationrules">{"prerender":[{"where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":"/"}},{"not":{"href_matches":"/mentoria/*"}},{"not":{"href_matches":"/*\\?*area=*"}},{"not":{"selector_matches":"[target=_blank]"}}]},"eagerness":"moderate"}],"prefetch":[{"where":{"or":[{"href_matches":"/"},{"href_matches":"/mentoria/*"}]},"eagerness":"moderate"}]}</script>
+<style>@view-transition{navigation:auto}header{view-transition-name:cab}::view-transition-old(root),::view-transition-new(root){animation-duration:.18s}</style>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Plataforma PREPARA UFU · Professor Jazz</title>
 <meta name="description" content="Plataforma PREPARA UFU do Professor Jazz: Banco de Questões UFU e Assessoria PREPARA UFU.">
@@ -228,7 +230,7 @@ $('sairTopo').onclick=async()=>{try{Object.keys(sessionStorage).filter(x=>x.star
 inicio();
 })();
 </script>
-<script>(function(){var V='1795629303';var K='bqufu-recarga-';
+<script>(function(){var V='1795629566';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -238,6 +240,6 @@ confere(true);
 document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')confere(false);});
 window.addEventListener('focus',function(){confere(false);});
 setInterval(function(){if(document.visibilityState==='visible')confere(false);},180000);})();</script>
-<script src="js/presenca.js?v=1795629303" defer></script>
+<script src="js/presenca.js?v=1795629566" defer></script>
 </body>
 </html>

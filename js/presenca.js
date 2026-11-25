@@ -27,7 +27,8 @@
       });
     }catch(e){}
   }
-  setTimeout(navArea,1200);
+  function ativo(fn,ms){if(document.prerendering)document.addEventListener('prerenderingchange',function(){setTimeout(fn,ms);},{once:true});else setTimeout(fn,ms);}
+  ativo(navArea,1200);
   function logoAreas(){
     try{
       if(typeof SB==='undefined'||!SB)return;
@@ -98,9 +99,9 @@
     }catch(e){}
   }
   window.avisoVA=avisoVA;
-  setTimeout(avisoVA,2200);setInterval(function(){if(!document.hidden)avisoVA();},30000);
+  ativo(avisoVA,2200);setInterval(function(){if(!document.hidden)avisoVA();},30000);
   window.avisoMsgs=avisoMsgs;
-  setTimeout(avisoMsgs,1500);setInterval(function(){if(!document.hidden)avisoMsgs();},20000);
+  ativo(avisoMsgs,1500);setInterval(function(){if(!document.hidden)avisoMsgs();},20000);
   function modoAlunoMentoria(){
     try{
       if(/^\/mentoria\//.test(location.pathname))return;
@@ -117,7 +118,7 @@
     }catch(e){}
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',modoAlunoMentoria);else modoAlunoMentoria();
-  setTimeout(ping,2500);
+  ativo(ping,2500);
   setInterval(function(){if(!document.hidden)ping();},60000);
   document.addEventListener('visibilitychange',function(){if(!document.hidden)ping();});
 })();
