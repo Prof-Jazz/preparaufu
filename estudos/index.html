@@ -207,7 +207,7 @@ select,input[type=number],input[type=text]{font:500 16px var(--body);padding:11p
 <div id="exBar" hidden>Modo aluno exemplo — é assim que o aluno vê. <button type="button" id="exSair">Sair do modo exemplo</button></div>
 <main id="app"><p class="pend">Carregando…</p></main>
 
-<script>(function(){var V='1795629566';var K='bqufu-recarga-';
+<script>(function(){var V='1795629693';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -266,7 +266,11 @@ async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!se
 function menus(){const adm=REAL_ADMIN&&!EXMODO,stf=STAFF&&!EXMODO;$('tabPainel').hidden=!(ASSESSORIA&&!stf);$('tabPainel').textContent='Meu Dashboard';$('tabAlunos').hidden=!stf;$('tabDen').hidden=!adm;$('tabEx').hidden=!adm;$('exBar').hidden=!EXMODO||MVER;}
 const abas=on=>['tabSala','tabPainel','tabAlunos','tabDen'].forEach(t=>$(t).classList.toggle('on',t===on));
 
-async function carregaPlano(){if(PLANO)return;const [p,c]=await Promise.all([MENTORADO?SB.from('m_plano').select('id,semana,materia,frente,assunto').eq('email',ALVO).order('semana').order('id'):SB.from('plano_itens').select('id,semana,materia,frente,assunto').order('id'),SB.from('checkup').select('respostas').eq('email',ALVO).maybeSingle()]);
+async function carregaPlano(){if(PLANO)return;
+  const ck='bqufu-plano-'+(MENTORADO?'m-':'t-')+ALVO;
+  try{const x=JSON.parse(sessionStorage.getItem(ck)||'null');if(x&&Date.now()-x.t<15*60000){PLANO=x.p;LINGUA=x.l;return;}}catch(e){}
+  await carregaPlanoRede();try{sessionStorage.setItem(ck,JSON.stringify({t:Date.now(),p:PLANO,l:LINGUA}));}catch(e){}}
+async function carregaPlanoRede(){const [p,c]=await Promise.all([MENTORADO?SB.from('m_plano').select('id,semana,materia,frente,assunto').eq('email',ALVO).order('semana').order('id'):SB.from('plano_itens').select('id,semana,materia,frente,assunto').order('id'),SB.from('checkup').select('respostas').eq('email',ALVO).maybeSingle()]);
   PLANO=p.data||[];LINGUA=(c.data&&c.data.respostas&&c.data.respostas.lingua)||'';}
 const semanas=()=>[...new Set(PLANO.map(x=>x.semana))].sort();
 const semAtual=()=>{const s=semanas(),h=iso(new Date());let i=s.findIndex((x,k)=>h>=x&&(k===s.length-1||h<s[k+1]));return i<0?(h<s[0]?0:s.length-1):i;};
@@ -487,6 +491,6 @@ async function telaDen(){abas('tabDen');$('app').innerHTML='<p class="pend">Carr
   $('app').querySelectorAll('[data-r]').forEach(b=>b.onclick=async()=>{await SB.rpc('admin_resolver',{p_id:+b.dataset.id,p:b.dataset.r==='1'});telaDen();});}
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795629566" defer></script>
+<script src="../js/presenca.js?v=1795629693" defer></script>
 </body>
 </html>
