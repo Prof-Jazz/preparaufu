@@ -205,7 +205,7 @@ select,input[type=number],input[type=text]{font:500 16px var(--body);padding:11p
 <div id="exBar" hidden>Modo aluno exemplo — é assim que o aluno vê. <button type="button" id="exSair">Sair do modo exemplo</button></div>
 <main id="app"><p class="pend">Carregando…</p></main>
 
-<script>(function(){var V='1795558737';var K='bqufu-recarga-';
+<script>(function(){var V='1795617696';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -341,7 +341,7 @@ function encerrar(s){const seg=Math.round(decorrido(s)/1000);if(s.rodando){s.acu
     if(a+e>q){msg('Acertos + erros não pode passar do total de questões feitas.');return;}
     const bt=f.querySelector('[type=submit]');bt.disabled=true;
     const fimT=Date.now();const row={email:s.email,inicio:new Date(s.inicio).toISOString(),fim:new Date(fimT).toISOString(),segundos:seg,tipo:s.tipo,materia:s.materia,assunto:s.assunto||null,plano_item:s.item,questoes:q,acertos:a,erros:e};
-    const r=await SB.from('sessoes').insert(row);if(r.error){msg('Não foi possível salvar: '+r.error.message);bt.disabled=false;return;}
+    let r=await SB.from('sessoes').insert(row);if(r.error&&/plano_item|foreign key/i.test(r.error.message)){row.plano_item=null;r=await SB.from('sessoes').insert(row);}if(r.error){msg('Não foi possível salvar: '+r.error.message);bt.disabled=false;return;}
     if(f.mk&&f.mk.checked)await SB.from(MENTORADO?'m_plano_feito':'plano_feito').insert({email:s.email,item:s.item});
     gravaS(null);d.remove();telaSala();};}
 function ASSESSORIA_ALVO(){return EXMODO||ASSESSORIA;}
@@ -485,6 +485,6 @@ async function telaDen(){abas('tabDen');$('app').innerHTML='<p class="pend">Carr
   $('app').querySelectorAll('[data-r]').forEach(b=>b.onclick=async()=>{await SB.rpc('admin_resolver',{p_id:+b.dataset.id,p:b.dataset.r==='1'});telaDen();});}
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795558737" defer></script>
+<script src="../js/presenca.js?v=1795617696" defer></script>
 </body>
 </html>
