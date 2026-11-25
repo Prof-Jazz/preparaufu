@@ -416,7 +416,7 @@ body{}@keyframes fadein{from{opacity:0}to{opacity:1}}
 <div id="exBar" hidden>Modo aluno exemplo — é assim que o aluno vê. Nada aqui entra nas estatísticas da turma. <button type="button" id="exSair">Sair do modo exemplo</button></div>
 <main id="app"></main>
 
-<script>(function(){var V='1795631996';var K='bqufu-recarga-';
+<script>(function(){var V='1795632122';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,.adlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -564,7 +564,7 @@ async function telaForm(){
     const ROT=['acorda','dorme','horas_dia','disp','fixos','escola_turno','trabalha','cursinho','atividade','atividade_fixo','melhor_periodo','nivel','curso','lingua','situacao','aulas_mat','rev_tempo','redacao_freq','simulados'];
     const antes=data&&data.respostas;const mudou=!antes||ROT.some(k=>JSON.stringify(antes[k]??null)!==JSON.stringify(r[k]??null));
     const {error}=await SB.from('checkup').upsert({email:ALVO,respostas:r,atualizado_em:agora},{onConflict:'email'});
-    let recalc=false;if(!error&&mudou){try{const g=gerar(r);const B=paraBlocos(g);const c=await SB.from('cronograma').upsert({email:ALVO,blocos:B,atualizado_em:agora,atualizado_por:EMAIL},{onConflict:'email'});recalc=!c.error;}catch(e){}}
+    let recalc=false;if(!error&&mudou){try{const g=gerar(r);const B=paraBlocos(g);const c=await SB.from('cronograma').upsert({email:ALVO,blocos:B,atualizado_em:agora,atualizado_por:EMAIL},{onConflict:'email'});recalc=!c.error;if(recalc){const amanha=new Date();amanha.setDate(amanha.getDate()+1);const ds=amanha.getFullYear()+'-'+String(amanha.getMonth()+1).padStart(2,'0')+'-'+String(amanha.getDate()).padStart(2,'0');await SB.from('agenda_estudos').delete().eq('email',ALVO).eq('origem','crono').gte('data',ds);}}catch(e){}}
     if(!error)data={respostas:r,atualizado_em:agora};
     $('enviar').disabled=false;
     if(error){m.className='err';m.textContent='Não foi possível enviar: '+error.message;return;}
@@ -1332,6 +1332,6 @@ async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!se
 $('sair').onclick=async()=>{try{localStorage.removeItem('bqufu-sig-v2');}catch(e){}await SB.auth.signOut();location.href='/';};
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795631996" defer></script>
+<script src="../js/presenca.js?v=1795632122" defer></script>
 </body>
 </html>
