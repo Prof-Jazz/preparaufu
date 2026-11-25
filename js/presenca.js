@@ -70,6 +70,35 @@
       });
     }catch(e){}
   }
+  function toastVA(tit,sub,href){try{var t=document.getElementById('vaToast');if(!t){t=document.createElement('a');t.id='vaToast';
+      t.style.cssText='position:fixed;right:18px;bottom:96px;z-index:200;display:flex;align-items:center;gap:12px;max-width:360px;padding:14px 16px;border-radius:16px;background:#16304F;color:#fff;text-decoration:none;font:600 14.5px system-ui,sans-serif;box-shadow:0 14px 40px rgba(0,0,0,.4);border:1px solid #DDDD24;transition:opacity .3s,transform .3s;opacity:0;transform:translateY(10px)';
+      document.body.appendChild(t);}
+    t.href=href;var e=function(x){return String(x||'').replace(/[<>&"]/g,'');};
+    t.innerHTML='<span style="flex:none;width:38px;height:38px;border-radius:50%;background:#DDDD24;color:#16304F;display:grid;place-items:center;font:800 19px system-ui">?</span><span><b style="display:block;font-size:15px">'+e(tit)+'</b><span style="opacity:.85">'+e(sub)+'</span></span>';
+    t.style.opacity='1';t.style.transform='none';clearTimeout(t._tm);t._tm=setTimeout(function(){t.style.opacity='0';t.style.transform='translateY(10px)';},10000);}catch(x){}}
+  function avisoVA(){
+    try{
+      if(typeof SB==='undefined'||!SB)return;
+      SB.auth.getSession().then(function(r){
+        if(!r||!r.data||!r.data.session)return;
+        SB.rpc('va_alertas').then(function(x){var a=x&&x.data;if(!a)return;var n=a.n||0,u=a.ultima;
+          var antes=null;try{antes=sessionStorage.getItem('bqufu-va-n');sessionStorage.setItem('bqufu-va-n',String(n));}catch(e){}
+          var prof=a.papel==='prof';
+          var mostra=function(){if(!u)return;
+            if(prof)toastVA(n>1?n+' dúvidas novas em Minhas Aulas':'Nova dúvida em Minhas Aulas',(u.nome?u.nome+' · ':'')+(u.titulo||''),'/minhasaulas/#duvidas');
+            else toastVA('O Prof. Jazz respondeu sua dúvida',u.titulo||'','/minhasaulas/#a/'+u.aula);};
+          var aqui=/^\/minhasaulas\//.test(location.pathname)&&(prof?location.hash==='#duvidas':(u&&location.hash==='#a/'+u.aula));
+          if(!aqui){if(antes===null&&n>0)mostra();else if(antes!==null&&n>+antes){somMsg();mostra();}}
+          document.querySelectorAll('header nav a[href*="minhasaulas/"]').forEach(function(l){var b=l.querySelector('.vabdg');
+            if(!n){if(b)b.remove();return;}
+            if(!b){b=document.createElement('em');b.className='vabdg';b.style.cssText='display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;margin-left:6px;border-radius:999px;background:#E5484D;color:#fff;font:800 11px system-ui;font-style:normal;vertical-align:middle';l.appendChild(b);}
+            b.textContent=n;b.title=prof?n+' dúvida(s) nova(s) nas videoaulas':n+' resposta(s) nova(s) do Prof. Jazz';});
+        },function(){});
+      });
+    }catch(e){}
+  }
+  window.avisoVA=avisoVA;
+  setTimeout(avisoVA,2200);setInterval(function(){if(!document.hidden)avisoVA();},30000);
   window.avisoMsgs=avisoMsgs;
   setTimeout(avisoMsgs,1500);setInterval(function(){if(!document.hidden)avisoMsgs();},20000);
   function modoAlunoMentoria(){
