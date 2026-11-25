@@ -237,7 +237,7 @@ select,input[type=number],input[type=text]{font:500 16px var(--body);padding:11p
 <div id="exBar" hidden>Vendo como <select id="exAluno" aria-label="Escolher o aluno"><option>Aluno exemplo</option></select> — é assim que esse aluno vê. <button type="button" id="exSair">Sair do modo aluno</button></div>
 <main id="app"><p class="pend">Carregando…</p></main>
 
-<script>(function(){var V='1795640987';var K='bqufu-recarga-';
+<script>(function(){var V='1795641568';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -304,8 +304,10 @@ const abas=on=>['tabSala','tabPainel','tabAlunos','tabDen'].forEach(t=>$(t).clas
 
 async function carregaPlano(){if(PLANO)return;
   const ck='bqufu-plano-'+(MENTORADO?'m-':'t-')+ALVO;
-  try{const x=JSON.parse(sessionStorage.getItem(ck)||'null');if(x&&Date.now()-x.t<15*60000){PLANO=x.p;LINGUA=x.l;return;}}catch(e){}
-  await carregaPlanoRede();try{sessionStorage.setItem(ck,JSON.stringify({t:Date.now(),p:PLANO,l:LINGUA}));}catch(e){}}
+  let ok=false;try{const x=JSON.parse(sessionStorage.getItem(ck)||'null');if(x&&Date.now()-x.t<15*60000){PLANO=x.p;LINGUA=x.l;ok=true;}}catch(e){}
+  if(!ok){await carregaPlanoRede();try{sessionStorage.setItem(ck,JSON.stringify({t:Date.now(),p:PLANO,l:LINGUA}));}catch(e){}}
+  if(!MENTORADO){try{const {data}=await SB.from('plano_remarcado').select('item,semana').eq('email',ALVO);const OV={};(data||[]).forEach(r=>OV[r.item]=r.semana);
+    PLANO=PLANO.map(x=>({...x,semana:OV[x.id]||x.semana0||x.semana,semana0:x.semana0||x.semana}));}catch(e){}}}
 async function carregaPlanoRede(){const [p,c]=await Promise.all([MENTORADO?SB.from('m_plano').select('id,semana,materia,frente,assunto').eq('email',ALVO).order('semana').order('id'):SB.from('plano_itens').select('id,semana,materia,frente,assunto').order('id'),SB.from('checkup').select('respostas').eq('email',ALVO).maybeSingle()]);
   PLANO=p.data||[];LINGUA=(c.data&&c.data.respostas&&c.data.respostas.lingua)||'';}
 const matSala=x=>x.materia==='Português'&&/^literatura/i.test(x.frente||'')?'Literatura':x.materia==='Português'&&/^reda/i.test(x.frente||'')?'Redação':x.materia;
@@ -588,6 +590,6 @@ async function telaDen(){abas('tabDen');$('app').innerHTML='<p class="pend">Carr
   $('app').querySelectorAll('[data-r]').forEach(b=>b.onclick=async()=>{await SB.rpc('admin_resolver',{p_id:+b.dataset.id,p:b.dataset.r==='1'});telaDen();});}
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795640987" defer></script>
+<script src="../js/presenca.js?v=1795641568" defer></script>
 </body>
 </html>

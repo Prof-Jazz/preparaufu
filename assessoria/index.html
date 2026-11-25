@@ -12,6 +12,29 @@
 .rec{font:600 12px var(--body);border:1px solid var(--line);background:var(--bg);color:var(--muted);border-radius:8px;padding:6px 6px;cursor:pointer;line-height:1.2}
 .rec.on{background:rgba(27,175,122,.16);border-color:#1BAF7A;color:var(--ink)}
 .rec:hover{border-color:var(--azul)}
+.preag{display:flex;gap:14px;align-items:center;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--amarelo);border-radius:14px;padding:14px 16px}
+.preag>div:first-child{flex:1;min-width:240px;display:flex;flex-direction:column;gap:2px}.preag span{color:var(--muted);font-size:14px}
+.preb{display:flex;gap:8px;flex-wrap:wrap}
+.prem{display:block;font:600 11.5px var(--body);color:#C9A227;margin-top:2px}
+.ralerta{background:rgba(221,221,36,.12);border:1px solid rgba(221,221,36,.5);border-radius:12px;padding:10px 12px;font-size:14px}
+#rlist{display:flex;flex-direction:column;gap:8px;max-height:46vh;overflow:auto}
+.rdisc{border:1px solid var(--line);border-left:5px solid var(--c);border-radius:12px;background:var(--bg)}
+.rdisc.ruim{border-color:#E5484D;border-left-color:#E5484D}
+.rdisc summary{display:flex;gap:10px;align-items:center;padding:9px 12px;cursor:pointer;flex-wrap:wrap}.rdisc summary span{color:var(--muted);font-size:13px}
+.rdisc summary em{margin-left:auto;font:700 12px var(--body);font-style:normal;padding:2px 9px;border-radius:999px}
+.rok{background:rgba(27,175,122,.16);color:#1BAF7A}.rbad{background:#E5484D;color:#fff}
+.ritens{display:flex;flex-direction:column;gap:4px;padding:0 12px 10px}
+.ritens label{display:flex;gap:9px;align-items:flex-start;font-size:14px;cursor:pointer}.ritens small{display:block;color:var(--muted);font-size:11.5px}
+.rerro{background:rgba(229,72,77,.12);border:1px solid #E5484D;border-radius:12px;padding:10px 12px;font-size:14px}
+.rinfo{background:rgba(27,175,122,.1);border:1px solid rgba(27,175,122,.45);border-radius:12px;padding:10px 12px;font-size:14px}
+.rtoast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#16304F;color:#fff;border:1px solid var(--amarelo);border-radius:12px;padding:12px 18px;z-index:90;font-weight:600}
+.dlg{position:fixed;inset:0;z-index:80;background:rgba(5,8,18,.6);display:flex;align-items:flex-start;justify-content:center;padding:30px 14px;overflow:auto}
+.dlg .box{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:18px;max-width:600px;width:100%;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.dlg .top{padding:16px 20px;color:#fff;background:#16304F;border-bottom:4px solid var(--amarelo);display:flex;gap:12px;align-items:flex-start}
+.dlg .top h3{margin:0;font:800 20px var(--display)}.dlg .top p{margin:3px 0 0;color:#D6E6F5;font-size:13.5px}
+.dlg .top .x{margin-left:auto;background:none;border:0;color:#fff;font-size:24px;cursor:pointer;line-height:1}
+.dlg .bd{padding:16px 20px;display:flex;flex-direction:column;gap:12px}
+.dlg .btns{display:flex;gap:8px;flex-wrap:wrap}
 </style>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Assessoria PREPARA UFU</title>
@@ -422,7 +445,7 @@ body{}@keyframes fadein{from{opacity:0}to{opacity:1}}
 <div id="exBar" hidden>Vendo como <select id="exAluno" aria-label="Escolher o aluno"><option>Aluno exemplo</option></select> — é assim que esse aluno vê. <span id="exObs"></span><button type="button" id="exSair">Sair do modo aluno</button></div>
 <main id="app"></main>
 
-<script>(function(){var V='1795640987';var K='bqufu-recarga-';
+<script>(function(){var V='1795641568';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,.adlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -1267,12 +1290,12 @@ const MESL=['janeiro','fevereiro','março','abril','maio','junho','julho','agost
 const dm=d=>String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0');
 async function carregaPlano(email){
   if(!PLANO){const {data,error}=await SB.from('plano_itens').select('*').order('id');if(error)throw error;PLANO=data||[];}
-  const [f,c,k]=await Promise.all([SB.from('plano_feito').select('item').eq('email',email),SB.from('cronograma').select('blocos').eq('email',email).maybeSingle(),SB.from('checkup').select('respostas').eq('email',email).maybeSingle()]);
-  const lingua=(k.data&&k.data.respostas&&k.data.respostas.lingua)||'';
-  const itens=PLANO.filter(x=>!(x.materia==='Inglês'&&lingua==='Espanhol')&&!(x.materia==='Espanhol'&&lingua==='Inglês'));
+  const [f,c,k,rm,hs]=await Promise.all([SB.from('plano_feito').select('item').eq('email',email),SB.from('cronograma').select('blocos').eq('email',email).maybeSingle(),SB.from('checkup').select('respostas').eq('email',email).maybeSingle(),SB.from('plano_remarcado').select('item,semana').eq('email',email),SB.from('plano_reag_hist').select('id').eq('email',email).order('id',{ascending:false}).limit(1)]);
+  const lingua=(k.data&&k.data.respostas&&k.data.respostas.lingua)||'';const OV={};(rm.data||[]).forEach(x=>OV[x.item]=x.semana);
+  const itens=PLANO.filter(x=>!(x.materia==='Inglês'&&lingua==='Espanhol')&&!(x.materia==='Espanhol'&&lingua==='Inglês')).map(x=>({...x,semana0:x.semana,semana:OV[x.id]||x.semana}));
   const sem=[...new Set(itens.map(x=>x.semana))].sort();
   const hoje=isoD(new Date());let cur=sem.findIndex((s,i)=>hoje>=s&&(i===sem.length-1||hoje<sem[i+1]));if(cur<0)cur=hoje<sem[0]?0:sem.length-1;
-  return {itens,sem,cur,feito:new Set((f.data||[]).map(x=>x.item)),blocos:(c.data&&c.data.blocos)||[],lingua};}
+  return {itens,sem,cur,nRem:Object.keys(OV).length,temHist:!!(hs.data&&hs.data.length),OV,feito:new Set((f.data||[]).map(x=>x.item)),blocos:(c.data&&c.data.blocos)||[],lingua};}
 async function telaPlano(){abas('tabPlano');$('app').innerHTML='<p class="pend">Carregando o plano de estudos…</p>';
   let P;try{P=await carregaPlano(ALVO);}catch(e){$('app').innerHTML=`<div class="aviso"><h2>Não foi possível carregar o plano</h2><p>${esc(e.message)}</p></div>`;return;}
   P.sel=P.cur;desenhaPlano(P);}
@@ -1295,15 +1318,75 @@ function desenhaPlano(P){
    <div class="pgrid">${grupos.map(g=>{const f=g.L.filter(x=>P.feito.has(x.id)).length,cor=CORD[g.k==='LE'?'LE':g.k],nb=nBlocos(g.k);
       return `<section class="pcard${f===g.L.length?' done':''}" style="--c:${cor}"><svg class="pdec" viewBox="0 0 240 240" aria-hidden="true" stroke="currentColor" fill="currentColor">${PDEC[g.k]}</svg>
         <header><span class="pic">${PICO[g.k]}</span><div><h3>${esc(g.n)}</h3><small>${f} de ${g.L.length} estudado${g.L.length>1?'s':''}</small></div><span class="pbar"><em style="width:${Math.round(100*f/g.L.length)}%"></em></span></header>
-        <ul>${g.L.map(x=>`<li><label class="pit${P.feito.has(x.id)?' feito':''}"><input type="checkbox" data-id="${x.id}" ${P.feito.has(x.id)?'checked':''}><span class="pck"></span><span class="ptx">${x.frente?`<em>${esc(x.frente)}</em>`:''}<b>${esc(x.assunto)}</b></span></label></li>`).join('')}</ul>
+        <ul>${g.L.map(x=>`<li><label class="pit${P.feito.has(x.id)?' feito':''}"><input type="checkbox" data-id="${x.id}" ${P.feito.has(x.id)?'checked':''}><span class="pck"></span><span class="ptx">${x.frente?`<em>${esc(x.frente)}</em>`:''}<b>${esc(x.assunto)}</b>${x.semana!==x.semana0?`<small class="prem">↻ reagendado da semana ${P.sem.indexOf(x.semana0)+1}</small>`:''}</span></label></li>`).join('')}</ul>
         ${nb?`<footer>📅 ${nb} bloco${nb>1?'s':''} de ${esc(g.n)} no seu Cronograma Semanal</footer>`:''}</section>`;}).join('')}</div>
+   ${(()=>{const R=atrasados(P);return `<div class="preag"><div><b>${R.L.length?`Você tem ${R.L.length} assunto${R.L.length>1?'s':''} atrasado${R.L.length>1?'s':''}.`:'Nenhum assunto atrasado.'}</b><span>${R.L.length?'Ao fim de cada semana, use “Reagendar plano de estudos” para redistribuir o que ficou para trás nas semanas que restam, sem quebrar a ordem dos conteúdos.':'Continue marcando cada assunto quando terminar de estudar.'}</span></div>
+     <div class="preb">${P.temHist?'<button class="btn" id="pUndo">↶ Desfazer último reagendamento</button>':''}${P.nRem?'<button class="btn" id="pDesf">Voltar ao plano original</button>':''}<button class="btn pri" id="pReag">↻ Reagendar plano de estudos</button></div></div>`;})()}
    <p class="pend" style="text-align:center;margin:4px 0 0">Marque cada assunto quando terminar de estudar. O Prof. Jazz acompanha o seu progresso.</p>`;
+  $('pReag').onclick=()=>reagendar(P);
+  if($('pDesf'))$('pDesf').onclick=async ev=>{const b=ev.target;if(!b.dataset.ok){b.dataset.ok=1;b.textContent='Confirmar: voltar ao plano original';return;}
+    b.disabled=true;try{await guardaCenario(P);const {error}=await SB.from('plano_remarcado').delete().eq('email',ALVO);if(error)throw error;telaPlano();}catch(e){alert(e.message||e);b.disabled=false;}};
+  if($('pUndo'))$('pUndo').onclick=async ev=>{const b=ev.target;if(!b.dataset.ok){b.dataset.ok=1;b.textContent='Confirmar: voltar ao cenário anterior';return;}
+    b.disabled=true;try{await desfazUltimo();telaPlano();}catch(e){alert(e.message||e);b.disabled=false;}};
   const st=$('pStrip'),on=st.querySelector('.on');if(on)st.scrollLeft=on.offsetLeft-st.clientWidth/2+on.clientWidth/2;
   st.querySelectorAll('.pw').forEach(b=>b.onclick=()=>{P.sel=+b.dataset.i;desenhaPlano(P);});
   $('pAnt').onclick=()=>{if(P.sel>0){P.sel--;desenhaPlano(P);}};$('pProx').onclick=()=>{if(P.sel<P.sem.length-1){P.sel++;desenhaPlano(P);}};
   $('app').querySelectorAll('.pit input').forEach(c=>c.onchange=async()=>{const id=+c.dataset.id;
     if(c.checked){P.feito.add(id);desenhaPlano(P);const {error}=await SB.from('plano_feito').insert({email:ALVO,item:id});if(error&&!/duplicate/i.test(error.message)){P.feito.delete(id);desenhaPlano(P);alert('Não foi possível salvar: '+error.message);}}
     else{P.feito.delete(id);desenhaPlano(P);const {error}=await SB.from('plano_feito').delete().eq('email',ALVO).eq('item',id);if(error){P.feito.add(id);desenhaPlano(P);alert('Não foi possível salvar: '+error.message);}}});}
+
+/* ===== Reagendar plano de estudos ===== */
+async function guardaCenario(P){const snap=Object.entries(P.OV).map(([item,semana])=>({item:+item,semana}));const r=await SB.from('plano_reag_hist').insert({email:ALVO,snapshot:snap});if(r.error)throw r.error;}
+async function desfazUltimo(){const {data,error}=await SB.from('plano_reag_hist').select('*').eq('email',ALVO).order('id',{ascending:false}).limit(1);if(error)throw error;const h=data&&data[0];if(!h)return;
+  const d1=await SB.from('plano_remarcado').delete().eq('email',ALVO);if(d1.error)throw d1.error;
+  const snap=(h.snapshot||[]).map(x=>({email:ALVO,item:x.item,semana:x.semana}));if(snap.length){const r=await SB.from('plano_remarcado').insert(snap);if(r.error)throw r.error;}
+  const d2=await SB.from('plano_reag_hist').delete().eq('id',h.id);if(d2.error)throw d2.error;}
+
+const discDe=x=>x.materia==='Português'?(/^literatura/i.test(x.frente||'')?'Literatura':/^reda/i.test(x.frente||'')?'Redação':'Português'):x.materia;
+const MAXSEM=5;
+function inicioReag(P){const d=new Date().getDay();let i=P.cur+((d===6||d===0)?1:0);return Math.min(i,P.sem.length);}
+function atrasados(P){const ini=inicioReag(P);const lim=P.sem[ini]||'9999';return {ini,L:P.itens.filter(x=>x.semana<lim&&!P.feito.has(x.id)).sort((a,b)=>a.semana0.localeCompare(b.semana0)||a.id-b.id)};}
+/* distribui, por disciplina, os atrasados escolhidos + os assuntos futuros não estudados, mantendo a ordem (pré-requisitos antes) */
+function planejaDisc(P,ini,late,fut){const n=P.sem.length;const S=late.map(x=>({x,min:ini})).concat(fut.map(x=>({x,min:Math.max(ini,P.sem.indexOf(x.semana))})));
+  const base=Math.max(1,...P.sem.slice(ini).map(w=>fut.filter(x=>x.semana===w).length));
+  const tenta=T=>{const load=new Array(n).fill(0),out=[];let w=ini;for(const it of S){w=Math.max(w,it.min);while(w<n&&load[w]>=T)w++;if(w>=n)return null;load[w]++;out.push([it.x,w]);}return {out,T,max:Math.max(...load)};};
+  for(let T=Math.max(base,Math.ceil(S.length/Math.max(1,n-ini)));T<=MAXSEM;T++){const r=tenta(T);if(r)return r;}
+  return null;}
+function maxCabem(P,ini,late,fut){let lo=0,hi=late.length;while(lo<hi){const m=Math.ceil((lo+hi)/2);if(planejaDisc(P,ini,late.slice(0,m),fut))lo=m;else hi=m-1;}return lo;}
+function reagendar(P){const {ini,L}=atrasados(P);const n=P.sem.length;
+  const d=document.createElement('div');d.className='dlg';document.body.appendChild(d);
+  const fecha=()=>d.remove();d.addEventListener('mousedown',e=>{if(e.target===d)fecha();});
+  if(ini>=n){d.innerHTML=`<div class="box"><div class="top"><h3>Reagendar plano de estudos</h3><button class="x">×</button></div><div class="bd"><p>O plano já chegou à última semana: não há mais semanas para reagendar. Fale com o Prof. Jazz.</p></div></div>`;d.querySelector('.x').onclick=fecha;return;}
+  if(!L.length){d.innerHTML=`<div class="box"><div class="top"><h3>Reagendar plano de estudos</h3><button class="x">×</button></div><div class="bd"><p><b>Nenhum assunto atrasado.</b> Você está em dia com o plano. Parabéns!</p></div></div>`;d.querySelector('.x').onclick=fecha;return;}
+  const discs=[...new Set(L.map(discDe))].sort((a,b)=>PMAT.findIndex(z=>z[0]===a)-PMAT.findIndex(z=>z[0]===b));
+  const sel=new Set(L.map(x=>x.id));
+  d.innerHTML=`<div class="box" style="max-width:760px"><div class="top"><div><h3>↻ Reagendar plano de estudos</h3><p>Os assuntos atrasados serão distribuídos da semana ${ini+1} até a semana ${n} (${dm(pData(P.sem[ini]))} a ${dm(new Date(pData(P.sem[n-1]).getTime()+6*864e5))}), sem sair do plano.</p></div><button class="x">×</button></div>
+    <div class="bd"><div class="ralerta"><b>Atenção:</b> conteúdo atrasado significa <b>mais conteúdo nas semanas que restam</b>. Cuidado com o seu planejamento: reagendar não diminui o que falta estudar, só reorganiza.</div>
+    <p class="pend" style="margin:0">Marque o que você quer reagendar. A ordem dos conteúdos é mantida: o que é pré-requisito continua vindo antes. O que você desmarcar continua atrasado na semana original; se for deixar algum assunto de lado, combine antes com o Prof. Jazz ou com a sua assessora.</p>
+    <div id="rlist"></div><div id="rres"></div>
+    <div class="btns"><button class="btn pri" id="rOk">Reagendar</button><button class="btn" id="rTodos">Marcar todos</button><button class="btn" id="rNenhum">Desmarcar todos</button></div></div></div>`;
+  d.querySelector('.x').onclick=fecha;
+  let plano=null;
+  const calc=()=>{const res={},prob=[];discs.forEach(ds=>{const late=L.filter(x=>discDe(x)===ds&&sel.has(x.id));const fut=P.itens.filter(x=>discDe(x)===ds&&x.semana>=P.sem[ini]&&!P.feito.has(x.id)).sort((a,b)=>a.semana.localeCompare(b.semana)||a.semana0.localeCompare(b.semana0)||a.id-b.id);
+      if(!late.length){res[ds]={ok:true,n:0};return;}const r=planejaDisc(P,ini,late,fut);if(r)res[ds]={ok:true,n:late.length,r};else{const k=maxCabem(P,ini,late,fut);res[ds]={ok:false,n:late.length,cabe:k};prob.push(ds);}});return {res,prob};};
+  const desenha=()=>{const {res,prob}=calc();plano=prob.length?null:res;
+    $('rlist').innerHTML=discs.map(ds=>{const it=L.filter(x=>discDe(x)===ds),r=res[ds];const cor=CORD[(PMAT.find(z=>z[0]===ds)||PMAT.find(z=>z[0]==='Português'))[1]]||'#3A8CCB';
+      return `<details class="rdisc${r.ok?'':' ruim'}" open style="--c:${cor}"><summary><b>${esc(ds)}</b><span>${it.filter(x=>sel.has(x.id)).length} de ${it.length} marcado${it.length>1?'s':''}</span>${r.ok?(r.n?`<em class="rok">ok · até ${r.r.max} por semana</em>`:''):`<em class="rbad">não cabe: desmarque ${r.n-r.cabe}</em>`}</summary>
+        <div class="ritens">${it.map(x=>`<label><input type="checkbox" data-id="${x.id}"${sel.has(x.id)?' checked':''}><span><small>Semana ${P.sem.indexOf(x.semana)+1}${x.frente?' · '+esc(x.frente):''}</small>${esc(x.assunto)}</span></label>`).join('')}</div></details>`;}).join('');
+    $('rlist').querySelectorAll('input[data-id]').forEach(c=>c.onchange=()=>{c.checked?sel.add(+c.dataset.id):sel.delete(+c.dataset.id);desenha();});
+    const tot=sel.size;
+    $('rres').innerHTML=prob.length?`<div class="rerro"><b>Não é possível reagendar com essa quantidade de assuntos atrasados.</b> Em ${prob.map(esc).join(', ')}, a semana ficaria com mais de ${MAXSEM} assuntos da mesma disciplina. Selecione uma quantidade menor de assuntos para reorganizar. É hora de definir as suas prioridades: converse com o Prof. Jazz ou com a sua assessora para decidir o que fica de fora.</div>`
+      :tot?`<div class="rinfo">${tot} assunto${tot>1?'s':''} ${tot>1?'serão':'será'} reorganizado${tot>1?'s':''}. Nenhuma semana passa de ${MAXSEM} assuntos da mesma disciplina.</div>`:'<div class="rinfo">Nenhum assunto marcado.</div>';
+    $('rOk').disabled=!!prob.length||!tot;};
+  desenha();
+  $('rTodos').onclick=()=>{L.forEach(x=>sel.add(x.id));desenha();};$('rNenhum').onclick=()=>{sel.clear();desenha();};
+  $('rOk').onclick=async()=>{if(!plano)return;const b=$('rOk');b.disabled=true;b.textContent='Reagendando…';
+    const ups=[],dels=[];Object.values(plano).forEach(r=>{if(!r.r)return;r.r.out.forEach(([x,w])=>{const nova=P.sem[w];if(nova===x.semana0)dels.push(x.id);else if(nova!==x.semana)ups.push({email:ALVO,item:x.id,semana:nova,em:new Date().toISOString()});else if(x.semana!==x.semana0){} });});
+    try{await guardaCenario(P);if(ups.length){const r=await SB.from('plano_remarcado').upsert(ups,{onConflict:'email,item'});if(r.error)throw r.error;}
+      if(dels.length){const r=await SB.from('plano_remarcado').delete().eq('email',ALVO).in('item',dels);if(r.error)throw r.error;}
+      fecha();await telaPlano();
+      const t=document.createElement('div');t.className='rtoast';t.textContent='Plano reagendado: '+sel.size+' assunto'+(sel.size>1?'s':'')+' redistribuído'+(sel.size>1?'s':'')+'.';document.body.appendChild(t);setTimeout(()=>t.remove(),5000);
+    }catch(e){b.disabled=false;b.textContent='Reagendar';alert('Não foi possível reagendar: '+(e.message||e));}};}
 async function planoResumo(email){try{const P=await carregaPlano(email);const ate=P.itens.filter(x=>x.semana<=P.sem[P.cur]),f=ate.filter(x=>P.feito.has(x.id)).length;
   const W=P.itens.filter(x=>x.semana===P.sem[P.cur]),fw=W.filter(x=>P.feito.has(x.id)).length;const pct=ate.length?Math.round(100*f/ate.length):0;
   return `<div class="presumo"><div><span class="pk2">Plano de Estudos</span><b>${pct}%</b><small>${f} de ${ate.length} assuntos previstos até a semana ${P.cur+1}</small></div><div class="pbar big"><em style="width:${pct}%"></em></div><div><span class="pk2">Esta semana</span><b>${fw}/${W.length}</b><small>assuntos marcados</small></div></div>`;}catch(e){return '';}}
@@ -1353,6 +1436,6 @@ async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!se
 $('sair').onclick=async()=>{try{localStorage.removeItem('bqufu-sig-v2');}catch(e){}await SB.auth.signOut();location.href='/';};
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795640987" defer></script>
+<script src="../js/presenca.js?v=1795641568" defer></script>
 </body>
 </html>
