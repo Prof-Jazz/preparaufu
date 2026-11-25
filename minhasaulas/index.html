@@ -223,7 +223,7 @@ main.va{max-width:1240px}
 </header>
 <main id="app" class="va"><p class="pend">Carregando…</p></main>
 
-<script>(function(){var V='1795625668';var K='bqufu-recarga-';
+<script>(function(){var V='1795626759';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -481,11 +481,11 @@ function editaCurso(c){const novo=!c;c=c||{titulo:'',descricao:'',turmas:['asses
     const bt=f.querySelector('[type=submit]');bt.disabled=true;msg('');
     try{const row={titulo:f.titulo.value.trim(),descricao:f.descricao.value.trim()||null,turmas,ordem:parseInt(f.ordem.value)||0};
       let id=c.id;
-      if(novo){const r=await SB.from('va_cursos').insert(row).select().single();if(r.error)throw r.error;id=r.data.id;}
+      if(!id){const r=await SB.from('va_cursos').insert(row).select().single();if(r.error)throw r.error;id=c.id=r.data.id;}
       else{const r=await SB.from('va_cursos').update(row).eq('id',id);if(r.error)throw r.error;}
       const x=f.capa.files[0];
       if(x){bt.textContent='Enviando a capa…';const blob=await prepCapa(x);const path=`cursos/${id}-${Date.now()}.jpg`;
-        const u=await SB.storage.from('capas').upload(path,blob,{contentType:'image/jpeg',upsert:true});if(u.error)throw u.error;
+        const u=await SB.storage.from('capas').upload(path,blob,{contentType:'image/jpeg',upsert:false});if(u.error)throw u.error;
         const r=await SB.from('va_cursos').update({capa:path}).eq('id',id);if(r.error)throw r.error;if(c.capa)SB.storage.from('capas').remove([c.capa]);}
       else if(f.semcapa&&f.semcapa.checked){await SB.from('va_cursos').update({capa:null}).eq('id',id);SB.storage.from('capas').remove([c.capa]);}
       d.remove();await carregar();rota();
@@ -521,8 +521,9 @@ async function editaAula(a,cid){const novo=!a;const L=aulasDe(cid);
     const bt=f.querySelector('[type=submit]');bt.disabled=true;
     try{const row={curso:cid,titulo:f.titulo.value.trim(),modulo:f.modulo.value.trim()||null,video:v?ytId(v):null,descricao:f.descricao.value.trim()||null,ordem:parseInt(f.ordem.value)||0};
       let id=a.id;
-      if(novo){const r=await SB.from('va_aulas').insert(row).select().single();if(r.error)throw r.error;id=r.data.id;}
-      else{const r=await SB.from('va_aulas').update(row).eq('id',id);if(r.error)throw r.error;const x=await SB.from('va_links').delete().eq('aula',id);if(x.error)throw x.error;}
+      if(!id){const r=await SB.from('va_aulas').insert(row).select().single();if(r.error)throw r.error;id=a.id=r.data.id;}
+      else{const r=await SB.from('va_aulas').update(row).eq('id',id);if(r.error)throw r.error;}
+      {const x=await SB.from('va_links').delete().eq('aula',id);if(x.error)throw x.error;}
       if(ls.length){const r=await SB.from('va_links').insert(ls.map((l,i)=>({aula:id,nome:l.nome,url:l.url,ordem:i})));if(r.error)throw r.error;}
       d.remove();await carregar();if(novo)rota();else rota();
     }catch(e){msg('Não foi possível salvar: '+(e.message||e));bt.disabled=false;}};
@@ -530,6 +531,6 @@ async function editaAula(a,cid){const novo=!a;const L=aulasDe(cid);
 }
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795625668" defer></script>
+<script src="../js/presenca.js?v=1795626759" defer></script>
 </body>
 </html>
