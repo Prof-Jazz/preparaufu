@@ -237,7 +237,7 @@ select,input[type=number],input[type=text]{font:500 16px var(--body);padding:11p
 <div id="exBar" hidden>Modo aluno exemplo — é assim que o aluno vê. <button type="button" id="exSair">Sair do modo exemplo</button></div>
 <main id="app"><p class="pend">Carregando…</p></main>
 
-<script>(function(){var V='1795630860';var K='bqufu-recarga-';
+<script>(function(){var V='1795631996';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -365,7 +365,17 @@ function desenhaSala(s){abas('tabSala');clearInterval(TICK);
       const livre=!esc_.materia,cor_=esc_.tipos.includes('correcao');
       const n={email:ALVO,tipo:esc_.tipos.join(','),materia:livre?(esc_.tipos.includes('correcao')?SIMG:REVG):esc_.materia,assunto:livre?'':(it?it.assunto:$('sOutro').value.trim()),livre,item:it?it.id:null,inicio:Date.now(),desde:Date.now(),acum:0,rodando:true};
       gravaS(n);desenhaSala(n);};}
-  desenhaHoje();desenhaVivo();}
+  desenhaHoje();desenhaVivo();if(!s)preSelPlanejado();}
+async function preSelPlanejado(){const id=new URLSearchParams(location.search).get('planejado');if(!id)return;
+  history.replaceState(null,'',location.pathname+'#sala');
+  const {data:x}=await SB.from('agenda_estudos').select('*').eq('id',id).maybeSingle();if(!x||!$('sMat'))return;
+  if(![...$('sMat').options].some(o=>o.value===x.materia))return;
+  $('sMat').value=x.materia;$('sMat').onchange();
+  if(x.item&&[...$('sAss').options].some(o=>o.value===String(x.item))){$('sAss').value=String(x.item);}
+  else if(x.assunto){$('sAss').value='__outro';$('sOutro').value=x.assunto;}
+  $('sAss').onchange();
+  const t=$('tipos');if(t&&!t.querySelector('.tipo.on')){$('estado').textContent='Escolha o que vai fazer e aperte Iniciar';}
+  const c=$('cron');if(c)c.scrollIntoView({block:'start',behavior:'smooth'});}
 function desenhaRelogio(s){desenhaSala(s);}
 function encerrar(s){const seg=Math.round(decorrido(s)/1000);if(s.rodando){s.acum=decorrido(s);s.rodando=false;gravaS(s);}
   const [n,ic,,c]=TI(s.tipo);const simu=tlist(s.tipo).includes('correcao');const pedeQ=tlist(s.tipo).some(k=>k==='questoes'||k==='correcao');
@@ -566,6 +576,6 @@ async function telaDen(){abas('tabDen');$('app').innerHTML='<p class="pend">Carr
   $('app').querySelectorAll('[data-r]').forEach(b=>b.onclick=async()=>{await SB.rpc('admin_resolver',{p_id:+b.dataset.id,p:b.dataset.r==='1'});telaDen();});}
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795630860" defer></script>
+<script src="../js/presenca.js?v=1795631996" defer></script>
 </body>
 </html>

@@ -8,7 +8,26 @@
 <link rel="manifest" href="/site.webmanifest">
 <meta name="theme-color" content="#16304F">
 <script type="speculationrules">{"prerender":[{"where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":"/"}},{"not":{"href_matches":"/mentoria/*"}},{"not":{"href_matches":"/*\\?*area=*"}},{"not":{"selector_matches":"[target=_blank]"}}]},"eagerness":"moderate"}],"prefetch":[{"where":{"or":[{"href_matches":"/"},{"href_matches":"/mentoria/*"}]},"eagerness":"moderate"}]}</script>
-<style>@view-transition{navigation:auto}header{view-transition-name:cab}::view-transition-old(root),::view-transition-new(root){animation-duration:.18s}</style>
+<style>@view-transition{navigation:auto}header{view-transition-name:cab}::view-transition-old(root),::view-transition-new(root){animation-duration:.18s}.ev.meu{background:transparent;border:1.5px solid #1BAF7A;color:#3ED39A;cursor:pointer}
+:root:not([data-theme="dark"]) .ev.meu{color:#0E7A55}
+.dlg .box.largo{max-width:760px}
+.dia .diaev{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.diatop{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:14px;color:var(--muted)}.diatop b{color:var(--ink)}.diatop .btn{margin-left:auto}
+.tl{height:min(58vh,520px);overflow-y:auto;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
+.tlg{position:relative;cursor:pointer;margin-left:0}
+.tlg .hr{height:46px;border-top:1px solid var(--line);position:relative;padding-left:58px}
+.tlg .hr:first-child{border-top:0}
+.tlg .hr::after{content:'';position:absolute;left:58px;right:0;top:50%;border-top:1px dashed var(--soft)}
+.tlg .hr span{position:absolute;left:8px;top:-1px;font:600 12px var(--body);color:var(--muted);background:var(--bg);padding:2px 0}
+.tlg .hr:hover{background:rgba(58,140,203,.06)}
+.blk{position:absolute;left:64px;right:8px;border-radius:9px;padding:5px 10px;background:color-mix(in srgb,var(--c) 22%,transparent);border-left:4px solid var(--c);color:var(--ink);overflow:hidden;cursor:pointer;display:flex;flex-direction:column;gap:1px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.blk b{font:700 13.5px var(--body)}.blk small{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.blk.curto{flex-direction:row;align-items:center;gap:8px;padding:2px 10px}
+.blk.aula{--c:#3A8CCB;background:repeating-linear-gradient(135deg,rgba(58,140,203,.16) 0 8px,rgba(58,140,203,.08) 8px 16px);right:auto;width:42%;left:auto;right:8px}
+.blk:hover{filter:brightness(1.12)}
+.dlg label.f[hidden]{display:none}
+.dlg .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+</style>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Aulas e materiais · PREPARA UFU</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -182,7 +201,7 @@ textarea{min-height:70px;resize:vertical}
 <div id="exBar" hidden>Modo aluno exemplo — é assim que o aluno da turma <select id="exTurma"><option value="assessoria">Assessoria PREPARA UFU</option><option value="matematica">Curso de Matemática</option></select> vê esta página. <button type="button" id="exSair">Sair do modo exemplo</button></div>
 <main id="app"></main>
 
-<script>(function(){var V='1795630860';var K='bqufu-recarga-';
+<script>(function(){var V='1795631996';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -201,6 +220,7 @@ const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
   set(m||'dark');$('theme').onclick=()=>set(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');})();
 const SB=supabase.createClient('https://ygdlbhoqyqjsqoyyfizk.supabase.co','sb_publishable_jB2I59Ruw4MaMT63KLWtSA_O-DMf63b');
 const ADMIN='jesrrael.santos@gmail.com';
+let MEUS=[],PLANO_A=null,LINGUA_A='';
 let EMAIL='',IS_ADMIN=false,REAL_ADMIN=false,EXT=null,AULAS=[],ARQ=[],PASTAS=[],MES=null;
 const TURMAS=[['assessoria','Assessoria PREPARA UFU','as'],['matematica','Curso de Matemática','ma']];
 const TIPOS=[['aula','Aula ao vivo'],['revisao','Revisão'],['simulado','Simulado'],['prova','Prova'],['outro','Outro evento']];
@@ -260,6 +280,7 @@ const abas=on=>['tabAg','tabMat'].forEach(t=>$(t).classList.toggle('on',t===on))
 async function carregar(){
   const [a,b,c]=await Promise.all([SB.from('aulas').select('*').order('data').order('ini',{nullsFirst:true}),SB.from('arquivos').select('*').order('criado_em'),SB.from('pastas').select('*').order('ordem').order('criado_em')]);
   const err=a.error||b.error||c.error;if(err)throw err;AULAS=a.data||[];ARQ=b.data||[];PASTAS=c.data||[];
+  if(!IS_ADMIN){const r=await SB.from('agenda_estudos').select('*').eq('email',EMAIL).order('data').order('ini');MEUS=r.data||[];}
   if(EXT){AULAS=AULAS.filter(x=>(x.turmas||[]).includes(EXT));PASTAS=PASTAS.filter(x=>(x.turmas||[]).includes(EXT));ARQ=ARQ.filter(f=>f.pasta?PASTAS.some(x=>x.id===f.pasta):AULAS.some(x=>x.id===f.aula));}}
 async function abrirArq(f,btn){const w=window.open('','_blank');if(btn)btn.disabled=true;
   const {data,error}=await SB.storage.from('materiais').createSignedUrl(f.path,3600);if(btn)btn.disabled=false;
@@ -304,7 +325,8 @@ function desenhaAgenda(){
    ${IS_ADMIN?'<p class="pend" style="margin:-4px 0 12px">Clique numa aula para cadastrar o tema, o professor, o link do Meet, os materiais e as turmas. Clique num dia vazio para criar outro evento.</p>':''}
    <div class="cal">${['dom','seg','ter','qua','qui','sex','sáb'].map(d=>`<div class="dw">${d}</div>`).join('')}
    ${dias.map(d=>{const k=iso(d);const L=AULAS.filter(a=>a.data===k);const fer=FERIADOS[k],rec=k>=RECESSO[0]&&k<=RECESSO[1];
-     return `<div class="d${d.getMonth()!==m?' fora':''}${k===HOJE?' hoje':''}${fer?' fer':''}${rec?' rec':''}${IS_ADMIN?' adm':''}" data-dia="${k}"><div class="n"><span>${d.getDate()}</span>${fer?`<i>${fer}</i>`:rec&&d.getDay()===1?'<i>recesso</i>':''}</div>${L.map(ev).join('')}</div>`;}).join('')}</div>
+     return `<div class="d${d.getMonth()!==m?' fora':''}${k===HOJE?' hoje':''}${fer?' fer':''}${rec?' rec':''}${IS_ADMIN?' adm':''}" data-dia="${k}"><div class="n"><span>${d.getDate()}</span>${fer?`<i>${fer}</i>`:rec&&d.getDay()===1?'<i>recesso</i>':''}</div>${L.map(ev).join('')}${(()=>{const P=MEUS.filter(x=>x.data===k);if(!P.length)return '';const t=P.reduce((a,x)=>a+x.dur,0);return `<span class="ev meu" title="${P.length} estudo${P.length>1?'s':''} planejado${P.length>1?'s':''}">Meus estudos<small>${durTxt(t)}</small></span>`;})()}</div>`;}).join('')}</div>
+   ${IS_ADMIN?'':'<p class="pend" style="margin:10px 0 0">Dica: clique em um dia para planejar os seus horários de estudo, com a matéria e o assunto do seu Plano de Estudos. É opcional.</p>'}
    <div class="leg"><span><i style="background:var(--azul)"></i>Aula ao vivo</span><span><i style="border:1.5px dashed var(--azul)"></i>Aula com tema a definir</span><span><i style="border:2px solid var(--roxo)"></i>Revisão final</span><span><i style="background:var(--amarelo)"></i>Simulado PREPARA UFU</span><span><i style="background:#111;border:2px solid var(--amarelo)"></i>Prova UFU</span><span><i style="background:var(--verm)"></i>Feriado</span><span><i style="background:rgba(217,67,79,.25)"></i>Recesso das aulas</span></div></div>
    <div class="card"><h2 class="t" style="font-size:19px;margin-bottom:10px">Eventos de ${MESES[m]}</h2><div class="lista">${doMes.length?doMes.map(a=>{const d=parse(a.data);const nf=ARQ.filter(f=>f.aula===a.id).length;const cor=a.tipo==='simulado'?'var(--amarelo)':a.tipo==='revisao'?'var(--roxo)':a.tipo==='prova'?'#111':a.tipo==='outro'?'var(--verde)':'var(--azul)';
       return `<div class="li${a.data<HOJE?' passou':''}" data-id="${a.id}" style="border-left-color:${cor}"><div class="dd"><b>${d.getDate()}</b><span>${DSEM[d.getDay()].slice(0,3)}</span></div><div class="tx"><b>${esc(titulo(a))}</b><span>${esc(faixa(a))}${a.professor?' · '+esc(a.professor):''}${nf?' · 📎 '+nf:''}${IS_ADMIN&&a.turmas.length<2?' · só '+esc((TURMAS.find(t=>t[0]===a.turmas[0])||['',''])[1]):''}</span></div>${linkOk(a.link)&&a.data>=HOJE?'<span class="tg ma">Meet</span>':''}</div>`;}).join(''):'<p class="pend" style="margin:0">Nenhum evento neste mês.</p>'}</div></div>`;
@@ -312,7 +334,66 @@ function desenhaAgenda(){
   $('mHoje').onclick=()=>{const d=new Date();MES=new Date(d.getFullYear(),d.getMonth(),1);desenhaAgenda();};
   $('app').querySelectorAll('[data-id]').forEach(b=>b.onclick=ev=>{ev.stopPropagation();verEvento(AULAS.find(a=>a.id===b.dataset.id));});
   if(IS_ADMIN)$('app').querySelectorAll('.d.adm').forEach(c=>c.onclick=()=>editarEvento(null,c.dataset.dia));
-  else $('app').querySelectorAll('.d').forEach(c=>c.onclick=()=>{const L=AULAS.filter(a=>a.data===c.dataset.dia);if(L.length)verEvento(L[0]);});}
+  else $('app').querySelectorAll('.d').forEach(c=>c.onclick=()=>abreDia(c.dataset.dia));}
+
+/* ===== planejamento pessoal de estudos no dia ===== */
+const MATS_A=['Matemática','Física','Química','Biologia','Português','Literatura','Redação','História','Geografia','Filosofia','Sociologia','Inglês','Espanhol','Francês'];
+const CORM_A={'Matemática':'#D9480F','Física':'#1864AB','Química':'#5F3DC4','Biologia':'#2B8A3E','Português':'#C92A2A','Literatura':'#A61E4D','Redação':'#C2255C','História':'#7F4F24','Geografia':'#5C7A0A','Filosofia':'#495057','Sociologia':'#9C6644','Inglês':'#0B7285','Espanhol':'#E67700','Francês':'#364FC7'};
+const matSalaA=x=>x.materia==='Português'&&/^literatura/i.test(x.frente||'')?'Literatura':x.materia==='Português'&&/^reda/i.test(x.frente||'')?'Redação':x.materia;
+const durTxt=m=>m<60?m+' min':Math.floor(m/60)+' h'+(m%60?' '+String(m%60).padStart(2,'0'):'');
+const hhmm=m=>String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
+const minDe=t=>{const [h,mm]=String(t||'0:0').split(':').map(Number);return h*60+(mm||0);};
+async function carregaPlanoA(){if(PLANO_A)return;try{const [p,c]=await Promise.all([SB.from('plano_itens').select('id,semana,materia,frente,assunto').order('id'),SB.from('checkup').select('respostas').eq('email',EMAIL).maybeSingle()]);
+  PLANO_A=p.data||[];LINGUA_A=(c.data&&c.data.respostas&&c.data.respostas.lingua)||'';}catch(e){PLANO_A=[];}}
+const HPX=46;
+async function abreDia(k){await carregaPlanoA();const d=parse(k);
+  const [dlg,fecha]=dialogo(`<div class="top"><div><h3>${DSEM[d.getDay()].replace(/^./,c=>c.toUpperCase())}, ${d.getDate()} de ${MESES[d.getMonth()]}</h3><p>Planeje os seus horários de estudo deste dia (opcional)</p></div><button class="x" data-fecha aria-label="Fechar">×</button></div><div class="bd dia" id="diaBd"></div>`);
+  dlg.querySelector('.box').classList.add('largo');
+  const desenha=()=>{const P=MEUS.filter(x=>x.data===k).sort((a,b)=>a.ini.localeCompare(b.ini)),L=AULAS.filter(a=>a.data===k),tot=P.reduce((a,x)=>a+x.dur,0);
+    const bd=dlg.querySelector('#diaBd');
+    bd.innerHTML=`${L.length?`<div class="diaev">${L.map(a=>`<button class="ev ${a.tipo==='aula'?(a.titulo?'':'prev'):a.tipo}" data-aula="${a.id}">${esc(titulo(a))}<small>${esc(faixa(a))}</small></button>`).join('')}</div>`:''}
+      <div class="diatop"><span>${P.length?`<b>${durTxt(tot)}</b> planejad${tot===1?'o':'os'} em ${P.length} estudo${P.length>1?'s':''}`:'Nenhum estudo planejado ainda. Clique em um horário para adicionar.'}</span><button class="btn pri" id="diaAdd">+ Adicionar estudo</button></div>
+      <div class="tl" id="tl"><div class="tlg">${Array.from({length:24},(_,h)=>`<div class="hr" data-h="${h}"><span>${String(h).padStart(2,'0')}:00</span></div>`).join('')}
+      ${L.filter(a=>a.ini).map(a=>{const i=minDe(a.ini),f=a.fim?minDe(a.fim):i+90;return `<div class="blk aula" style="top:${i*HPX/60}px;height:${Math.max(20,(f-i)*HPX/60)}px" data-aula="${a.id}"><b>${esc(titulo(a))}</b><small>${hhmm(i)}–${hhmm(f)}</small></div>`;}).join('')}
+      ${P.map(x=>{const i=minDe(x.ini),cor=CORM_A[x.materia]||'#3A8CCB';return `<div class="blk${x.dur<45?' curto':''}" style="top:${i*HPX/60}px;height:${Math.max(20,x.dur*HPX/60)}px;--c:${cor}" data-p="${x.id}"><b>${esc(x.materia)}</b><small>${hhmm(i)}–${hhmm(i+x.dur)} · ${durTxt(x.dur)}${x.assunto?' · '+esc(x.assunto):''}</small></div>`;}).join('')}</div></div>`;
+    bd.querySelectorAll('[data-aula]').forEach(b=>b.onclick=ev=>{ev.stopPropagation();verEvento(AULAS.find(a=>a.id===b.dataset.aula));});
+    bd.querySelectorAll('[data-p]').forEach(b=>b.onclick=ev=>{ev.stopPropagation();formEstudo(k,MEUS.find(x=>x.id===b.dataset.p),null,desenha);});
+    bd.querySelector('#diaAdd').onclick=()=>{const ult=P.length?minDe(P[P.length-1].ini)+P[P.length-1].dur:(k===HOJE?Math.min(23*60,Math.ceil((new Date().getHours()*60+new Date().getMinutes())/30)*30):8*60);formEstudo(k,null,ult,desenha);};
+    const tl=bd.querySelector('#tl');tl.querySelector('.tlg').onclick=ev=>{if(ev.target.closest('.blk'))return;const r=tl.querySelector('.tlg').getBoundingClientRect();const m=Math.max(0,Math.min(23*60+30,Math.floor((ev.clientY-r.top)/HPX*2)*30));formEstudo(k,null,m,desenha);};
+    const foco=P.length?minDe(P[0].ini):L.find(a=>a.ini)?minDe(L.find(a=>a.ini).ini):7*60;tl.scrollTop=Math.max(0,(foco-30)*HPX/60);};
+  desenha();}
+function formEstudo(k,x,iniMin,depois){const novo=!x;const d=parse(k);
+  const mats=MATS_A.filter(m=>!(m==='Inglês'&&LINGUA_A==='Espanhol')&&!(m==='Espanhol'&&LINGUA_A==='Inglês')&&!(m==='Francês'&&LINGUA_A!=='Francês'));
+  const sems=[...new Set(PLANO_A.map(z=>z.semana))].sort();const semK=sems.filter(w=>w<=k).pop()||sems[0];
+  x=x||{materia:'',assunto:'',item:null,ini:hhmm(iniMin||0),dur:60};
+  const [dlg,fecha]=dialogo(`<div class="top"><div><h3>${novo?'Novo estudo':'Editar estudo'}</h3><p>${DSEM[d.getDay()]}, ${d.getDate()} de ${MESES[d.getMonth()]}</p></div><button class="x" data-fecha aria-label="Fechar">×</button></div>
+    <form class="bd"><label class="f">Matéria<select name="mat" required><option value="">Selecione a matéria</option>${mats.map(m=>`<option${m===x.materia?' selected':''}>${esc(m)}</option>`).join('')}</select></label>
+    <label class="f">Assunto<select name="ass"><option value="">Escolha antes a matéria</option></select></label>
+    <label class="f" id="fOutro" hidden>Qual assunto?<input type="text" name="outro" maxlength="140" placeholder="ex.: lista de funções"></label>
+    <div class="row2"><label class="f">Começa às<input type="time" name="ini" step="300" required value="${esc(String(x.ini).slice(0,5))}"></label>
+    <label class="f">Duração<select name="dur">${[15,30,45,60,75,90,105,120,150,180,210,240,300].map(m=>`<option value="${m}"${m===x.dur?' selected':''}>${durTxt(m)}</option>`).join('')}</select></label></div>
+    <p class="msg"></p><div class="btns"><button class="btn pri" type="submit">Salvar</button>${novo?'':`<a class="btn" href="/estudos/?planejado=${x.id}">▶ Estudar agora</a><button class="btn del" type="button" id="exE" style="margin-left:auto">Excluir</button>`}</div></form>`);
+  const f=dlg.querySelector('form'),msg=t=>f.querySelector('.msg').textContent=t;
+  const monta=(keep)=>{const m=f.mat.value;const L=PLANO_A.filter(z=>matSalaA(z)===m);
+    let h='<option value="">Sem assunto definido</option>';
+    const ord=[semK,...sems.filter(w=>w!==semK)];
+    ord.forEach(w=>{const G=L.filter(z=>z.semana===w);if(!G.length)return;const i=sems.indexOf(w);h+=`<optgroup label="Semana ${i+1} · ${String(parse(w).getDate()).padStart(2,'0')}/${String(parse(w).getMonth()+1).padStart(2,'0')}${w===semK?' (semana deste dia)':''}">${G.map(z=>`<option value="${z.id}">${esc(z.assunto)}${z.frente?' — '+esc(z.frente):''}</option>`).join('')}</optgroup>`;});
+    h+='<option value="__outro">Outro assunto (digitar)</option>';f.ass.innerHTML=h;f.ass.disabled=!m;
+    if(keep&&x.item&&L.some(z=>String(z.id)===String(x.item)))f.ass.value=String(x.item);
+    else if(keep&&x.assunto){f.ass.value='__outro';f.outro.value=x.assunto;}
+    else{const g=L.find(z=>z.semana===semK);f.ass.value=g?String(g.id):'';}
+    $('fOutro').hidden=f.ass.value!=='__outro';};
+  f.mat.onchange=()=>monta(false);f.ass.onchange=()=>{$('fOutro').hidden=f.ass.value!=='__outro';if(f.ass.value==='__outro')f.outro.focus();};
+  if(x.materia)monta(true);else f.ass.disabled=true;
+  if(!novo)$('exE').onclick=async ev=>{const b=ev.target;if(!b.dataset.ok){b.dataset.ok=1;b.textContent='Confirmar exclusão';return;}
+    const r=await SB.from('agenda_estudos').delete().eq('id',x.id);if(r.error){msg(r.error.message);return;}MEUS=MEUS.filter(z=>z.id!==x.id);fecha();depois();desenhaAgenda();};
+  f.onsubmit=async ev=>{ev.preventDefault();if(!f.mat.value){msg('Escolha a matéria.');return;}
+    const it=f.ass.value&&f.ass.value!=='__outro'?PLANO_A.find(z=>String(z.id)===f.ass.value):null;
+    const row={data:k,ini:f.ini.value,dur:+f.dur.value,materia:f.mat.value,assunto:it?it.assunto:(f.ass.value==='__outro'?f.outro.value.trim()||null:null),item:it?it.id:null};
+    const bt=f.querySelector('[type=submit]');bt.disabled=true;
+    const r=novo?await SB.from('agenda_estudos').insert({...row,email:EMAIL}).select().single():await SB.from('agenda_estudos').update(row).eq('id',x.id).select().single();
+    if(r.error){msg('Não foi possível salvar: '+r.error.message);bt.disabled=false;return;}
+    MEUS=MEUS.filter(z=>z.id!==r.data.id).concat([r.data]);fecha();depois();desenhaAgenda();};}
 function dialogo(html){const d=document.createElement('div');d.className='dlg';d.innerHTML=`<div class="box">${html}</div>`;document.body.appendChild(d);
   const fecha=()=>{d.remove();document.removeEventListener('keydown',esc_);};const esc_=e=>{if(e.key==='Escape')fecha();};document.addEventListener('keydown',esc_);
   d.onclick=e=>{if(e.target===d)fecha();};d.querySelectorAll('[data-fecha]').forEach(b=>b.onclick=fecha);return [d,fecha];}
@@ -396,6 +477,6 @@ function editarPasta(p){const nova=!p;p=p||{nome:'',descricao:'',turmas:['assess
     if(L.length)await SB.storage.from('materiais').remove(L.map(x=>x.path));if(p.capa)await SB.storage.from('capas').remove([p.capa]);const {error}=await SB.from('pastas').delete().eq('id',p.id);if(error){msg(error.message);return;}fecha();await carregar();desenhaPastas();};}
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795630860" defer></script>
+<script src="../js/presenca.js?v=1795631996" defer></script>
 </body>
 </html>
