@@ -207,7 +207,7 @@ textarea{min-height:70px;resize:vertical}
 <div id="exBar" hidden>Modo aluno exemplo — é assim que o aluno da turma <select id="exTurma"><option value="assessoria">Assessoria PREPARA UFU</option><option value="matematica">Curso de Matemática</option></select> vê esta página. <button type="button" id="exSair">Sair do modo exemplo</button></div>
 <main id="app"></main>
 
-<script>(function(){var V='1795640557';var K='bqufu-recarga-';
+<script>(function(){var V='1795640987';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -227,6 +227,8 @@ const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
 const SB=supabase.createClient('https://ygdlbhoqyqjsqoyyfizk.supabase.co','sb_publishable_jB2I59Ruw4MaMT63KLWtSA_O-DMf63b');
 const ADMIN='jesrrael.santos@gmail.com';
 let MEUS=[],PLANO_A=null,LINGUA_A='',CRONO_A=[];
+const verEmail=()=>{if(!EXT)return EMAIL;try{const v=JSON.parse(sessionStorage.getItem('bqufu-ver')||'null');return (v&&v.email)||'exemplo@preparaufu.com.br';}catch(e){return 'exemplo@preparaufu.com.br';}};
+const verReal=()=>EXT&&verEmail()!=='exemplo@preparaufu.com.br';
 let EMAIL='',IS_ADMIN=false,REAL_ADMIN=false,EXT=null,AULAS=[],ARQ=[],PASTAS=[],MES=null;
 const TURMAS=[['assessoria','Assessoria PREPARA UFU','as'],['matematica','Curso de Matemática','ma']];
 const TIPOS=[['aula','Aula ao vivo'],['revisao','Revisão'],['simulado','Simulado'],['prova','Prova'],['outro','Outro evento']];
@@ -286,7 +288,7 @@ const abas=on=>['tabAg','tabMat'].forEach(t=>$(t).classList.toggle('on',t===on))
 async function carregar(){
   const [a,b,c]=await Promise.all([SB.from('aulas').select('*').order('data').order('ini',{nullsFirst:true}),SB.from('arquivos').select('*').order('criado_em'),SB.from('pastas').select('*').order('ordem').order('criado_em')]);
   const err=a.error||b.error||c.error;if(err)throw err;AULAS=a.data||[];ARQ=b.data||[];PASTAS=c.data||[];
-  if(!IS_ADMIN){const r=await SB.from('agenda_estudos').select('*').eq('email',EMAIL).order('data').order('ini');MEUS=r.data||[];}
+  if(!IS_ADMIN){const r=await SB.from('agenda_estudos').select('*').eq('email',verReal()?verEmail():EMAIL).order('data').order('ini');MEUS=r.data||[];}
   if(EXT){AULAS=AULAS.filter(x=>(x.turmas||[]).includes(EXT));PASTAS=PASTAS.filter(x=>(x.turmas||[]).includes(EXT));ARQ=ARQ.filter(f=>f.pasta?PASTAS.some(x=>x.id===f.pasta):AULAS.some(x=>x.id===f.aula));}}
 async function abrirArq(f,btn){const w=window.open('','_blank');if(btn)btn.disabled=true;
   const {data,error}=await SB.storage.from('materiais').createSignedUrl(f.path,3600);if(btn)btn.disabled=false;
@@ -349,7 +351,7 @@ const matSalaA=x=>x.materia==='Português'&&/^literatura/i.test(x.frente||'')?'L
 const durTxt=m=>m<60?m+' min':Math.floor(m/60)+' h'+(m%60?' '+String(m%60).padStart(2,'0'):'');
 const hhmm=m=>String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
 const minDe=t=>{if(typeof t==='number')return t;const z=String(t||'0');if(/^\d+$/.test(z))return +z;const [h,mm]=z.split(':').map(Number);return h*60+(mm||0);};
-async function carregaPlanoA(){if(PLANO_A)return;try{const [p,c,k]=await Promise.all([SB.from('plano_itens').select('id,semana,materia,frente,assunto').order('id'),SB.from('checkup').select('respostas').eq('email',EXT?'exemplo@preparaufu.com.br':EMAIL).maybeSingle(),SB.from('cronograma').select('blocos').eq('email',EXT?'exemplo@preparaufu.com.br':EMAIL).maybeSingle()]);
+async function carregaPlanoA(){if(PLANO_A)return;try{const [p,c,k]=await Promise.all([SB.from('plano_itens').select('id,semana,materia,frente,assunto').order('id'),SB.from('checkup').select('respostas').eq('email',verEmail()).maybeSingle(),SB.from('cronograma').select('blocos').eq('email',verEmail()).maybeSingle()]);
   PLANO_A=p.data||[];LINGUA_A=(c.data&&c.data.respostas&&c.data.respostas.lingua)||'';CRONO_A=(k.data&&Array.isArray(k.data.blocos))?k.data.blocos:[];}catch(e){PLANO_A=PLANO_A||[];}}
 const CORD_A={MAT:'#D9480F',FIS:'#1864AB',QUI:'#5F3DC4',BIO:'#2B8A3E',LP:'#C92A2A',LIT:'#A61E4D',LE:'#0B7285',HIS:'#7F4F24',GEO:'#5C7A0A',FIL:'#495057',SOC:'#8C6500',RED:'#C2255C',REV:'#1BAF7A',SIM:'#7B4FC9'};
 const KMAT={MAT:'Matemática',FIS:'Física',QUI:'Química',BIO:'Biologia',LP:'Português',LIT:'Literatura',HIS:'História',GEO:'Geografia',FIL:'Filosofia',SOC:'Sociologia',RED:'Redação',REV:'Revisão geral',SIM:'Simulado'};
@@ -376,7 +378,7 @@ async function abreDia(k){await carregaPlanoA();const d=parse(k);
     bd.querySelectorAll('[data-p]').forEach(b=>b.onclick=ev=>{ev.stopPropagation();formEstudo(k,MEUS.find(x=>x.id===b.dataset.p),null,desenha);});
     const G=sugestoes(k);
     bd.querySelectorAll('[data-s]').forEach(b=>b.onclick=ev=>{ev.stopPropagation();const g=G[+b.dataset.s];formEstudo(k,null,g.ini,desenha,{materia:g.materia,dur:g.fim-g.ini});});
-    const ap=bd.querySelector('#diaAplica');if(ap)ap.onclick=async()=>{ap.disabled=true;ap.textContent='Salvando…';
+    const ap=bd.querySelector('#diaAplica');if(ap&&verReal())ap.hidden=true;if(ap)ap.onclick=async()=>{ap.disabled=true;ap.textContent='Salvando…';
       const rows=G.map(g=>{const t=topicoSemana(k,g.materia);return {email:EMAIL,data:k,ini:hhmm(g.ini),dur:Math.min(720,g.fim-g.ini),materia:g.materia,assunto:t?t.assunto:null,item:t?t.id:null,origem:'crono'};});
       const r=await SB.from('agenda_estudos').insert(rows).select();if(r.error){ap.textContent='Não foi possível salvar';return;}
       MEUS=MEUS.concat(Array.isArray(r.data)?r.data:[r.data]);desenha();desenhaAgenda();};
@@ -410,7 +412,7 @@ function formEstudo(k,x,iniMin,depois,pre){const novo=!x;const d=parse(k);
   if(x.materia)monta(!preset);else f.ass.disabled=true;
   if(!novo)$('exE').onclick=async ev=>{const b=ev.target;if(!b.dataset.ok){b.dataset.ok=1;b.textContent='Confirmar exclusão';return;}
     const r=await SB.from('agenda_estudos').delete().eq('id',x.id);if(r.error){msg(r.error.message);return;}MEUS=MEUS.filter(z=>z.id!==x.id);fecha();depois();desenhaAgenda();};
-  f.onsubmit=async ev=>{ev.preventDefault();if(!f.mat.value){msg('Escolha a matéria.');return;}
+  f.onsubmit=async ev=>{ev.preventDefault();if(verReal()){msg('Modo visualização: só o aluno pode salvar o planejamento dele.');return;}if(!f.mat.value){msg('Escolha a matéria.');return;}
     const it=f.ass.value&&f.ass.value!=='__outro'?PLANO_A.find(z=>String(z.id)===f.ass.value):null;
     const row={data:k,ini:f.ini.value,dur:+f.dur.value,materia:f.mat.value,assunto:it?it.assunto:(f.ass.value==='__outro'?f.outro.value.trim()||null:null),item:it?it.id:null};
     const bt=f.querySelector('[type=submit]');bt.disabled=true;
@@ -500,6 +502,6 @@ function editarPasta(p){const nova=!p;p=p||{nome:'',descricao:'',turmas:['assess
     if(L.length)await SB.storage.from('materiais').remove(L.map(x=>x.path));if(p.capa)await SB.storage.from('capas').remove([p.capa]);const {error}=await SB.from('pastas').delete().eq('id',p.id);if(error){msg(error.message);return;}fecha();await carregar();desenhaPastas();};}
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795640557" defer></script>
+<script src="../js/presenca.js?v=1795640987" defer></script>
 </body>
 </html>

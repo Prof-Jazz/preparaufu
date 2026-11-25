@@ -73,7 +73,7 @@ header{background:var(--head);padding:14px 22px;display:flex;align-items:center;
 .subnav button{flex:none;font:600 14px var(--body);border:0;background:transparent;color:var(--muted);padding:9px 14px;border-radius:999px;cursor:pointer;white-space:nowrap}
 .subnav button:hover{color:var(--ink);background:var(--soft)}.subnav button.on{background:var(--azul);color:#fff}
 #exBar{background:var(--amarelo);color:#16304F;font:600 14px var(--body);padding:8px 16px;text-align:center;position:sticky;top:52px;z-index:24}
-#exBar[hidden]{display:none}#exBar button{margin-left:10px;font:700 13px var(--body);background:#16304F;color:#fff;border:0;border-radius:999px;padding:5px 12px;cursor:pointer}
+#exBar[hidden]{display:none}#exBar select{font:700 13px var(--body);padding:4px 8px;border-radius:999px;border:0;background:#fff;color:#16304F;max-width:300px;margin:0 4px}#exBar button{margin-left:10px;font:700 13px var(--body);background:#16304F;color:#fff;border:0;border-radius:999px;padding:5px 12px;cursor:pointer}
 main{max-width:1180px;margin:0 auto;padding:22px 16px 60px;display:flex;flex-direction:column;gap:16px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 20px;box-shadow:var(--shadow)}
 .pend{font-size:14px;color:var(--muted)}
@@ -234,10 +234,10 @@ select,input[type=number],input[type=text]{font:500 16px var(--body);padding:11p
   <nav class="tabs"><button class="theme" id="theme" aria-label="Alternar modo diurno e noturno" title="Modo diurno / noturno"><span class="sun">☀</span><span class="moon">☾</span></button><a href="../minhasaulas/">Minhas Aulas</a><a href="../bancodequestoes/">Banco de Questões</a><a href="../aulas/#agenda">Agenda</a><a href="../aulas/#materiais">Materiais</a><a class="am" href="../assessoria/">Assessoria</a><button id="sair">Sair</button></nav>
 </header>
 <nav class="subnav" aria-label="Sala de Estudos"><div class="in"><button id="tabSala" class="on">Sala de Estudos</button><button id="tabPainel" hidden>Meu Dashboard</button><button id="tabAlunos" hidden>Dashboard dos alunos</button><button id="tabDen" hidden>Denúncias</button><button id="tabEx" hidden>Ver como aluno</button></div></nav>
-<div id="exBar" hidden>Modo aluno exemplo — é assim que o aluno vê. <button type="button" id="exSair">Sair do modo exemplo</button></div>
+<div id="exBar" hidden>Vendo como <select id="exAluno" aria-label="Escolher o aluno"><option>Aluno exemplo</option></select> — é assim que esse aluno vê. <button type="button" id="exSair">Sair do modo aluno</button></div>
 <main id="app"><p class="pend">Carregando…</p></main>
 
-<script>(function(){var V='1795640557';var K='bqufu-recarga-';
+<script>(function(){var V='1795640987';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -285,20 +285,21 @@ async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!se
   if(!ASSESSORIA){try{const rr=await SB.rpc('meus_recursos');REC=rr.data||[];}catch(e){}}
   let ex=null,mv=null;try{ex=sessionStorage.getItem('bqufu-exemplo');if(sessionStorage.getItem('bqufu-mentoria-puro'))mv=JSON.parse(sessionStorage.getItem('bqufu-mentoria-ver')||'null');}catch(e){}
   if(REAL_ADMIN&&mv&&mv.email){EXMODO=true;ALVO=mv.email;MENTORADO=true;ASSESSORIA=true;MVER=true;}
-  else if(REAL_ADMIN&&ex){EXMODO=true;ALVO=EXEMPLO;}
+  else if(STAFF&&ex){EXMODO=true;const v=verGet();ALVO=(v&&v.email)||EXEMPLO;}
   menus();
   $('tabSala').onclick=()=>{history.replaceState(null,'','#sala');telaSala();};
   $('tabPainel').onclick=()=>{history.replaceState(null,'','#painel');telaPainel(ALVO);};
   $('tabDen').onclick=()=>{history.replaceState(null,'','#denuncias');telaDen();};
   $('tabAlunos').onclick=()=>{history.replaceState(null,'','#alunos');telaAlunos();};
-  $('tabEx').onclick=()=>{EXMODO=true;ALVO=EXEMPLO;try{sessionStorage.setItem('bqufu-exemplo','assessoria');}catch(e){}menus();telaSala();};
-  $('exSair').onclick=()=>{EXMODO=false;ALVO=EMAIL;try{sessionStorage.removeItem('bqufu-exemplo');}catch(e){}menus();telaAlunos();};
+  $('tabEx').onclick=()=>{EXMODO=true;const v=verGet();ALVO=(v&&v.email)||EXEMPLO;PLANO=null;try{sessionStorage.setItem('bqufu-exemplo','assessoria');}catch(e){}menus();verOpcoes();telaSala();};
+  if(EXMODO&&!MVER)verOpcoes();
+  $('exSair').onclick=()=>{EXMODO=false;ALVO=EMAIL;PLANO=null;try{sessionStorage.removeItem('bqufu-exemplo');}catch(e){}verSet(null);menus();telaAlunos();};
   const al=new URLSearchParams(location.search).get('aluno');
   if(REAL_ADMIN&&!EXMODO&&location.hash==='#denuncias')telaDen();else if(STAFF&&!EXMODO&&(al||location.hash==='#alunos'||(!REAL_ADMIN&&location.hash!=='#sala')))telaAlunos(al);
   else if(location.hash==='#painel'&&$('tabPainel').hidden===false)telaPainel(ALVO);
   else telaSala();
   if(location.hash==='#mensagens'){history.replaceState(null,'','#sala');setTimeout(()=>{if(typeof abreCaixa==='function')abreCaixa();},900);}}
-function menus(){const adm=REAL_ADMIN&&!EXMODO,stf=STAFF&&!EXMODO;$('tabPainel').hidden=!((ASSESSORIA||REC.includes('dash'))&&!stf);$('tabPainel').textContent='Meu Dashboard';$('tabAlunos').hidden=!stf;$('tabDen').hidden=!adm;$('tabEx').hidden=!adm;$('exBar').hidden=!EXMODO||MVER;}
+function menus(){const adm=REAL_ADMIN&&!EXMODO,stf=STAFF&&!EXMODO;$('tabPainel').hidden=!((ASSESSORIA||REC.includes('dash'))&&!stf);$('tabPainel').textContent='Meu Dashboard';$('tabAlunos').hidden=!stf;$('tabDen').hidden=!adm;$('tabEx').hidden=!stf;$('exBar').hidden=!EXMODO||MVER;}
 const abas=on=>['tabSala','tabPainel','tabAlunos','tabDen'].forEach(t=>$(t).classList.toggle('on',t===on));
 
 async function carregaPlano(){if(PLANO)return;
@@ -318,7 +319,7 @@ let TICK=null;
 /* ---------- Sala de Estudos ---------- */
 async function telaSala(){abas('tabSala');clearInterval(TICK);$('app').innerHTML='<p class="pend">Carregando a sala de estudos…</p>';
   try{await carregaPlano();}catch(e){}
-  desenhaSala(lerS());}
+  desenhaSala(VER_REAL()?null:lerS());}
 function desenhaSala(s){abas('tabSala');clearInterval(TICK);
   const esc_={tipos:[],materia:'',item:''};
   const lst=semanas(),ca=semAtual();
@@ -351,7 +352,7 @@ function desenhaSala(s){abas('tabSala');clearInterval(TICK);
   }else{
     const pronto=()=>{const rv=esc_.tipos.includes('revisao'),cs=esc_.tipos.includes('correcao'),livre=rv||cs;$('revOpc').hidden=!livre;$('matOpc').hidden=!livre;
       if(livre)$('revOpc').innerHTML=cs?'Na <b>Correção de simulado</b>, matéria e assunto são opcionais. É só iniciar: no fim você informa as questões de cada disciplina e os tipos de erro.':'Na <b>Revisão</b>, matéria e assunto são opcionais (Anki, caderno de erros e revisões amplas). Se não escolher, é só iniciar: no fim você conta o que revisou.';
-      $('go').disabled=!(esc_.tipos.length&&((livre&&!esc_.materia)||(esc_.materia&&esc_.item&&(esc_.item!=='__outro'||$('sOutro').value.trim()))));
+      $('go').disabled=VER_REAL()||!(esc_.tipos.length&&((livre&&!esc_.materia)||(esc_.materia&&esc_.item&&(esc_.item!=='__outro'||$('sOutro').value.trim()))));
       $('estado').textContent=$('go').disabled?'Pronto para começar':'Tudo certo: aperte Iniciar';};
     $('tipos').querySelectorAll('.tipo').forEach(b=>b.onclick=()=>{b.classList.toggle('on');esc_.tipos=[...$('tipos').querySelectorAll('.tipo.on')].map(x=>x.dataset.t);$('tipos').classList.toggle('esc',esc_.tipos.length>0);$('cron').style.setProperty('--c',esc_.tipos.length?TIPOS[esc_.tipos[0]][3]:'#3A8CCB');pronto();});
     $('sMat').onchange=()=>{esc_.materia=$('sMat').value;esc_.item='';const L=PLANO.filter(x=>matSala(x)===esc_.materia);
@@ -367,6 +368,7 @@ function desenhaSala(s){abas('tabSala');clearInterval(TICK);
       const livre=!esc_.materia,cor_=esc_.tipos.includes('correcao');
       const n={email:ALVO,tipo:esc_.tipos.join(','),materia:livre?(esc_.tipos.includes('correcao')?SIMG:REVG):esc_.materia,assunto:livre?'':(it?it.assunto:$('sOutro').value.trim()),livre,item:it?it.id:null,inicio:Date.now(),desde:Date.now(),acum:0,rodando:true};
       gravaS(n);desenhaSala(n);};}
+  if(VER_REAL()&&$('go')){$('go').disabled=true;$('go').textContent='Modo visualização: o cronômetro fica desativado';}
   desenhaHoje();desenhaVivo();if(!s)preSelPlanejado();}
 async function preSelPlanejado(){const id=new URLSearchParams(location.search).get('planejado');if(!id)return;
   history.replaceState(null,'',location.pathname+'#sala');
@@ -430,6 +432,14 @@ function encerrar(s){const seg=Math.round(decorrido(s)/1000);if(s.rodando){s.acu
     let r=await SB.from('sessoes').insert(row);if(r.error&&/plano_item|foreign key/i.test(r.error.message)){row.plano_item=null;r=await SB.from('sessoes').insert(row);}if(r.error){msg('Não foi possível salvar: '+r.error.message);bt.disabled=false;return;}
     if(f.mk&&f.mk.checked)await SB.from(MENTORADO?'m_plano_feito':'plano_feito').insert({email:s.email,item:s.item});
     gravaS(null);d.remove();telaSala();};}
+function verGet(){try{return JSON.parse(sessionStorage.getItem('bqufu-ver')||'null');}catch(e){return null;}}
+function verSet(v){try{v?sessionStorage.setItem('bqufu-ver',JSON.stringify(v)):sessionStorage.removeItem('bqufu-ver');}catch(e){}}
+const VER_REAL=()=>EXMODO&&!MVER&&ALVO!==EXEMPLO;
+async function verOpcoes(){const sel=$('exAluno');if(!sel)return;const {data}=await SB.rpc('admin_lista');let L=(data||[]).filter(a=>a.email!==ADMIN&&a.email!==EXEMPLO);if(!REAL_ADMIN)L=L.filter(a=>a.assessoria);
+  L.sort((a,b)=>(a.nome||a.email).localeCompare(b.nome||b.email,'pt-BR',{sensitivity:'base'}));
+  sel.innerHTML=`<option value="${EXEMPLO}">★ Aluno exemplo</option>`+L.map(a=>`<option value="${esc(a.email)}">${esc(a.nome||a.email)}${a.assessoria?'':' (Curso de Matemática)'}</option>`).join('');sel.value=ALVO;
+  sel.onchange=()=>{const o=sel.selectedOptions[0];verSet({email:sel.value,nome:o.textContent});ALVO=sel.value;PLANO=null;
+    if($('tabPainel').classList.contains('on'))telaPainel(ALVO);else telaSala();};}
 function ASSESSORIA_ALVO(){return EXMODO||ASSESSORIA||REC.includes('plano');}
 async function desenhaHoje(){const ini=new Date();ini.setHours(0,0,0,0);
   const {data}=await SB.from('sessoes').select('*').eq('email',ALVO).gte('inicio',ini.toISOString()).order('inicio',{ascending:false});
@@ -578,6 +588,6 @@ async function telaDen(){abas('tabDen');$('app').innerHTML='<p class="pend">Carr
   $('app').querySelectorAll('[data-r]').forEach(b=>b.onclick=async()=>{await SB.rpc('admin_resolver',{p_id:+b.dataset.id,p:b.dataset.r==='1'});telaDen();});}
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795640557" defer></script>
+<script src="../js/presenca.js?v=1795640987" defer></script>
 </body>
 </html>
