@@ -38,6 +38,13 @@
 .teb .tt{height:14px;border-radius:9px;background:var(--soft);overflow:hidden}.teb .tt i{display:block;height:100%;border-radius:9px}
 .teb .tv{text-align:right;display:flex;flex-direction:column}.teb .tv b{font:800 18px var(--display)}.teb .tv small{color:var(--muted);font-size:12px}
 @media (max-width:560px){.teb{grid-template-columns:1fr 60px}.teb .tt{grid-column:1/-1;order:3}}
+.avbtn{font-size:13px;padding:6px 11px}
+#hojeBox .avbtn{margin-left:auto}
+.ses .edt{border:1px solid var(--line);background:var(--bg);color:var(--muted);width:30px;height:30px;border-radius:8px;cursor:pointer;flex:none;font-size:14px}
+.ses .edt:hover{color:var(--azul);border-color:var(--azul)}
+.dlg .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.dlg label.f{display:flex;flex-direction:column;gap:5px;font-weight:600;font-size:14px}
+.dlg label.f input,.dlg label.f select{font:500 15px var(--body);padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink)}
 </style>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sala de Estudos · PREPARA UFU</title>
@@ -237,7 +244,7 @@ select,input[type=number],input[type=text]{font:500 16px var(--body);padding:11p
 <div id="exBar" hidden>Vendo como <select id="exAluno" aria-label="Escolher o aluno"><option>Aluno exemplo</option></select> — é assim que esse aluno vê. <button type="button" id="exSair">Sair do modo aluno</button></div>
 <main id="app"><p class="pend">Carregando…</p></main>
 
-<script>(function(){var V='1795641568';var K='bqufu-recarga-';
+<script>(function(){var V='1795643488';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -446,11 +453,49 @@ function ASSESSORIA_ALVO(){return EXMODO||ASSESSORIA||REC.includes('plano');}
 async function desenhaHoje(){const ini=new Date();ini.setHours(0,0,0,0);
   const {data}=await SB.from('sessoes').select('*').eq('email',ALVO).gte('inicio',ini.toISOString()).order('inicio',{ascending:false});
   const box=$('hojeBox');if(!box)return;const L=data||[];const tot=L.reduce((t,x)=>t+x.segundos,0),q=L.reduce((t,x)=>t+x.questoes,0),a=L.reduce((t,x)=>t+x.acertos,0);
-  box.innerHTML=`<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px"><h3 style="margin:0;font:800 18px var(--display)">Hoje</h3></div>
+  const pode=!VER_REAL();
+  box.innerHTML=`<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px"><h3 style="margin:0;font:800 18px var(--display)">Hoje</h3>${pode?'<button class="btn avbtn" id="avAdd">+ Estudo extra</button>':''}</div>
    <div class="hstat"><div><b>${L.length?hfmt(tot):'0 min'}</b><span>estudados</span></div><div><b>${q}</b><span>questões</span></div><div><b>${q?Math.round(100*a/q)+'%':'—'}</b><span>de acerto</span></div></div>
    ${L.length?'':'<p class="pend" style="margin:12px 2px 0">Nenhuma sessão hoje. Quando você encerrar uma sessão, ela aparece aqui.</p>'}
-   <div class="hoje">${L.map(x=>{const [n,ic,,c]=TI(x.tipo);const h=new Date(x.inicio);return `<div class="ses" style="--c:${c}"><span style="font-size:20px">${ic}</span><div class="tx"><b>${esc(x.materia)} · ${esc(n)}</b><span>${String(h.getHours()).padStart(2,'0')}:${String(h.getMinutes()).padStart(2,'0')} · ${esc(x.assunto||'')}${x.questoes?` · ${x.acertos}/${x.questoes} acertos`:''}</span></div><span class="du">${hfmt(x.segundos)}</span><button class="del" data-id="${x.id}" title="Apagar sessão">×</button></div>`;}).join('')}</div>`;
-  box.querySelectorAll('.del').forEach(b=>b.onclick=async()=>{if(!confirm('Apagar esta sessão do seu histórico?'))return;await SB.from('sessoes').delete().eq('id',b.dataset.id);desenhaHoje();});}
+   <div class="hoje">${L.map(x=>{const [n,ic,,c]=TI(x.tipo);const h=new Date(x.inicio);return `<div class="ses" style="--c:${c}"><span style="font-size:20px">${ic}</span><div class="tx"><b>${esc(x.materia)} · ${x.detalhe&&(x.detalhe.extra||x.detalhe.avulsa)?'Estudo extra':esc(n)}</b><span>${String(h.getHours()).padStart(2,'0')}:${String(h.getMinutes()).padStart(2,'0')} · ${esc(x.assunto||'')}${x.questoes?` · ${x.acertos}/${x.questoes} acertos`:''}</span></div><span class="du">${hfmt(x.segundos)}</span>${pode?`<button class="edt" data-id="${x.id}" title="Corrigir sessão">✎</button>`:''}</div>`;}).join('')}</div>`;
+  if($('avAdd'))$('avAdd').onclick=()=>formSessao(null,desenhaHoje);
+  box.querySelectorAll('.edt').forEach(b=>b.onclick=()=>formSessao(L.find(x=>String(x.id)===b.dataset.id),desenhaHoje));}
+/* registrar questões avulsas / corrigir uma sessão */
+function formSessao(x,depois){const novo=!x;const simu=!!(x&&x.detalhe&&x.detalhe.disc&&Object.keys(x.detalhe.disc).length);
+  const minhas=MATS.filter(m=>!(m==='Inglês'&&LINGUA==='Espanhol')&&!(m==='Espanhol'&&LINGUA==='Inglês')&&!(m==='Francês'&&LINGUA!=='Francês'));
+  const mats=x&&!minhas.includes(x.materia)?minhas.concat([x.materia]):minhas;
+  const dt=x?new Date(x.inicio):new Date();const dIso=iso(dt),hh=String(dt.getHours()).padStart(2,'0')+':'+String(dt.getMinutes()).padStart(2,'0');
+  const d=document.createElement('div');d.className='dlg';
+  d.innerHTML=`<div class="box" style="--c:#EB6834"><div class="top"><h3>${novo?'➕ Estudo extra':'✎ Corrigir sessão'}</h3><p>${novo?'Para o que você estudou fora da plataforma ou sem o cronômetro (outra lista, outro material). Conta nas suas estatísticas, mas não marca nada no Plano de Estudos.':'Ajuste o que ficou errado nesta sessão.'}</p></div>
+   <form class="bd"><div class="row2"><label class="f">Matéria<select name="mat" required${simu?' disabled':''}><option value="">Selecione</option>${mats.map(m=>`<option${x&&x.materia===m?' selected':''}>${esc(m)}</option>`).join('')}</select></label>
+     <label class="f">Dia<input type="date" name="dia" value="${dIso}" max="${iso(new Date())}" required></label></div>
+    <label class="f">Assunto<input type="text" name="top" maxlength="200" placeholder="ex.: lista de funções do 1º grau do cursinho" value="${esc(x?x.assunto||'':'')}"${simu?' disabled':''}${novo?' required':''}></label>
+    ${simu?'<p class="pend" style="margin:0">Esta é uma correção de simulado: as questões por disciplina e os tipos de erro não podem ser alterados aqui. Se precisar refazer, apague a sessão e registre de novo.</p>':`<div class="qs"><label>Feitas<input type="number" name="q" min="0" max="999" inputmode="numeric" value="${x?x.questoes:''}" placeholder="0"></label><label class="ac">Acertos<input type="number" name="a" min="0" max="999" inputmode="numeric" value="${x?x.acertos:''}" placeholder="0"></label><label class="er">Erros<input type="number" name="e" readonly tabindex="-1" value="${x?x.erros:''}"></label></div>`}
+    <label class="f"><span>Quanto tempo você estudou? <span class="opc">(em minutos)</span></span><input type="number" name="min" min="0" max="720" inputmode="numeric" value="${x&&x.segundos?Math.round(x.segundos/60):''}" placeholder="ex.: 50"${novo?' required':''}></label>
+    <p class="msg"></p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn pri" type="submit" style="flex:1">${novo?'Registrar':'Salvar correção'}</button><button class="btn" type="button" data-x="fecha">Cancelar</button></div>
+    ${novo?'':'<button class="btn del" type="button" data-x="apaga" style="background:none;border:0">Apagar esta sessão</button>'}</form></div>`;
+  document.body.appendChild(d);const f=d.querySelector('form'),msg=t=>d.querySelector('.msg').textContent=t,fecha=()=>d.remove();
+  d.querySelector('[data-x=fecha]').onclick=fecha;d.addEventListener('mousedown',e=>{if(e.target===d)fecha();});
+  if(!simu){const er=()=>{const q=parseInt(f.q.value,10),a=parseInt(f.a.value,10);f.e.value=isNaN(q)?'':Math.max(0,q-(isNaN(a)?0:a));};f.q.oninput=er;f.a.oninput=er;er();}
+  const ap=d.querySelector('[data-x=apaga]');if(ap)ap.onclick=async()=>{if(!ap.dataset.ok){ap.dataset.ok=1;ap.textContent='Confirmar: apagar esta sessão';return;}
+    const {error}=await SB.from('sessoes').delete().eq('id',x.id);if(error){msg(error.message);return;}fecha();depois&&depois();};
+  f.onsubmit=async ev=>{ev.preventDefault();const bt=f.querySelector('[type=submit]');
+    const min=Math.max(0,parseInt(f.min.value,10)||0),seg=min*60;
+    const [y,mo,da]=f.dia.value.split('-').map(Number);const ehHoje=f.dia.value===iso(new Date());
+    const inicio=novo?(ehHoje?new Date(Date.now()-seg*1000):new Date(y,mo-1,da,12,0)):new Date(y,mo-1,da,dt.getHours(),dt.getMinutes());
+    const row={inicio:inicio.toISOString(),fim:new Date(inicio.getTime()+seg*1000).toISOString(),segundos:seg};
+    if(!simu){if(!f.mat.value){msg('Escolha a matéria.');return;}const q=parseInt(f.q.value,10)||0,a=parseInt(f.a.value,10)||0;
+      if(a>q){msg('Os acertos não podem passar do total de questões feitas.');return;}
+      const top=f.top.value.trim();if(novo&&!top){msg('Escreva o assunto que você estudou.');return;}
+      Object.assign(row,{materia:f.mat.value,assunto:top||null,questoes:q,acertos:a,erros:q-a});if(novo)row.plano_item=null;}
+    if(novo&&!seg){msg('Informe quanto tempo você estudou.');return;}
+    bt.disabled=true;let r;
+    if(novo)r=await SB.from('sessoes').insert({...row,email:ALVO,tipo:'questoes',detalhe:{extra:true}});
+    else r=await SB.from('sessoes').update(row).eq('id',x.id);
+    if(r.error&&/plano_item|foreign key/i.test(r.error.message)){delete row.plano_item;r=novo?await SB.from('sessoes').insert({...row,email:ALVO,tipo:'questoes',detalhe:{extra:true}}):await SB.from('sessoes').update(row).eq('id',x.id);}
+    if(r.error){msg('Não foi possível salvar: '+r.error.message);bt.disabled=false;return;}
+    fecha();depois&&depois();};}
 
 /* ---------- Dashboard ---------- */
 const anel=(p,cor)=>{const R=24,C=2*Math.PI*R;return `<svg class="ring" viewBox="0 0 60 60"><circle cx="30" cy="30" r="${R}" fill="none" stroke="var(--soft)" stroke-width="7"/><circle cx="30" cy="30" r="${R}" fill="none" stroke="${cor}" stroke-width="7" stroke-linecap="round" stroke-dasharray="${(C*p/100).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 30 30)"/><text class="rv" x="30" y="35" text-anchor="middle">${p}%</text></svg>`;};
@@ -509,7 +554,14 @@ async function telaPainel(email,cab){if(!cab)abas('tabPainel');$('app').innerHTM
      <div style="overflow-x:auto"><table class="mt"><thead><tr><th>Matéria</th><th>Tempo</th><th class="opt"></th><th>Questões</th><th>Acertos × erros</th><th>Aproveitamento</th></tr></thead><tbody>
      ${ML.map(([n,m])=>{const p=m.q?Math.round(100*m.a/m.q):null;const cor=CORM[n]||'#3A8CCB';return `<tr><td><span class="nm"><i style="background:${cor}"></i>${esc(n)}</span></td><td style="white-space:nowrap;font-weight:700">${hfmt(m.s)}</td><td class="opt" style="width:28%"><div class="tbar"><em style="width:${Math.round(100*m.s/smax)}%;background:${cor}"></em></div></td><td style="font-weight:700">${m.q||'—'}</td><td>${m.q?`<div class="ae" title="${m.a} acertos · ${m.e} erros"><span class="a" style="width:${100*m.a/m.q}%"></span><span class="e" style="width:${100*m.e/m.q}%"></span></div><small class="pend">${m.a} ✓ · ${m.e} ✗</small>`:'<small class="pend">sem questões</small>'}</td><td><span class="pc ${pcCls(p)}">${p==null?'—':p+'%'}</span></td></tr>`;}).join('')}</tbody></table></div></div>
    ${cardErros}
-   <div class="chart"><h3><i class="hi c"></i>Atividade recente</h3><div class="hoje" style="margin-top:10px">${S.length?'':'<p class="pend">Nenhuma sessão registrada ainda. As últimas sessões aparecem aqui.</p>'}${S.slice(-8).reverse().map(x=>{const [n,ic,,c]=TI(x.tipo);const h=new Date(x.inicio);return `<div class="ses" style="--c:${c}"><span style="font-size:20px">${ic}</span><div class="tx"><b>${esc(x.materia)} · ${esc(n)}</b><span>${dm(h)} às ${String(h.getHours()).padStart(2,'0')}:${String(h.getMinutes()).padStart(2,'0')} · ${esc(x.assunto||'')}${x.questoes?` · ${x.acertos}/${x.questoes} acertos`:''}</span></div><span class="du">${hfmt(x.segundos)}</span></div>`;}).join('')}</div></div>`;
+   <div class="chart"><h3 style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><i class="hi c"></i>Atividade recente${!cab&&!VER_REAL()?'<span style="margin-left:auto;display:flex;gap:8px"><button class="btn avbtn" id="dAv">+ Estudo extra</button>'+(S.length>8?'<button class="btn avbtn" id="dTodas">Ver todas as sessões</button>':'')+'</span>':''}</h3><div class="hoje" style="margin-top:10px">${S.length?'':'<p class="pend">Nenhuma sessão registrada ainda. As últimas sessões aparecem aqui.</p>'}${S.slice(-8).reverse().map(x=>{const [n,ic,,c]=TI(x.tipo);const h=new Date(x.inicio);return `<div class="ses" style="--c:${c}"><span style="font-size:20px">${ic}</span><div class="tx"><b>${esc(x.materia)} · ${x.detalhe&&(x.detalhe.extra||x.detalhe.avulsa)?'Estudo extra':esc(n)}</b><span>${dm(h)} às ${String(h.getHours()).padStart(2,'0')}:${String(h.getMinutes()).padStart(2,'0')} · ${esc(x.assunto||'')}${x.questoes?` · ${x.acertos}/${x.questoes} acertos`:''}</span></div><span class="du">${hfmt(x.segundos)}</span>${!cab&&!VER_REAL()?`<button class="edt" data-id="${x.id}" title="Corrigir sessão">✎</button>`:''}</div>`;}).join('')}</div></div>`;
+  const recar=()=>telaPainel(email,cab);
+  if($('dAv'))$('dAv').onclick=async()=>{try{await carregaPlano();}catch(e){}formSessao(null,recar);};
+  $('app').querySelectorAll('.edt').forEach(b=>b.onclick=async()=>{try{await carregaPlano();}catch(e){}formSessao(S.find(x=>String(x.id)===b.dataset.id),recar);});
+  if($('dTodas'))$('dTodas').onclick=()=>{const d=document.createElement('div');d.className='dlg';
+    d.innerHTML=`<div class="box" style="max-width:640px"><div class="top"><h3>Todas as sessões</h3><p>Toque em ✎ para corrigir uma sessão.</p></div><div class="bd"><div class="hoje" style="max-height:60vh;overflow:auto">${S.slice().reverse().map(x=>{const [n,ic,,c]=TI(x.tipo);const h=new Date(x.inicio);return `<div class="ses" style="--c:${c}"><span style="font-size:20px">${ic}</span><div class="tx"><b>${esc(x.materia)} · ${x.detalhe&&(x.detalhe.extra||x.detalhe.avulsa)?'Estudo extra':esc(n)}</b><span>${dm(h)} às ${String(h.getHours()).padStart(2,'0')}:${String(h.getMinutes()).padStart(2,'0')} · ${esc(x.assunto||'')}${x.questoes?` · ${x.acertos}/${x.questoes} acertos`:''}</span></div><span class="du">${hfmt(x.segundos)}</span><button class="edt" data-id="${x.id}" title="Corrigir sessão">✎</button></div>`;}).join('')}</div><button class="btn" type="button" data-x="f">Fechar</button></div></div>`;
+    document.body.appendChild(d);d.querySelector('[data-x=f]').onclick=()=>d.remove();d.addEventListener('mousedown',e=>{if(e.target===d)d.remove();});
+    d.querySelectorAll('.edt').forEach(b=>b.onclick=async()=>{try{await carregaPlano();}catch(e){}d.remove();formSessao(S.find(x=>String(x.id)===b.dataset.id),recar);});};
   ligaCab();if($('irSala'))$('irSala').onclick=telaSala;}
 let LALUNOS=null;
 function ligaCab(){const s=$('selAl');if(!s)return;s.onchange=()=>telaAlunos(s.value);$('alAnt').onclick=()=>{if(s.selectedIndex>0){s.selectedIndex--;s.onchange();}};$('alProx').onclick=()=>{if(s.selectedIndex<s.options.length-1){s.selectedIndex++;s.onchange();}};}
@@ -590,6 +642,6 @@ async function telaDen(){abas('tabDen');$('app').innerHTML='<p class="pend">Carr
   $('app').querySelectorAll('[data-r]').forEach(b=>b.onclick=async()=>{await SB.rpc('admin_resolver',{p_id:+b.dataset.id,p:b.dataset.r==='1'});telaDen();});}
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795641568" defer></script>
+<script src="../js/presenca.js?v=1795643488" defer></script>
 </body>
 </html>
