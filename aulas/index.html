@@ -33,6 +33,7 @@
 .blk.sugst em{font-style:normal;font:700 10.5px var(--body);text-transform:uppercase;letter-spacing:.04em;background:var(--c);color:#fff;padding:1px 6px;border-radius:999px;margin-left:4px}
 .blk.sugst:hover{background:color-mix(in srgb,var(--c) 45%,transparent)}
 .blk:not(.sugst):not(.aula){background:var(--c);color:#fff}.blk:not(.sugst):not(.aula) small{color:rgba(255,255,255,.85)}.blk:not(.sugst):not(.aula) b::before{content:'✓ '}
+.ment .leg,.ment .evm{display:none}
 </style>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Aulas e materiais · PREPARA UFU</title>
@@ -207,7 +208,7 @@ textarea{min-height:70px;resize:vertical}
 <div id="exBar" hidden>Modo aluno exemplo — é assim que o aluno da turma <select id="exTurma"><option value="assessoria">Assessoria PREPARA UFU</option><option value="matematica">Curso de Matemática</option></select> vê esta página. <button type="button" id="exSair">Sair do modo exemplo</button></div>
 <main id="app"></main>
 
-<script>(function(){var V='1795643499';var K='bqufu-recarga-';
+<script>(function(){var V='1795647604';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -226,9 +227,9 @@ const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
   set(m||'dark');$('theme').onclick=()=>set(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');})();
 const SB=supabase.createClient('https://ygdlbhoqyqjsqoyyfizk.supabase.co','sb_publishable_jB2I59Ruw4MaMT63KLWtSA_O-DMf63b');
 const ADMIN='jesrrael.santos@gmail.com';
-let MEUS=[],PLANO_A=null,LINGUA_A='',CRONO_A=[];
-const verEmail=()=>{if(!EXT)return EMAIL;try{const v=JSON.parse(sessionStorage.getItem('bqufu-ver')||'null');return (v&&v.email)||'exemplo@preparaufu.com.br';}catch(e){return 'exemplo@preparaufu.com.br';}};
-const verReal=()=>EXT&&verEmail()!=='exemplo@preparaufu.com.br';
+let MEUS=[],PLANO_A=null,LINGUA_A='',CRONO_A=[],MENT_A=false,MVER_A=null;
+const verEmail=()=>{if(MVER_A)return MVER_A;if(!EXT)return EMAIL;try{const v=JSON.parse(sessionStorage.getItem('bqufu-ver')||'null');return (v&&v.email)||'exemplo@preparaufu.com.br';}catch(e){return 'exemplo@preparaufu.com.br';}};
+const verReal=()=>!!MVER_A||(EXT&&verEmail()!=='exemplo@preparaufu.com.br');
 let EMAIL='',IS_ADMIN=false,REAL_ADMIN=false,EXT=null,AULAS=[],ARQ=[],PASTAS=[],MES=null;
 const TURMAS=[['assessoria','Assessoria PREPARA UFU','as'],['matematica','Curso de Matemática','ma']];
 const TIPOS=[['aula','Aula ao vivo'],['revisao','Revisão'],['simulado','Simulado'],['prova','Prova'],['outro','Outro evento']];
@@ -274,6 +275,10 @@ async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!se
   const {data:ok}=await SB.rpc('is_allowed');
   if(!ok){try{localStorage.removeItem('bqufu-sig-v2');}catch(e){}await SB.auth.signOut();$('gate').hidden=false;gm('Seu acesso não está liberado. Fale com o Prof. Jazz.');return;}
   $('gate').hidden=true;
+  try{const {data:ar}=await SB.rpc('minhas_areas');MENT_A=!REAL_ADMIN&&!!(ar&&ar.mentoria&&!ar.turma);}catch(e){}
+  if(REAL_ADMIN){try{const v=JSON.parse(sessionStorage.getItem('bqufu-mentoria-ver')||'null');if(sessionStorage.getItem('bqufu-mentoria-puro')&&v&&v.email){MENT_A=true;MVER_A=v.email;}}catch(e){}}
+  if(MENT_A){document.body.classList.add('ment');IS_ADMIN=false;$('tabMat').hidden=true;$('tabEx').hidden=true;const h=document.querySelector('.ttl h1'),q=document.querySelector('.ttl p');if(h)h.textContent='Agenda de estudos';if(q)q.textContent='Planeje os seus horários de estudo, dia a dia';
+    if(!location.hash||location.hash==='#materiais')history.replaceState(null,'','#agenda');telaAgenda();return;}
   $('tabAg').onclick=()=>{history.replaceState(null,'','#agenda');telaAgenda();};
   $('tabMat').onclick=()=>{history.replaceState(null,'','#materiais');telaMat();};
   if(REAL_ADMIN){$('tabEx').hidden=false;try{EXT=sessionStorage.getItem('bqufu-exemplo');}catch(e){}
@@ -336,7 +341,7 @@ function desenhaAgenda(){
      return `<div class="d${d.getMonth()!==m?' fora':''}${k===HOJE?' hoje':''}${fer?' fer':''}${rec?' rec':''}${IS_ADMIN?' adm':''}" data-dia="${k}"><div class="n"><span>${d.getDate()}</span>${fer?`<i>${fer}</i>`:rec&&d.getDay()===1?'<i>recesso</i>':''}</div>${L.map(ev).join('')}${(()=>{const P=MEUS.filter(x=>x.data===k);if(!P.length)return '';const t=P.reduce((a,x)=>a+x.dur,0);return `<span class="ev meu" title="${P.length} estudo${P.length>1?'s':''} planejado${P.length>1?'s':''}">Meus estudos<small>${durTxt(t)}</small></span>`;})()}</div>`;}).join('')}</div>
    ${IS_ADMIN?'':'<p class="pend" style="margin:10px 0 0">Dica: clique em um dia para planejar os seus horários de estudo, com a matéria e o assunto do seu Plano de Estudos. É opcional.</p>'}
    <div class="leg"><span><i style="background:var(--azul)"></i>Aula ao vivo</span><span><i style="border:1.5px dashed var(--azul)"></i>Aula com tema a definir</span><span><i style="border:2px solid var(--roxo)"></i>Revisão final</span><span><i style="background:var(--amarelo)"></i>Simulado PREPARA UFU</span><span><i style="background:#111;border:2px solid var(--amarelo)"></i>Prova UFU</span><span><i style="background:var(--verm)"></i>Feriado</span><span><i style="background:rgba(217,67,79,.25)"></i>Recesso das aulas</span></div></div>
-   <div class="card"><h2 class="t" style="font-size:19px;margin-bottom:10px">Eventos de ${MESES[m]}</h2><div class="lista">${doMes.length?doMes.map(a=>{const d=parse(a.data);const nf=ARQ.filter(f=>f.aula===a.id).length;const cor=a.tipo==='simulado'?'var(--amarelo)':a.tipo==='revisao'?'var(--roxo)':a.tipo==='prova'?'#111':a.tipo==='outro'?'var(--verde)':'var(--azul)';
+   <div class="card evm"><h2 class="t" style="font-size:19px;margin-bottom:10px">Eventos de ${MESES[m]}</h2><div class="lista">${doMes.length?doMes.map(a=>{const d=parse(a.data);const nf=ARQ.filter(f=>f.aula===a.id).length;const cor=a.tipo==='simulado'?'var(--amarelo)':a.tipo==='revisao'?'var(--roxo)':a.tipo==='prova'?'#111':a.tipo==='outro'?'var(--verde)':'var(--azul)';
       return `<div class="li${a.data<HOJE?' passou':''}" data-id="${a.id}" style="border-left-color:${cor}"><div class="dd"><b>${d.getDate()}</b><span>${DSEM[d.getDay()].slice(0,3)}</span></div><div class="tx"><b>${esc(titulo(a))}</b><span>${esc(faixa(a))}${a.professor?' · '+esc(a.professor):''}${nf?' · 📎 '+nf:''}${IS_ADMIN&&a.turmas.length<2?' · só '+esc((TURMAS.find(t=>t[0]===a.turmas[0])||['',''])[1]):''}</span></div>${linkOk(a.link)&&a.data>=HOJE?'<span class="tg ma">Meet</span>':''}</div>`;}).join(''):'<p class="pend" style="margin:0">Nenhum evento neste mês.</p>'}</div></div>`;
   $('mAnt').onclick=()=>{MES=new Date(y,m-1,1);desenhaAgenda();};$('mProx').onclick=()=>{MES=new Date(y,m+1,1);desenhaAgenda();};
   $('mHoje').onclick=()=>{const d=new Date();MES=new Date(d.getFullYear(),d.getMonth(),1);desenhaAgenda();};
@@ -351,8 +356,8 @@ const matSalaA=x=>x.materia==='Português'&&/^literatura/i.test(x.frente||'')?'L
 const durTxt=m=>m<60?m+' min':Math.floor(m/60)+' h'+(m%60?' '+String(m%60).padStart(2,'0'):'');
 const hhmm=m=>String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
 const minDe=t=>{if(typeof t==='number')return t;const z=String(t||'0');if(/^\d+$/.test(z))return +z;const [h,mm]=z.split(':').map(Number);return h*60+(mm||0);};
-async function carregaPlanoA(){if(PLANO_A)return;try{const [p,c,k]=await Promise.all([SB.from('plano_itens').select('id,semana,materia,frente,assunto').order('id'),SB.from('checkup').select('respostas').eq('email',verEmail()).maybeSingle(),SB.from('cronograma').select('blocos').eq('email',verEmail()).maybeSingle()]);
-  PLANO_A=p.data||[];LINGUA_A=(c.data&&c.data.respostas&&c.data.respostas.lingua)||'';CRONO_A=(k.data&&Array.isArray(k.data.blocos))?k.data.blocos:[];try{const rm=await SB.from('plano_remarcado').select('item,semana').eq('email',verEmail());const OV={};(rm.data||[]).forEach(r=>OV[r.item]=r.semana);PLANO_A=PLANO_A.map(x=>({...x,semana:OV[x.id]||x.semana}));}catch(e){}}catch(e){PLANO_A=PLANO_A||[];}}
+async function carregaPlanoA(){if(PLANO_A)return;try{const [p,c,k]=await Promise.all([MENT_A?SB.from('m_plano').select('id,semana,materia,frente,assunto').eq('email',verEmail()).order('semana').order('id'):SB.from('plano_itens').select('id,semana,materia,frente,assunto').order('id'),SB.from('checkup').select('respostas').eq('email',verEmail()).maybeSingle(),SB.from('cronograma').select('blocos').eq('email',verEmail()).maybeSingle()]);
+  PLANO_A=p.data||[];LINGUA_A=(c.data&&c.data.respostas&&c.data.respostas.lingua)||'';CRONO_A=(k.data&&Array.isArray(k.data.blocos))?k.data.blocos:[];try{const rm=await SB.from(MENT_A?'m_plano_remarcado':'plano_remarcado').select('item,semana').eq('email',verEmail());const OV={};(rm.data||[]).forEach(r=>OV[r.item]=r.semana);PLANO_A=PLANO_A.map(x=>({...x,semana:OV[x.id]||x.semana}));}catch(e){}}catch(e){PLANO_A=PLANO_A||[];}}
 const CORD_A={MAT:'#D9480F',FIS:'#1864AB',QUI:'#5F3DC4',BIO:'#2B8A3E',LP:'#C92A2A',LIT:'#A61E4D',LE:'#0B7285',HIS:'#7F4F24',GEO:'#5C7A0A',FIL:'#495057',SOC:'#8C6500',RED:'#C2255C',REV:'#1BAF7A',SIM:'#7B4FC9'};
 const KMAT={MAT:'Matemática',FIS:'Física',QUI:'Química',BIO:'Biologia',LP:'Português',LIT:'Literatura',HIS:'História',GEO:'Geografia',FIL:'Filosofia',SOC:'Sociologia',RED:'Redação',REV:'Revisão geral',SIM:'Simulado'};
 const matDoBloco=b=>b.k==='LE'?(LINGUA_A||'Inglês'):KMAT[b.k]||null;
@@ -502,6 +507,6 @@ function editarPasta(p){const nova=!p;p=p||{nome:'',descricao:'',turmas:['assess
     if(L.length)await SB.storage.from('materiais').remove(L.map(x=>x.path));if(p.capa)await SB.storage.from('capas').remove([p.capa]);const {error}=await SB.from('pastas').delete().eq('id',p.id);if(error){msg(error.message);return;}fecha();await carregar();desenhaPastas();};}
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795643499" defer></script>
+<script src="../js/presenca.js?v=1795647604" defer></script>
 </body>
 </html>

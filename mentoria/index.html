@@ -8,7 +8,30 @@
 <link rel="manifest" href="/site.webmanifest">
 <meta name="theme-color" content="#16304F">
 <script type="speculationrules">{"prerender":[{"where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":"/"}},{"not":{"href_matches":"/mentoria/*"}},{"not":{"href_matches":"/*\\?*area=*"}},{"not":{"selector_matches":"[target=_blank]"}}]},"eagerness":"moderate"}],"prefetch":[{"where":{"or":[{"href_matches":"/"},{"href_matches":"/mentoria/*"}]},"eagerness":"moderate"}]}</script>
-<style>@view-transition{navigation:auto}header{view-transition-name:cab}::view-transition-old(root),::view-transition-new(root){animation-duration:.18s}</style>
+<style>@view-transition{navigation:auto}header{view-transition-name:cab}::view-transition-old(root),::view-transition-new(root){animation-duration:.18s}.preag{display:flex;gap:14px;align-items:center;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--amarelo);border-radius:14px;padding:14px 16px}
+.preag>div:first-child{flex:1;min-width:240px;display:flex;flex-direction:column;gap:2px}.preag span{color:var(--muted);font-size:14px}
+.preb{display:flex;gap:8px;flex-wrap:wrap}
+.prem{display:block;font:600 11.5px var(--body);color:#C9A227;margin-top:2px}
+.ralerta{background:rgba(221,221,36,.12);border:1px solid rgba(221,221,36,.5);border-radius:12px;padding:10px 12px;font-size:14px}
+#rlist{display:flex;flex-direction:column;gap:8px;max-height:46vh;overflow:auto}
+.rdisc{border:1px solid var(--line);border-left:5px solid var(--c);border-radius:12px;background:var(--bg)}
+.rdisc.ruim{border-color:#E5484D;border-left-color:#E5484D}
+.rdisc summary{display:flex;gap:10px;align-items:center;padding:9px 12px;cursor:pointer;flex-wrap:wrap}.rdisc summary span{color:var(--muted);font-size:13px}
+.rdisc summary em{margin-left:auto;font:700 12px var(--body);font-style:normal;padding:2px 9px;border-radius:999px}
+.rok{background:rgba(27,175,122,.16);color:#1BAF7A}.rbad{background:#E5484D;color:#fff}
+.ritens{display:flex;flex-direction:column;gap:4px;padding:0 12px 10px}
+.ritens label{display:flex;gap:9px;align-items:flex-start;font-size:14px;cursor:pointer}.ritens small{display:block;color:var(--muted);font-size:11.5px}
+.rerro{background:rgba(229,72,77,.12);border:1px solid #E5484D;border-radius:12px;padding:10px 12px;font-size:14px}
+.rinfo{background:rgba(27,175,122,.1);border:1px solid rgba(27,175,122,.45);border-radius:12px;padding:10px 12px;font-size:14px}
+.rtoast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#16304F;color:#fff;border:1px solid var(--amarelo);border-radius:12px;padding:12px 18px;z-index:90;font-weight:600}
+.dlg{position:fixed;inset:0;z-index:80;background:rgba(5,8,18,.6);display:flex;align-items:flex-start;justify-content:center;padding:30px 14px;overflow:auto}
+.dlg .box{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:18px;max-width:600px;width:100%;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.dlg .top{padding:16px 20px;color:#fff;background:#16304F;border-bottom:4px solid var(--amarelo);display:flex;gap:12px;align-items:flex-start}
+.dlg .top h3{margin:0;font:800 20px var(--display)}.dlg .top p{margin:3px 0 0;color:#D6E6F5;font-size:13.5px}
+.dlg .top .x{margin-left:auto;background:none;border:0;color:#fff;font-size:24px;cursor:pointer;line-height:1}
+.dlg .bd{padding:16px 20px;display:flex;flex-direction:column;gap:12px}
+.dlg .btns{display:flex;gap:8px;flex-wrap:wrap}
+</style>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Mentoria Individual · Prof. Jazz</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -390,7 +413,7 @@ body{}@keyframes fadein{from{opacity:0}to{opacity:1}}
 <div id="exBar" hidden><span id="exTxt"></span> <button type="button" id="exPuro"></button> <button type="button" id="exSair">Voltar aos mentorados</button><button type="button" id="exTroca" hidden></button></div>
 <main id="app"></main>
 
-<script>(function(){var V='1795643499';var K='bqufu-recarga-';
+<script>(function(){var V='1795647604';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -1138,6 +1161,58 @@ async function carregaPlano(email){
 async function telaPlano(){abas('tabPlano');$('app').innerHTML='<p class="pend">Carregando o plano de estudos…</p>';
   let P;try{P=await carregaPlano(ALVO);}catch(e){$('app').innerHTML=`<div class="aviso"><h2>Não foi possível carregar o plano</h2><p>${esc(e.message)}</p></div>`;return;}
   P.sel=P.cur;desenhaPlano(P);}
+/* ===== Reagendar plano de estudos ===== */
+async function guardaCenario(P){const snap=Object.entries(P.OV).map(([item,semana])=>({item:+item,semana}));const r=await SB.from('plano_reag_hist').insert({email:ALVO,snapshot:snap,area:'mentoria'});if(r.error)throw r.error;}
+async function desfazUltimo(){const {data,error}=await SB.from('plano_reag_hist').select('*').eq('email',ALVO).eq('area','mentoria').order('id',{ascending:false}).limit(1);if(error)throw error;const h=data&&data[0];if(!h)return;
+  const d1=await SB.from('m_plano_remarcado').delete().eq('email',ALVO);if(d1.error)throw d1.error;
+  const snap=(h.snapshot||[]).map(x=>({email:ALVO,item:x.item,semana:x.semana}));if(snap.length){const r=await SB.from('m_plano_remarcado').insert(snap);if(r.error)throw r.error;}
+  const d2=await SB.from('plano_reag_hist').delete().eq('id',h.id);if(d2.error)throw d2.error;}
+
+const discDe=x=>x.materia==='Português'?(/^literatura/i.test(x.frente||'')?'Literatura':/^reda/i.test(x.frente||'')?'Redação':'Português'):x.materia;
+const MAXSEM=5;
+function inicioReag(P){const d=new Date().getDay();let i=P.cur+((d===6||d===0)?1:0);return Math.min(i,P.sem.length);}
+function atrasados(P){const ini=inicioReag(P);const lim=P.sem[ini]||'9999';return {ini,L:P.itens.filter(x=>x.semana<lim&&!P.feito.has(x.id)).sort((a,b)=>a.semana0.localeCompare(b.semana0)||a.id-b.id)};}
+/* distribui, por disciplina, os atrasados escolhidos + os assuntos futuros não estudados, mantendo a ordem (pré-requisitos antes) */
+function planejaDisc(P,ini,late,fut){const n=P.sem.length;const S=late.map(x=>({x,min:ini})).concat(fut.map(x=>({x,min:Math.max(ini,P.sem.indexOf(x.semana))})));
+  const base=Math.max(1,...P.sem.slice(ini).map(w=>fut.filter(x=>x.semana===w).length));
+  const tenta=T=>{const load=new Array(n).fill(0),out=[];let w=ini;for(const it of S){w=Math.max(w,it.min);while(w<n&&load[w]>=T)w++;if(w>=n)return null;load[w]++;out.push([it.x,w]);}return {out,T,max:Math.max(...load)};};
+  for(let T=Math.max(base,Math.ceil(S.length/Math.max(1,n-ini)));T<=MAXSEM;T++){const r=tenta(T);if(r)return r;}
+  return null;}
+function maxCabem(P,ini,late,fut){let lo=0,hi=late.length;while(lo<hi){const m=Math.ceil((lo+hi)/2);if(planejaDisc(P,ini,late.slice(0,m),fut))lo=m;else hi=m-1;}return lo;}
+function reagendar(P){const {ini,L}=atrasados(P);const n=P.sem.length;
+  const d=document.createElement('div');d.className='dlg';document.body.appendChild(d);
+  const fecha=()=>d.remove();d.addEventListener('mousedown',e=>{if(e.target===d)fecha();});
+  if(ini>=n){d.innerHTML=`<div class="box"><div class="top"><h3>Reagendar plano de estudos</h3><button class="x">×</button></div><div class="bd"><p>O plano já chegou à última semana: não há mais semanas para reagendar. Fale com o Prof. Jazz.</p></div></div>`;d.querySelector('.x').onclick=fecha;return;}
+  if(!L.length){d.innerHTML=`<div class="box"><div class="top"><h3>Reagendar plano de estudos</h3><button class="x">×</button></div><div class="bd"><p><b>Nenhum assunto atrasado.</b> Você está em dia com o plano. Parabéns!</p></div></div>`;d.querySelector('.x').onclick=fecha;return;}
+  const discs=[...new Set(L.map(discDe))].sort((a,b)=>PMAT.findIndex(z=>z[0]===a)-PMAT.findIndex(z=>z[0]===b));
+  const sel=new Set(L.map(x=>x.id));
+  d.innerHTML=`<div class="box" style="max-width:760px"><div class="top"><div><h3>↻ Reagendar plano de estudos</h3><p>Os assuntos atrasados serão distribuídos da semana ${ini+1} até a semana ${n} (${dm(pData(P.sem[ini]))} a ${dm(new Date(pData(P.sem[n-1]).getTime()+6*864e5))}), sem sair do plano.</p></div><button class="x">×</button></div>
+    <div class="bd"><div class="ralerta"><b>Atenção:</b> conteúdo atrasado significa <b>mais conteúdo nas semanas que restam</b>. Cuidado com o seu planejamento: reagendar não diminui o que falta estudar, só reorganiza.</div>
+    <p class="pend" style="margin:0">Marque o que você quer reagendar. A ordem dos conteúdos é mantida: o que é pré-requisito continua vindo antes. O que você desmarcar continua atrasado na semana original; se for deixar algum assunto de lado, combine antes com o Prof. Jazz ou com a sua assessora.</p>
+    <div id="rlist"></div><div id="rres"></div>
+    <div class="btns"><button class="btn pri" id="rOk">Reagendar</button><button class="btn" id="rTodos">Marcar todos</button><button class="btn" id="rNenhum">Desmarcar todos</button></div></div></div>`;
+  d.querySelector('.x').onclick=fecha;
+  let plano=null;
+  const calc=()=>{const res={},prob=[];discs.forEach(ds=>{const late=L.filter(x=>discDe(x)===ds&&sel.has(x.id));const fut=P.itens.filter(x=>discDe(x)===ds&&x.semana>=P.sem[ini]&&!P.feito.has(x.id)).sort((a,b)=>a.semana.localeCompare(b.semana)||a.semana0.localeCompare(b.semana0)||a.id-b.id);
+      if(!late.length){res[ds]={ok:true,n:0};return;}const r=planejaDisc(P,ini,late,fut);if(r)res[ds]={ok:true,n:late.length,r};else{const k=maxCabem(P,ini,late,fut);res[ds]={ok:false,n:late.length,cabe:k};prob.push(ds);}});return {res,prob};};
+  const desenha=()=>{const {res,prob}=calc();plano=prob.length?null:res;
+    $('rlist').innerHTML=discs.map(ds=>{const it=L.filter(x=>discDe(x)===ds),r=res[ds];const cor=CORD[(PMAT.find(z=>z[0]===ds)||PMAT.find(z=>z[0]==='Português'))[1]]||'#3A8CCB';
+      return `<details class="rdisc${r.ok?'':' ruim'}" open style="--c:${cor}"><summary><b>${esc(ds)}</b><span>${it.filter(x=>sel.has(x.id)).length} de ${it.length} marcado${it.length>1?'s':''}</span>${r.ok?(r.n?`<em class="rok">ok · até ${r.r.max} por semana</em>`:''):`<em class="rbad">não cabe: desmarque ${r.n-r.cabe}</em>`}</summary>
+        <div class="ritens">${it.map(x=>`<label><input type="checkbox" data-id="${x.id}"${sel.has(x.id)?' checked':''}><span><small>Semana ${P.sem.indexOf(x.semana)+1}${x.frente?' · '+esc(x.frente):''}</small>${esc(x.assunto)}</span></label>`).join('')}</div></details>`;}).join('');
+    $('rlist').querySelectorAll('input[data-id]').forEach(c=>c.onchange=()=>{c.checked?sel.add(+c.dataset.id):sel.delete(+c.dataset.id);desenha();});
+    const tot=sel.size;
+    $('rres').innerHTML=prob.length?`<div class="rerro"><b>Não é possível reagendar com essa quantidade de assuntos atrasados.</b> Em ${prob.map(esc).join(', ')}, a semana ficaria com mais de ${MAXSEM} assuntos da mesma disciplina. Selecione uma quantidade menor de assuntos para reorganizar. É hora de definir as suas prioridades: converse com o Prof. Jazz ou com a sua assessora para decidir o que fica de fora.</div>`
+      :tot?`<div class="rinfo">${tot} assunto${tot>1?'s':''} ${tot>1?'serão':'será'} reorganizado${tot>1?'s':''}. Nenhuma semana passa de ${MAXSEM} assuntos da mesma disciplina.</div>`:'<div class="rinfo">Nenhum assunto marcado.</div>';
+    $('rOk').disabled=!!prob.length||!tot;};
+  desenha();
+  $('rTodos').onclick=()=>{L.forEach(x=>sel.add(x.id));desenha();};$('rNenhum').onclick=()=>{sel.clear();desenha();};
+  $('rOk').onclick=async()=>{if(!plano)return;const b=$('rOk');b.disabled=true;b.textContent='Reagendando…';
+    const ups=[],dels=[];Object.values(plano).forEach(r=>{if(!r.r)return;r.r.out.forEach(([x,w])=>{const nova=P.sem[w];if(nova===x.semana0)dels.push(x.id);else if(nova!==x.semana)ups.push({email:ALVO,item:x.id,semana:nova,em:new Date().toISOString()});else if(x.semana!==x.semana0){} });});
+    try{await guardaCenario(P);if(ups.length){const r=await SB.from('m_plano_remarcado').upsert(ups,{onConflict:'email,item'});if(r.error)throw r.error;}
+      if(dels.length){const r=await SB.from('m_plano_remarcado').delete().eq('email',ALVO).in('item',dels);if(r.error)throw r.error;}
+      fecha();await telaPlano();
+      const t=document.createElement('div');t.className='rtoast';t.textContent='Plano reagendado: '+sel.size+' assunto'+(sel.size>1?'s':'')+' redistribuído'+(sel.size>1?'s':'')+'.';document.body.appendChild(t);setTimeout(()=>t.remove(),5000);
+    }catch(e){b.disabled=false;b.textContent='Reagendar';alert('Não foi possível reagendar: '+(e.message||e));}};}
 function desenhaPlano0(P){
   const s=P.sem[P.sel],ini=pData(s),fim=new Date(ini.getFullYear(),ini.getMonth(),ini.getDate()+6);
   const W=P.itens.filter(x=>x.semana===s),feitosW=W.filter(x=>P.feito.has(x.id)).length;
@@ -1157,9 +1232,16 @@ function desenhaPlano0(P){
    <div class="pgrid">${grupos.map(g=>{const f=g.L.filter(x=>P.feito.has(x.id)).length,cor=CORD[g.k==='LE'?'LE':g.k],nb=nBlocos(g.k);
       return `<section class="pcard${f===g.L.length?' done':''}" style="--c:${cor}"><svg class="pdec" viewBox="0 0 240 240" aria-hidden="true" stroke="currentColor" fill="currentColor">${PDEC[g.k]}</svg>
         <header><span class="pic">${PICO[g.k]}</span><div><h3>${esc(g.n)}</h3><small>${f} de ${g.L.length} estudado${g.L.length>1?'s':''}</small></div><span class="pbar"><em style="width:${Math.round(100*f/g.L.length)}%"></em></span></header>
-        <ul>${g.L.map(x=>`<li><label class="pit${P.feito.has(x.id)?' feito':''}"><input type="checkbox" data-id="${x.id}" ${P.feito.has(x.id)?'checked':''}><span class="pck"></span><span class="ptx">${x.frente?`<em>${esc(x.frente)}</em>`:''}<b>${esc(x.assunto)}</b></span></label></li>`).join('')}</ul>
+        <ul>${g.L.map(x=>`<li><label class="pit${P.feito.has(x.id)?' feito':''}"><input type="checkbox" data-id="${x.id}" ${P.feito.has(x.id)?'checked':''}><span class="pck"></span><span class="ptx">${x.frente?`<em>${esc(x.frente)}</em>`:''}<b>${esc(x.assunto)}</b>${x.semana0&&x.semana!==x.semana0?`<small class="prem">↻ reagendado da semana ${P.sem.indexOf(x.semana0)+1}</small>`:''}</span></label></li>`).join('')}</ul>
         ${nb?`<footer>📅 ${nb} bloco${nb>1?'s':''} de ${esc(g.n)} no seu Cronograma Semanal</footer>`:''}</section>`;}).join('')}</div>
+   ${(()=>{const R=atrasados(P);return `<div class="preag"><div><b>${R.L.length?`${IS_ADMIN?'O aluno tem':'Você tem'} ${R.L.length} assunto${R.L.length>1?'s':''} atrasado${R.L.length>1?'s':''}.`:'Nenhum assunto atrasado.'}</b><span>${R.L.length?'Ao fim de cada semana, use “Reagendar plano de estudos” para redistribuir o que ficou para trás nas semanas que restam, sem quebrar a ordem dos conteúdos.':'Continue marcando cada assunto quando terminar de estudar.'}</span></div>
+     <div class="preb">${P.temHist?'<button class="btn" id="pUndo">↶ Desfazer último reagendamento</button>':''}${P.nRem?'<button class="btn" id="pDesf">Voltar ao plano original</button>':''}<button class="btn pri" id="pReag">↻ Reagendar plano de estudos</button></div></div>`;})()}
    <p class="pend" style="text-align:center;margin:4px 0 0">Marque cada assunto quando terminar de estudar. O Prof. Jazz acompanha o seu progresso.</p>`;
+  $('pReag').onclick=()=>reagendar(P);
+  if($('pDesf'))$('pDesf').onclick=async ev=>{const b=ev.target;if(!b.dataset.ok){b.dataset.ok=1;b.textContent='Confirmar: voltar ao plano original';return;}
+    b.disabled=true;try{await guardaCenario(P);const {error}=await SB.from('m_plano_remarcado').delete().eq('email',ALVO);if(error)throw error;telaPlano(P.sem[P.sel]);}catch(e){alert(e.message||e);b.disabled=false;}};
+  if($('pUndo'))$('pUndo').onclick=async ev=>{const b=ev.target;if(!b.dataset.ok){b.dataset.ok=1;b.textContent='Confirmar: voltar ao cenário anterior';return;}
+    b.disabled=true;try{await desfazUltimo();telaPlano(P.sem[P.sel]);}catch(e){alert(e.message||e);b.disabled=false;}};
   const st=$('pStrip'),on=st.querySelector('.on');if(on)st.scrollLeft=on.offsetLeft-st.clientWidth/2+on.clientWidth/2;
   st.querySelectorAll('.pw').forEach(b=>b.onclick=()=>{P.sel=+b.dataset.i;desenhaPlano(P);});
   $('pAnt').onclick=()=>{if(P.sel>0){P.sel--;desenhaPlano(P);}};$('pProx').onclick=()=>{if(P.sel<P.sem.length-1){P.sel++;desenhaPlano(P);}};
@@ -1319,12 +1401,13 @@ function mdlg(html,cor){const d=document.createElement('div');d.className='mdlg'
 
 /* ---------- plano individual ---------- */
 async function carregaPlano(email){
-  const [p,f,c,k]=await Promise.all([SB.from('m_plano').select('*').eq('email',email).order('semana').order('id'),SB.from('m_plano_feito').select('item').eq('email',email),SB.from('cronograma').select('blocos').eq('email',email).maybeSingle(),SB.from('checkup').select('respostas').eq('email',email).maybeSingle()]);
+  const [p,f,c,k,rm,hs]=await Promise.all([SB.from('m_plano').select('*').eq('email',email).order('semana').order('id'),SB.from('m_plano_feito').select('item').eq('email',email),SB.from('cronograma').select('blocos').eq('email',email).maybeSingle(),SB.from('checkup').select('respostas').eq('email',email).maybeSingle(),SB.from('m_plano_remarcado').select('item,semana').eq('email',email),SB.from('plano_reag_hist').select('id').eq('email',email).eq('area','mentoria').order('id',{ascending:false}).limit(1)]);
   if(p.error)throw p.error;
-  const itens=p.data||[];const lingua=(k.data&&k.data.respostas&&k.data.respostas.lingua)||'';
+  const OV={};(rm.data||[]).forEach(x=>OV[x.item]=x.semana);
+  const itens=(p.data||[]).map(x=>({...x,semana0:x.semana,semana:OV[x.id]||x.semana}));const lingua=(k.data&&k.data.respostas&&k.data.respostas.lingua)||'';
   const sem=[...new Set(itens.map(x=>x.semana))].sort();
   const hoje=isoD(new Date());let cur=sem.findIndex((s,i)=>hoje>=s&&(i===sem.length-1||hoje<sem[i+1]));if(cur<0)cur=sem.length&&hoje<sem[0]?0:Math.max(0,sem.length-1);
-  return {itens,sem,cur,feito:new Set((f.data||[]).map(x=>x.item)),blocos:(c.data&&c.data.blocos)||[],lingua};}
+  return {itens,sem,cur,nRem:Object.keys(OV).length,temHist:!!(hs.data&&hs.data.length),OV,feito:new Set((f.data||[]).map(x=>x.item)),blocos:(c.data&&c.data.blocos)||[],lingua};}
 async function telaPlano(selSemana){abas('tabPlano');$('app').innerHTML='<p class="pend">Carregando o plano de estudos…</p>';
   let P;try{P=await carregaPlano(ALVO);}catch(e){$('app').innerHTML=`<div class="aviso"><h2>Não foi possível carregar o plano</h2><p>${esc(e.message)}</p></div>`;return;}
   P.sel=selSemana&&P.sem.includes(selSemana)?P.sem.indexOf(selSemana):P.cur;desenhaPlano(P);}
@@ -1337,7 +1420,7 @@ function planoAdm(P){const box=document.createElement('section');box.className='
    <div class="mtb"><button class="btn" data-a="copiar">📋 Copiar o plano da turma</button><button class="btn" data-a="modelo">⬇ Baixar modelo (Excel)</button><label class="btn">⬆ Subir planilha (Excel)<input type="file" accept=".xlsx,.xls,.csv" hidden data-a="subir"></label>${P.itens.length?'<button class="btn" data-a="exportar">⬇ Baixar este plano (Excel)</button>':''}${P.sem.length?`<button class="btn${P.edit?' pri':''}" data-a="editar">${P.edit?'✓ Concluir edição':'✎ Editar esta semana'}</button>`:''}<button class="btn" data-a="novo">+ Assunto</button></div><p class="mmsg" id="pMsg"></p>`;
   $('app').prepend(box);
   const msg=t=>{$('pMsg').textContent=t;};const recarrega=()=>telaPlano(P.sem[P.sel]);
-  box.querySelector('[data-a=copiar]').onclick=async()=>{if(P.itens.length&&!confirm(`Isso substitui o plano atual de ${ANOME} (${P.itens.length} assuntos, e as marcações de estudado) pela cópia do plano da turma. Continuar?`))return;msg('Copiando…');const {data,error}=await SB.rpc('m_copiar_plano',{p_email:ALVO,p_substituir:true});if(error){msg('Erro: '+error.message);return;}msg(`✓ ${data} assuntos copiados.`);recarrega();};
+  box.querySelector('[data-a=copiar]').onclick=async()=>{if(P.itens.length&&!confirm(`Isso substitui o plano atual de ${ANOME} (${P.itens.length} assuntos, e as marcações de estudado) pela cópia do plano da turma. Continuar?`))return;msg('Copiando…');const {data,error}=await SB.rpc('m_copiar_plano',{p_email:ALVO,p_substituir:true});if(error){msg('Erro: '+error.message);return;}await SB.from('m_plano_remarcado').delete().eq('email',ALVO);await SB.from('plano_reag_hist').delete().eq('email',ALVO).eq('area','mentoria');msg(`✓ ${data} assuntos copiados.`);recarrega();};
   box.querySelector('[data-a=modelo]').onclick=()=>baixaModelo().catch(e=>msg('Erro: '+e.message));
   const ex=box.querySelector('[data-a=exportar]');if(ex)ex.onclick=()=>exportaPlano(P).catch(e=>msg('Erro: '+e.message));
   box.querySelector('[data-a=subir]').onchange=ev=>{const f=ev.target.files[0];ev.target.value='';if(f)subirPlano(f,P,msg).catch(e=>msg('Erro: '+e.message));};
@@ -1385,7 +1468,7 @@ async function subirPlano(file,P,msg){msg('Lendo a planilha…');const X=await x
   if(!rows.length){msg('Não encontrei nenhum assunto na planilha. Use o modelo (colunas: Semana, Matéria, Frente, Assunto, Observação).');return;}
   const sems=[...new Set(rows.map(r=>r.semana))].sort();
   if(!confirm(`Encontrei ${rows.length} assuntos em ${sems.length} semana(s), de ${brData(sems[0])} a ${brData(sems[sems.length-1])}.${erros.length?`\n\n${erros.length} linha(s) ficaram de fora por falta de semana, matéria ou assunto (linhas ${erros.slice(0,8).join(', ')}${erros.length>8?'…':''}).`:''}\n\nIsso SUBSTITUI o plano atual de ${ANOME} (${P.itens.length} assuntos e as marcações de estudado). Continuar?`)){msg('');return;}
-  msg('Salvando…');const del=await SB.from('m_plano').delete().eq('email',ALVO);if(del.error){msg('Erro: '+del.error.message);return;}
+  msg('Salvando…');await SB.from('m_plano_remarcado').delete().eq('email',ALVO);await SB.from('plano_reag_hist').delete().eq('email',ALVO).eq('area','mentoria');const del=await SB.from('m_plano').delete().eq('email',ALVO);if(del.error){msg('Erro: '+del.error.message);return;}
   for(let i=0;i<rows.length;i+=400){const {error}=await SB.from('m_plano').insert(rows.slice(i,i+400));if(error){msg('Erro: '+error.message);return;}}
   telaPlano();}
 
@@ -1511,7 +1594,8 @@ async function telaInicio(){abas('tabInicio');$('app').innerHTML='<p class="pend
     ['crono',null,ICO.grade,'Cronograma Semanal','A sua semana de estudos organizada, dia a dia','#3A8CCB','#1F4E79'],
     ['banco','../bancodequestoes/',ICO.lista,'Banco de Questões','Provas da UFU de 2015 a 2026, com gabarito','#7B4FC9','#4C2A8C'],
     ['mat',null,ICO.pasta,'Materiais','Os seus arquivos e os materiais da mentoria','#1BAF7A','#0E7A55'],
-    ['aulasv','../minhasaulas/',ICO.video,'Minhas Aulas','Videoaulas com resoluções e materiais','#D9434F','#8E1F2A']];
+    ['aulasv','../minhasaulas/',ICO.video,'Minhas Aulas','Videoaulas com resoluções e materiais','#D9434F','#8E1F2A'],
+    ['agenda','../aulas/#agenda',ICO.cal,'Agenda de estudos','Planeje cada dia com o seu cronograma e o seu plano','#2E7D74','#1B5049']];
   $('app').innerHTML=`<section class="mh2"><div class="mhx"><span class="hk2">Mentoria individual · Prof. Jazz</span><h2>${nome?'Olá, '+esc(nome)+'!':'Olá!'}</h2><p>Este é o seu espaço da mentoria: o plano de estudos feito só para você, o cronograma, os encontros e os materiais.</p>
       <div class="mpills"><span><b>${dias}</b> dias para a 1ª fase da UFU</span><span><b>${pctTot}%</b> do plano estudado</span><span><b>${nEnc}</b> encontro${nEnc===1?'':'s'} realizado${nEnc===1?'':'s'}</span></div></div>
     <div class="mhf"><picture><source srcset="../img/jazz.webp" type="image/webp"><img src="../img/jazz.png" alt="Prof. Jazz"></picture></div></section>
@@ -1777,6 +1861,6 @@ label.btn{display:inline-flex;align-items:center;cursor:pointer}
 .mvenc b{font:800 18px var(--display)}.mvenc p{margin:4px 0 0;line-height:1.5}
 </style>
 
-<script src="../js/presenca.js?v=1795643499" defer></script>
+<script src="../js/presenca.js?v=1795647604" defer></script>
 </body>
 </html>
