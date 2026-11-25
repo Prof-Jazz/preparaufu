@@ -390,7 +390,7 @@ body{}@keyframes fadein{from{opacity:0}to{opacity:1}}
 <div id="exBar" hidden><span id="exTxt"></span> <button type="button" id="exPuro"></button> <button type="button" id="exSair">Voltar aos mentorados</button><button type="button" id="exTroca" hidden></button></div>
 <main id="app"></main>
 
-<script>(function(){var V='1795630042';var K='bqufu-recarga-';
+<script>(function(){var V='1795630482';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -1217,7 +1217,8 @@ const abas=()=>{},ligaCab=()=>{},telaSala=()=>{location.href="../estudos/";};
 const tlist=t=>String(t||'').split(',').filter(k=>TIPOS[k]);
 const TI=t=>{const L=tlist(t);if(!L.length)L.push('teoria');return [L.map(k=>TIPOS[k][0]).join(' + '),L.map(k=>TIPOS[k][1]).join(''),'',TIPOS[L[0]][3]];};
 const TIPOS={teoria:['Teoria','📖','Assistir aula, ler e resumir','#3A8CCB'],questoes:['Questões','✏️','Resolver listas e provas','#EB6834'],revisao:['Revisão','🔁','Flashcards, Anki, caderno de erros','#1BAF7A'],correcao:['Correção de simulado','✅','Corrigir e entender os erros','#7B4FC9']};
-const CORM={'Matemática':'#D9480F','Física':'#1864AB','Química':'#5F3DC4','Biologia':'#2B8A3E','Português':'#C92A2A','Literatura':'#A61E4D','Redação':'#C2255C','História':'#7F4F24','Geografia':'#5C7A0A','Filosofia':'#495057','Sociologia':'#8C6500','Inglês':'#0B7285','Espanhol':'#0B7285','Francês':'#0B7285'};
+const TERR=[['lacuna','Lacuna teórica','Não sabia o conteúdo','#E5484D'],['interpretacao','Interpretação','Entendeu errado o enunciado','#EB6834'],['distracao','Distração','Sabia, mas errou por desatenção','#C9A227'],['tempo','Gestão de tempo','Faltou tempo ou chutou','#7B4FC9']];
+const CORM={'Revisão geral':'#1BAF7A','Simulado':'#7B4FC9','Matemática':'#D9480F','Física':'#1864AB','Química':'#5F3DC4','Biologia':'#2B8A3E','Português':'#C92A2A','Literatura':'#A61E4D','Redação':'#C2255C','História':'#7F4F24','Geografia':'#5C7A0A','Filosofia':'#495057','Sociologia':'#8C6500','Inglês':'#0B7285','Espanhol':'#0B7285','Francês':'#0B7285'};
 const PROVA=new Date(2027,3,4);
 const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 const dm=d=>String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0');
@@ -1251,7 +1252,13 @@ async function telaPainel(email,cab){if(!cab)abas('tabPainel');$('app').innerHTM
   const W=[];for(let k=7;k>=0;k--){const a=new Date(seg);a.setDate(seg.getDate()-7*k);const b=new Date(a);b.setDate(a.getDate()+7);W.push({a,s:S.filter(x=>{const t=new Date(x.inicio);return t>=a&&t<b;}).reduce((t,x)=>t+x.segundos,0)});}
   const wmax=Math.max(3600,...W.map(w=>w.s));
   // matérias
-  const M={};S.forEach(x=>{const m=M[x.materia]=M[x.materia]||{s:0,q:0,a:0,e:0};m.s+=x.segundos;m.q+=x.questoes;m.a+=x.acertos;m.e+=x.erros;});
+  const M={};const nv=k=>M[k]=M[k]||{s:0,q:0,a:0,e:0};
+  S.forEach(x=>{const m=nv(x.materia);m.s+=x.segundos;const dd=x.detalhe&&x.detalhe.disc;
+    if(dd&&Object.keys(dd).length)Object.entries(dd).forEach(([k,v])=>{const z=nv(k);z.q+=v.q||0;z.a+=v.a||0;z.e+=v.e||0;});else{m.q+=x.questoes;m.a+=x.acertos;m.e+=x.erros;}});
+  const TE={};TERR.forEach(([k])=>TE[k]=0);let nSim=0;S.forEach(x=>{const er=x.detalhe&&x.detalhe.erros;if(er){nSim++;TERR.forEach(([k])=>TE[k]+=er[k]||0);}});
+  const teTot=TERR.reduce((t,[k])=>t+TE[k],0),teMax=Math.max(1,...TERR.map(([k])=>TE[k]));const teTop=teTot?TERR.slice().sort((a,b)=>TE[b[0]]-TE[a[0]])[0]:null;
+  const cardErros=`<div class="chart"><h3><i class="hi b"></i>Tipos de erro nos simulados</h3><p class="sub">${teTot?`Soma de ${nSim} correç${nSim===1?'ão':'ões'} de simulado. Erro mais comum: <b style="color:${teTop[3]}">${teTop[1]}</b> (${Math.round(100*TE[teTop[0]]/teTot)}% dos erros).`:'Aparece quando houver correções de simulado registradas na Sala de Estudos, com os erros classificados.'}</p>
+    <div class="tebars">${TERR.map(([k,nm,dd,cc])=>`<div class="teb"><span class="tn"><b>${nm}</b><small>${dd}</small></span><span class="tt"><i style="width:${teTot?Math.max(2,Math.round(100*TE[k]/teMax)):0}%;background:${cc}"></i></span><span class="tv"><b>${TE[k]}</b><small>${teTot?Math.round(100*TE[k]/teTot)+'%':'—'}</small></span></div>`).join('')}</div></div>`;
   const ML=S.length?Object.entries(M).sort((a,b)=>b[1].s-a[1].s):Object.keys(CORM).filter(n=>!['Inglês','Espanhol','Francês'].includes(n)||n===(LINGUA||'Inglês')).map(n=>[n,{s:0,q:0,a:0,e:0}]);const smax=Math.max(1,...ML.map(x=>x[1].s));
   const qComp=ML.filter(([,m])=>m.q>0);const melhor=qComp.length?qComp.slice().sort((a,b)=>b[1].a/b[1].q-a[1].a/a[1].q)[0]:null;const pior=qComp.length>1?qComp.slice().sort((a,b)=>a[1].a/a[1].q-b[1].a/b[1].q)[0]:null;
   // tipos
@@ -1273,6 +1280,7 @@ async function telaPainel(email,cab){if(!cab)abas('tabPainel');$('app').innerHTM
    <div class="chart"><h3><i class="hi a"></i>Desempenho por matéria</h3><p class="sub">Tempo de estudo, questões feitas, acertos (verde) e erros (vermelho) e o aproveitamento de cada matéria.</p>
      <div style="overflow-x:auto"><table class="mt"><thead><tr><th>Matéria</th><th>Tempo</th><th class="opt"></th><th>Questões</th><th>Acertos × erros</th><th>Aproveitamento</th></tr></thead><tbody>
      ${ML.map(([n,m])=>{const p=m.q?Math.round(100*m.a/m.q):null;const cor=CORM[n]||'#3A8CCB';return `<tr><td><span class="nm"><i style="background:${cor}"></i>${esc(n)}</span></td><td style="white-space:nowrap;font-weight:700">${hfmt(m.s)}</td><td class="opt" style="width:28%"><div class="tbar"><em style="width:${Math.round(100*m.s/smax)}%;background:${cor}"></em></div></td><td style="font-weight:700">${m.q||'—'}</td><td>${m.q?`<div class="ae" title="${m.a} acertos · ${m.e} erros"><span class="a" style="width:${100*m.a/m.q}%"></span><span class="e" style="width:${100*m.e/m.q}%"></span></div><small class="pend">${m.a} ✓ · ${m.e} ✗</small>`:'<small class="pend">sem questões</small>'}</td><td><span class="pc ${pcCls(p)}">${p==null?'—':p+'%'}</span></td></tr>`;}).join('')}</tbody></table></div></div>
+   ${cardErros}
    <div class="chart"><h3><i class="hi c"></i>Atividade recente</h3><div class="hoje" style="margin-top:10px">${S.length?'':'<p class="pend">Nenhuma sessão registrada ainda. As últimas sessões aparecem aqui.</p>'}${S.slice(-8).reverse().map(x=>{const [n,ic,,c]=TI(x.tipo);const h=new Date(x.inicio);return `<div class="ses" style="--c:${c}"><span style="font-size:20px">${ic}</span><div class="tx"><b>${esc(x.materia)} · ${esc(n)}</b><span>${dm(h)} às ${String(h.getHours()).padStart(2,'0')}:${String(h.getMinutes()).padStart(2,'0')} · ${esc(x.assunto||'')}${x.questoes?` · ${x.acertos}/${x.questoes} acertos`:''}</span></div><span class="du">${hfmt(x.segundos)}</span></div>`;}).join('')}</div></div>`;
   ligaCab();if($('irSala'))$('irSala').onclick=telaSala;}
 let LINGUA='';
@@ -1666,6 +1674,8 @@ label.btn{display:inline-flex;align-items:center;cursor:pointer}
 .htile{padding-top:88px}
 @media (max-width:1100px) and (min-width:901px){.pchips{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:600px){.mh2::before{display:none}.pchips{width:100%;grid-template-columns:repeat(2,minmax(0,1fr))}.htile{min-height:0}.htile small{padding-right:0;padding-bottom:30px}.mh2{flex-direction:column;align-items:stretch;padding:0 22px}.mhx{padding:24px 0 0}.mhx h2{font-size:30px}.mhf{height:190px;align-self:center}.plb{flex-direction:column;align-items:flex-start}.htile{min-height:160px}}
+.dashm .tebars{display:flex;flex-direction:column;gap:10px;margin-top:12px}.dashm .teb{display:grid;grid-template-columns:200px 1fr 70px;gap:12px;align-items:center}.dashm .teb .tn{display:flex;flex-direction:column}.dashm .teb .tn b{font-size:14.5px}.dashm .teb .tn small{color:var(--muted);font-size:12px}.dashm .teb .tt{height:14px;border-radius:9px;background:var(--soft);overflow:hidden}.dashm .teb .tt i{display:block;height:100%;border-radius:9px}.dashm .teb .tv{text-align:right;display:flex;flex-direction:column}.dashm .teb .tv b{font:800 18px var(--display)}.dashm .teb .tv small{color:var(--muted);font-size:12px}
+@media (max-width:560px){.dashm .teb{grid-template-columns:1fr 60px}.dashm .teb .tt{grid-column:1/-1;order:3}}
 .dashm{--verde:#1BAF7A;--verm:#E5484D;display:flex;flex-direction:column;gap:16px}
 .dashm .dtop{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .dashm .dtop h2{margin:0;font:800 24px var(--display)}
@@ -1767,6 +1777,6 @@ label.btn{display:inline-flex;align-items:center;cursor:pointer}
 .mvenc b{font:800 18px var(--display)}.mvenc p{margin:4px 0 0;line-height:1.5}
 </style>
 
-<script src="../js/presenca.js?v=1795630042" defer></script>
+<script src="../js/presenca.js?v=1795630482" defer></script>
 </body>
 </html>

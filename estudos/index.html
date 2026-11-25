@@ -15,6 +15,29 @@
 .revm label{display:flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:14px;cursor:pointer;background:var(--bg)}
 .revm label:has(input:checked){border-color:#1BAF7A;background:rgba(27,175,122,.14)}
 @media (max-width:560px){.revm{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.dchips{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.dchip{display:flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:7px 9px;font:600 13px var(--body);cursor:pointer;text-align:left}
+.dchip i{width:9px;height:9px;border-radius:50%;flex:none}
+.dchip.on{border-color:#7B4FC9;background:rgba(123,79,201,.18)}
+.drows{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.drow{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:6px;align-items:end}
+.drow .dn{display:flex;align-items:center;gap:7px;font:700 14px var(--body);padding-bottom:9px}.drow .dn i{width:10px;height:10px;border-radius:50%}
+.drow label{display:flex;flex-direction:column;font:600 11.5px var(--body);color:var(--muted);gap:3px;text-align:center}
+.drow input{text-align:center;font:800 17px var(--display);padding:7px 4px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
+.drow .ac input{border-color:#1BAF7A}.drow .er input{border-color:#E5484D;background:var(--soft)}
+.dtot{font-size:13.5px;color:var(--muted);margin-top:6px}
+.terr{display:grid;grid-template-columns:1fr;gap:6px}
+.terr label{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-left:5px solid var(--c);border-radius:10px;padding:8px 10px;background:var(--bg)}
+.terr label span{flex:1;display:flex;flex-direction:column}.terr label b{font-size:14px}.terr label small{color:var(--muted);font-size:11.5px;line-height:1.25}
+.terr input{width:64px;text-align:center;font:800 17px var(--display);padding:6px;border-radius:9px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+#errBox[hidden]{display:none}
+@media (max-width:560px){.dchips{grid-template-columns:repeat(2,minmax(0,1fr))}.terr{grid-template-columns:1fr}.drow{grid-template-columns:1fr 1fr 1fr}.drow .dn{grid-column:1/-1;padding:0}}
+.tebars{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.teb{display:grid;grid-template-columns:200px 1fr 70px;gap:12px;align-items:center}
+.teb .tn{display:flex;flex-direction:column}.teb .tn b{font-size:14.5px}.teb .tn small{color:var(--muted);font-size:12px}
+.teb .tt{height:14px;border-radius:9px;background:var(--soft);overflow:hidden}.teb .tt i{display:block;height:100%;border-radius:9px}
+.teb .tv{text-align:right;display:flex;flex-direction:column}.teb .tv b{font:800 18px var(--display)}.teb .tv small{color:var(--muted);font-size:12px}
+@media (max-width:560px){.teb{grid-template-columns:1fr 60px}.teb .tt{grid-column:1/-1;order:3}}
 </style>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sala de Estudos · PREPARA UFU</title>
@@ -214,7 +237,7 @@ select,input[type=number],input[type=text]{font:500 16px var(--body);padding:11p
 <div id="exBar" hidden>Modo aluno exemplo — é assim que o aluno vê. <button type="button" id="exSair">Sair do modo exemplo</button></div>
 <main id="app"><p class="pend">Carregando…</p></main>
 
-<script>(function(){var V='1795630042';var K='bqufu-recarga-';
+<script>(function(){var V='1795630482';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -239,7 +262,9 @@ const TI=t=>{const L=tlist(t);if(!L.length)L.push('teoria');return [L.map(k=>TIP
 const TIPOS={teoria:['Teoria','📖','Assistir aula, ler e resumir','#3A8CCB'],questoes:['Questões','✏️','Resolver listas e provas','#EB6834'],revisao:['Revisão','🔁','Flashcards, Anki, caderno de erros','#1BAF7A'],correcao:['Correção de simulado','✅','Corrigir e entender os erros','#7B4FC9']};
 const MATS=['Matemática','Física','Química','Biologia','Português','Literatura','Redação','História','Geografia','Filosofia','Sociologia','Inglês','Espanhol','Francês'];
 const REVG='Revisão geral';
-const CORM={'Revisão geral':'#1BAF7A','Matemática':'#D9480F','Física':'#1864AB','Química':'#5F3DC4','Biologia':'#2B8A3E','Português':'#C92A2A','Literatura':'#A61E4D','Redação':'#C2255C','História':'#7F4F24','Geografia':'#5C7A0A','Filosofia':'#495057','Sociologia':'#8C6500','Inglês':'#0B7285','Espanhol':'#0B7285','Francês':'#0B7285'};
+const SIMG='Simulado';
+const TERR=[['lacuna','Lacuna teórica','Não sabia o conteúdo','#E5484D'],['interpretacao','Interpretação','Entendeu errado o enunciado','#EB6834'],['distracao','Distração','Sabia, mas errou por desatenção','#C9A227'],['tempo','Gestão de tempo','Faltou tempo ou chutou','#7B4FC9']];
+const CORM={'Revisão geral':'#1BAF7A','Simulado':'#7B4FC9','Matemática':'#D9480F','Física':'#1864AB','Química':'#5F3DC4','Biologia':'#2B8A3E','Português':'#C92A2A','Literatura':'#A61E4D','Redação':'#C2255C','História':'#7F4F24','Geografia':'#5C7A0A','Filosofia':'#495057','Sociologia':'#8C6500','Inglês':'#0B7285','Espanhol':'#0B7285','Francês':'#0B7285'};
 const PROVA=new Date(2027,3,4);
 const KEY='bqufu-sessao';
 const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
@@ -304,7 +329,7 @@ function desenhaSala(s){abas('tabSala');clearInterval(TICK);
        <p class="pend" style="margin:0;text-align:center">Pode fechar ou trocar de página: o cronômetro continua contando.</p>`
      :`<div class="lbl">O que você vai fazer? <span style="font-weight:500;color:var(--muted)">(pode marcar mais de um)</span></div>
        <div class="tipos" id="tipos">${Object.entries(TIPOS).map(([k,[n,ic,d,c]])=>`<button class="tipo" data-t="${k}" style="--c:${c}"><span class="ic">${ic}</span><b>${n}</b><small>${d}</small></button>`).join('')}</div>
-       <p class="revopc" id="revOpc" hidden>Na <b>Revisão</b>, matéria e assunto são opcionais (Anki, caderno de erros e revisões amplas). Se não escolher, é só iniciar: no fim você conta o que revisou.</p>
+       <p class="revopc" id="revOpc" hidden></p>
        <label class="lbl" for="sMat">Matéria <span class="opc" id="matOpc" hidden>(opcional)</span></label><select id="sMat"><option value="">Selecione a matéria</option>${minhas.map(m=>`<option>${esc(m)}</option>`).join('')}</select>
        <label class="lbl" for="sAss">Assunto</label><select id="sAss" disabled><option value="">Escolha antes a matéria</option></select>
        <span class="ajuda">Aparecem todos os assuntos do Plano de Estudos, de todas as semanas: pode adiantar conteúdo.</span>
@@ -321,7 +346,8 @@ function desenhaSala(s){abas('tabSala');clearInterval(TICK);
     $('pp').onclick=()=>{if(s.rodando){s.acum=decorrido(s);s.rodando=false;}else{s.desde=Date.now();s.rodando=true;}gravaS(s);atual();};
     $('fim').onclick=()=>encerrar(s);
   }else{
-    const pronto=()=>{const livre=esc_.tipos.includes('revisao');$('revOpc').hidden=!livre;$('matOpc').hidden=!livre;
+    const pronto=()=>{const rv=esc_.tipos.includes('revisao'),cs=esc_.tipos.includes('correcao'),livre=rv||cs;$('revOpc').hidden=!livre;$('matOpc').hidden=!livre;
+      if(livre)$('revOpc').innerHTML=cs?'Na <b>Correção de simulado</b>, matéria e assunto são opcionais. É só iniciar: no fim você informa as questões de cada disciplina e os tipos de erro.':'Na <b>Revisão</b>, matéria e assunto são opcionais (Anki, caderno de erros e revisões amplas). Se não escolher, é só iniciar: no fim você conta o que revisou.';
       $('go').disabled=!(esc_.tipos.length&&((livre&&!esc_.materia)||(esc_.materia&&esc_.item&&(esc_.item!=='__outro'||$('sOutro').value.trim()))));
       $('estado').textContent=$('go').disabled?'Pronto para começar':'Tudo certo: aperte Iniciar';};
     $('tipos').querySelectorAll('.tipo').forEach(b=>b.onclick=()=>{b.classList.toggle('on');esc_.tipos=[...$('tipos').querySelectorAll('.tipo.on')].map(x=>x.dataset.t);$('tipos').classList.toggle('esc',esc_.tipos.length>0);$('cron').style.setProperty('--c',esc_.tipos.length?TIPOS[esc_.tipos[0]][3]:'#3A8CCB');pronto();});
@@ -335,18 +361,25 @@ function desenhaSala(s){abas('tabSala');clearInterval(TICK);
     $('sAss').onchange=()=>{esc_.item=$('sAss').value;$('lOutro').hidden=esc_.item!=='__outro';if(esc_.item==='__outro')$('sOutro').focus();pronto();};
     $('sOutro').oninput=pronto;
     $('go').onclick=()=>{const it=esc_.item!=='__outro'?PLANO.find(x=>String(x.id)===esc_.item):null;
-      const livre=!esc_.materia;
-      const n={email:ALVO,tipo:esc_.tipos.join(','),materia:livre?REVG:esc_.materia,assunto:livre?'':(it?it.assunto:$('sOutro').value.trim()),livre,item:it?it.id:null,inicio:Date.now(),desde:Date.now(),acum:0,rodando:true};
+      const livre=!esc_.materia,cor_=esc_.tipos.includes('correcao');
+      const n={email:ALVO,tipo:esc_.tipos.join(','),materia:livre?(esc_.tipos.includes('correcao')?SIMG:REVG):esc_.materia,assunto:livre?'':(it?it.assunto:$('sOutro').value.trim()),livre,item:it?it.id:null,inicio:Date.now(),desde:Date.now(),acum:0,rodando:true};
       gravaS(n);desenhaSala(n);};}
   desenhaHoje();desenhaVivo();}
 function desenhaRelogio(s){desenhaSala(s);}
 function encerrar(s){const seg=Math.round(decorrido(s)/1000);if(s.rodando){s.acum=decorrido(s);s.rodando=false;gravaS(s);}
-  const [n,ic,,c]=TI(s.tipo);const pedeQ=tlist(s.tipo).some(k=>k==='questoes'||k==='correcao');
+  const [n,ic,,c]=TI(s.tipo);const simu=tlist(s.tipo).includes('correcao');const pedeQ=tlist(s.tipo).some(k=>k==='questoes'||k==='correcao');
+  const discs=MATS.filter(m=>!(m==='Inglês'&&LINGUA==='Espanhol')&&!(m==='Espanhol'&&LINGUA==='Inglês')&&!(m==='Francês'&&LINGUA!=='Francês')&&m!=='Redação');
+  const blocoSim=simu?`<div><b style="font-size:15px">Questões por disciplina</b><p class="pend" style="margin:2px 0 8px">Toque em cada disciplina que você corrigiu e informe quantas fez e quantas acertou.</p>
+    <div class="dchips">${discs.map(m=>`<button type="button" class="dchip${m===s.materia?' on':''}" data-m="${esc(m)}"><i style="background:${CORM[m]||'#3A8CCB'}"></i>${esc(m)}</button>`).join('')}</div>
+    <div class="drows" id="drows"></div><div class="dtot" id="dtot"></div></div>
+    <div id="errBox"><b style="font-size:15px">Tipos de erro</b><p class="pend" style="margin:2px 0 8px">Dos seus erros, quantos foram de cada tipo?</p>
+    <div class="terr">${TERR.map(([k,nm,dd,cc])=>`<label style="--c:${cc}"><span><b>${nm}</b><small>${dd}</small></span><input type="number" name="te_${k}" min="0" max="999" inputmode="numeric" value="0"></label>`).join('')}</div>
+    <div class="dtot" id="etot"></div></div>`:'';
   const d=document.createElement('div');d.className='dlg';d.innerHTML=`<div class="box" style="--c:${c}"><div class="top"><h3>${ic} Sessão encerrada: ${hfmt(seg)}</h3><p>${esc(s.materia)}${s.assunto?' · '+esc(s.assunto):''}</p></div>
-   <form class="bd">${s.livre?`<div><b style="font-size:15px">O que você revisou?</b><p class="pend" style="margin:2px 0 8px">Marque o que usou (pode ser mais de um) e, se quiser, conte em poucas palavras.</p>
+   <form class="bd">${blocoSim}${s.livre&&!simu?`<div><b style="font-size:15px">O que você revisou?</b><p class="pend" style="margin:2px 0 8px">Marque o que usou (pode ser mais de um) e, se quiser, conte em poucas palavras.</p>
     <div class="revm">${['Anki / flashcards','Caderno de erros','Resumos','Mapas mentais','Questões já feitas','Outro'].map(m=>`<label><input type="checkbox" name="rv" value="${m}"> ${m}</label>`).join('')}</div>
-    <input type="text" name="rvt" maxlength="120" placeholder="ex.: Anki de Biologia e Química" style="margin-top:8px;width:100%"></div>`:''}<div><b style="font-size:15px">Questões ${pedeQ?'':'(se você fez alguma)'}</b><p class="pend" style="margin:2px 0 8px">Quantas você fez, acertou e errou nesta sessão?</p>
-    <div class="qs"><label>Feitas<input type="number" name="q" min="0" max="999" inputmode="numeric" value="${pedeQ?'':0}"></label><label class="ac">Acertos<input type="number" name="a" min="0" max="999" inputmode="numeric" value="${pedeQ?'':0}"></label><label class="er">Erros<input type="number" name="e" min="0" max="999" inputmode="numeric" value="${pedeQ?'':0}"></label></div></div>
+    <input type="text" name="rvt" maxlength="120" placeholder="ex.: Anki de Biologia e Química" style="margin-top:8px;width:100%"></div>`:''}<div${simu?' hidden':''}><b style="font-size:15px">Questões ${pedeQ?'':'(se você fez alguma)'}</b><p class="pend" style="margin:2px 0 8px">Quantas você fez, acertou e errou nesta sessão?</p>
+    <div class="qs"${simu?' hidden':''}><label>Feitas<input type="number" name="q" min="0" max="999" inputmode="numeric" value="${pedeQ?'':0}"></label><label class="ac">Acertos<input type="number" name="a" min="0" max="999" inputmode="numeric" value="${pedeQ?'':0}"></label><label class="er">Erros<input type="number" name="e" min="0" max="999" inputmode="numeric" value="${pedeQ?'':0}"></label></div></div>
     ${s.item&&ASSESSORIA_ALVO()?`<label class="chk"><input type="checkbox" name="mk" checked> Marcar “${esc(s.assunto)}” como estudado no Plano de Estudos</label>`:''}
     <p class="msg"></p>
     <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn pri" type="submit" style="flex:1">Salvar sessão</button><button class="btn" type="button" data-x="volta">Voltar a estudar</button></div>
@@ -354,15 +387,33 @@ function encerrar(s){const seg=Math.round(decorrido(s)/1000);if(s.rodando){s.acu
   document.body.appendChild(d);const f=d.querySelector('form'),msg=t=>d.querySelector('.msg').textContent=t;
   const num=x=>{const v=parseInt(f[x].value,10);return isNaN(v)?0:v;};
   f.a.oninput=()=>{if(f.q.value!=='')f.e.value=Math.max(0,num('q')-num('a'));};f.q.oninput=f.a.oninput;
+  const DS={};const totSim=()=>{let q=0,a=0;Object.values(DS).forEach(x=>{q+=x.q;a+=x.a;});return {q,a,e:Math.max(0,q-a)};};
+  const somaErr=()=>TERR.reduce((t,[k])=>t+(parseInt(f['te_'+k].value,10)||0),0);
+  const atualSim=()=>{if(!simu)return;msg('');const t=totSim();$('dtot').innerHTML=Object.keys(DS).length?`Total: <b>${t.q}</b> questões · <b style="color:#1BAF7A">${t.a}</b> acertos · <b style="color:#E5484D">${t.e}</b> erros`:'';
+    const se=somaErr(),fl=t.e-se;$('errBox').hidden=!t.e;$('etot').innerHTML=!t.e?'':fl===0?'<span style="color:#1BAF7A">Todos os erros classificados ✓</span>':fl>0?`Faltam classificar <b>${fl}</b> erro${fl>1?'s':''}`:`<span style="color:#E5484D">Você classificou <b>${-fl}</b> a mais do que o total de erros</span>`;};
+  const linhaD=m=>{const id='d'+discs.indexOf(m);const r=document.createElement('div');r.className='drow';r.dataset.m=m;
+    r.innerHTML=`<span class="dn"><i style="background:${CORM[m]||'#3A8CCB'}"></i>${esc(m)}</span><label>Feitas<input type="number" min="0" max="999" inputmode="numeric" class="dq"></label><label class="ac">Acertos<input type="number" min="0" max="999" inputmode="numeric" class="da"></label><label class="er">Erros<input type="number" class="de" readonly tabindex="-1"></label>`;
+    const up=()=>{const q=parseInt(r.querySelector('.dq').value,10)||0,a=Math.min(q,parseInt(r.querySelector('.da').value,10)||0);DS[m]={q,a,e:q-a};r.querySelector('.de').value=r.querySelector('.dq').value===''?'':q-a;atualSim();};
+    r.querySelector('.dq').oninput=up;r.querySelector('.da').oninput=up;DS[m]={q:0,a:0,e:0};$('drows').appendChild(r);r.querySelector('.dq').focus();atualSim();};
+  if(simu){d.querySelectorAll('.dchip').forEach(b=>b.onclick=()=>{const m=b.dataset.m;b.classList.toggle('on');
+      if(b.classList.contains('on'))linhaD(m);else{delete DS[m];const r=[...$('drows').children].find(x=>x.dataset.m===m);if(r)r.remove();atualSim();}});
+    TERR.forEach(([k])=>f['te_'+k].oninput=atualSim);
+    d.querySelectorAll('.dchip.on').forEach(b=>linhaD(b.dataset.m));atualSim();}
   d.querySelector('[data-x=volta]').onclick=()=>{d.remove();s.desde=Date.now();s.rodando=true;gravaS(s);desenhaRelogio(s);};
   d.querySelector('[data-x=desc]').onclick=()=>{if(!confirm('Descartar esta sessão? O tempo não será salvo.'))return;gravaS(null);d.remove();telaSala();};
-  f.onsubmit=async ev=>{ev.preventDefault();const q=num('q'),a=num('a'),e=num('e');
+  f.onsubmit=async ev=>{ev.preventDefault();let q=num('q'),a=num('a'),e=num('e');let det=null;
+    if(simu){const t=totSim();if(!t.q){msg('Toque nas disciplinas que você corrigiu e informe quantas questões fez e acertou.');return;}
+      if([...$('drows').querySelectorAll('.drow')].some(r=>{const x=DS[r.dataset.m];return x&&r.querySelector('.da').value!==''&&+r.querySelector('.da').value>x.q;})){msg('Em alguma disciplina os acertos passaram do total de questões feitas.');return;}
+      const se=somaErr();if(t.e&&se!==t.e){msg(se<t.e?`Classifique todos os erros: faltam ${t.e-se}.`:`A soma dos tipos de erro (${se}) passou do total de erros (${t.e}).`);return;}
+      q=t.q;a=t.a;e=t.e;const disc={};Object.entries(DS).forEach(([m,x])=>{if(x.q)disc[m]=x;});
+      det={disc,erros:Object.fromEntries(TERR.map(([k])=>[k,parseInt(f['te_'+k].value,10)||0]))};
+      if(s.livre){const ks=Object.keys(disc);s.assunto=(ks.length>3?ks.slice(0,3).join(', ')+' e mais '+(ks.length-3):ks.join(', ')).slice(0,200);}}
     if(a+e>q){msg('Acertos + erros não pode passar do total de questões feitas.');return;}
     const bt=f.querySelector('[type=submit]');bt.disabled=true;
-    if(s.livre){const ms=[...f.querySelectorAll('[name=rv]:checked')].map(x=>x.value),t=f.rvt.value.trim();
+    if(s.livre&&!simu){const ms=[...f.querySelectorAll('[name=rv]:checked')].map(x=>x.value),t=f.rvt.value.trim();
       if(!ms.length&&!t){msg('Conte o que você revisou: marque uma opção ou escreva em poucas palavras.');bt.disabled=false;return;}
       s.assunto=(ms.join(', ')+(t?(ms.length?' — ':'')+t:'')).slice(0,200);}
-    const fimT=Date.now();const row={email:s.email,inicio:new Date(s.inicio).toISOString(),fim:new Date(fimT).toISOString(),segundos:seg,tipo:s.tipo,materia:s.materia,assunto:s.assunto||null,plano_item:s.item,questoes:q,acertos:a,erros:e};
+    const fimT=Date.now();const row={email:s.email,inicio:new Date(s.inicio).toISOString(),fim:new Date(fimT).toISOString(),segundos:seg,tipo:s.tipo,materia:s.materia,assunto:s.assunto||null,plano_item:s.item,questoes:q,acertos:a,erros:e,detalhe:det};
     let r=await SB.from('sessoes').insert(row);if(r.error&&/plano_item|foreign key/i.test(r.error.message)){row.plano_item=null;r=await SB.from('sessoes').insert(row);}if(r.error){msg('Não foi possível salvar: '+r.error.message);bt.disabled=false;return;}
     if(f.mk&&f.mk.checked)await SB.from(MENTORADO?'m_plano_feito':'plano_feito').insert({email:s.email,item:s.item});
     gravaS(null);d.remove();telaSala();};}
@@ -404,7 +455,13 @@ async function telaPainel(email,cab){if(!cab)abas('tabPainel');$('app').innerHTM
   const W=[];for(let k=7;k>=0;k--){const a=new Date(seg);a.setDate(seg.getDate()-7*k);const b=new Date(a);b.setDate(a.getDate()+7);W.push({a,s:S.filter(x=>{const t=new Date(x.inicio);return t>=a&&t<b;}).reduce((t,x)=>t+x.segundos,0)});}
   const wmax=Math.max(3600,...W.map(w=>w.s));
   // matérias
-  const M={};S.forEach(x=>{const m=M[x.materia]=M[x.materia]||{s:0,q:0,a:0,e:0};m.s+=x.segundos;m.q+=x.questoes;m.a+=x.acertos;m.e+=x.erros;});
+  const M={};const nv=k=>M[k]=M[k]||{s:0,q:0,a:0,e:0};
+  S.forEach(x=>{const m=nv(x.materia);m.s+=x.segundos;const dd=x.detalhe&&x.detalhe.disc;
+    if(dd&&Object.keys(dd).length)Object.entries(dd).forEach(([k,v])=>{const z=nv(k);z.q+=v.q||0;z.a+=v.a||0;z.e+=v.e||0;});else{m.q+=x.questoes;m.a+=x.acertos;m.e+=x.erros;}});
+  const TE={};TERR.forEach(([k])=>TE[k]=0);let nSim=0;S.forEach(x=>{const er=x.detalhe&&x.detalhe.erros;if(er){nSim++;TERR.forEach(([k])=>TE[k]+=er[k]||0);}});
+  const teTot=TERR.reduce((t,[k])=>t+TE[k],0),teMax=Math.max(1,...TERR.map(([k])=>TE[k]));const teTop=teTot?TERR.slice().sort((a,b)=>TE[b[0]]-TE[a[0]])[0]:null;
+  const cardErros=`<div class="chart"><h3><i class="hi b"></i>Tipos de erro nos simulados</h3><p class="sub">${teTot?`Soma de ${nSim} correç${nSim===1?'ão':'ões'} de simulado. Erro mais comum: <b style="color:${teTop[3]}">${teTop[1]}</b> (${Math.round(100*TE[teTop[0]]/teTot)}% dos erros).`:'Aparece quando houver correções de simulado registradas na Sala de Estudos, com os erros classificados.'}</p>
+    <div class="tebars">${TERR.map(([k,nm,dd,cc])=>`<div class="teb"><span class="tn"><b>${nm}</b><small>${dd}</small></span><span class="tt"><i style="width:${teTot?Math.max(2,Math.round(100*TE[k]/teMax)):0}%;background:${cc}"></i></span><span class="tv"><b>${TE[k]}</b><small>${teTot?Math.round(100*TE[k]/teTot)+'%':'—'}</small></span></div>`).join('')}</div></div>`;
   const ML=S.length?Object.entries(M).sort((a,b)=>b[1].s-a[1].s):Object.keys(CORM).filter(n=>!['Inglês','Espanhol','Francês'].includes(n)||n===(LINGUA||'Inglês')).map(n=>[n,{s:0,q:0,a:0,e:0}]);const smax=Math.max(1,...ML.map(x=>x[1].s));
   const qComp=ML.filter(([,m])=>m.q>0);const melhor=qComp.length?qComp.slice().sort((a,b)=>b[1].a/b[1].q-a[1].a/a[1].q)[0]:null;const pior=qComp.length>1?qComp.slice().sort((a,b)=>a[1].a/a[1].q-b[1].a/b[1].q)[0]:null;
   // tipos
@@ -426,6 +483,7 @@ async function telaPainel(email,cab){if(!cab)abas('tabPainel');$('app').innerHTM
    <div class="chart"><h3><i class="hi a"></i>Desempenho por matéria</h3><p class="sub">Tempo de estudo, questões feitas, acertos (verde) e erros (vermelho) e o aproveitamento de cada matéria.</p>
      <div style="overflow-x:auto"><table class="mt"><thead><tr><th>Matéria</th><th>Tempo</th><th class="opt"></th><th>Questões</th><th>Acertos × erros</th><th>Aproveitamento</th></tr></thead><tbody>
      ${ML.map(([n,m])=>{const p=m.q?Math.round(100*m.a/m.q):null;const cor=CORM[n]||'#3A8CCB';return `<tr><td><span class="nm"><i style="background:${cor}"></i>${esc(n)}</span></td><td style="white-space:nowrap;font-weight:700">${hfmt(m.s)}</td><td class="opt" style="width:28%"><div class="tbar"><em style="width:${Math.round(100*m.s/smax)}%;background:${cor}"></em></div></td><td style="font-weight:700">${m.q||'—'}</td><td>${m.q?`<div class="ae" title="${m.a} acertos · ${m.e} erros"><span class="a" style="width:${100*m.a/m.q}%"></span><span class="e" style="width:${100*m.e/m.q}%"></span></div><small class="pend">${m.a} ✓ · ${m.e} ✗</small>`:'<small class="pend">sem questões</small>'}</td><td><span class="pc ${pcCls(p)}">${p==null?'—':p+'%'}</span></td></tr>`;}).join('')}</tbody></table></div></div>
+   ${cardErros}
    <div class="chart"><h3><i class="hi c"></i>Atividade recente</h3><div class="hoje" style="margin-top:10px">${S.length?'':'<p class="pend">Nenhuma sessão registrada ainda. As últimas sessões aparecem aqui.</p>'}${S.slice(-8).reverse().map(x=>{const [n,ic,,c]=TI(x.tipo);const h=new Date(x.inicio);return `<div class="ses" style="--c:${c}"><span style="font-size:20px">${ic}</span><div class="tx"><b>${esc(x.materia)} · ${esc(n)}</b><span>${dm(h)} às ${String(h.getHours()).padStart(2,'0')}:${String(h.getMinutes()).padStart(2,'0')} · ${esc(x.assunto||'')}${x.questoes?` · ${x.acertos}/${x.questoes} acertos`:''}</span></div><span class="du">${hfmt(x.segundos)}</span></div>`;}).join('')}</div></div>`;
   ligaCab();if($('irSala'))$('irSala').onclick=telaSala;}
 let LALUNOS=null;
@@ -507,6 +565,6 @@ async function telaDen(){abas('tabDen');$('app').innerHTML='<p class="pend">Carr
   $('app').querySelectorAll('[data-r]').forEach(b=>b.onclick=async()=>{await SB.rpc('admin_resolver',{p_id:+b.dataset.id,p:b.dataset.r==='1'});telaDen();});}
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795630042" defer></script>
+<script src="../js/presenca.js?v=1795630482" defer></script>
 </body>
 </html>
