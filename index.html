@@ -210,7 +210,7 @@ $('arSair').onclick=()=>$('sairTopo').click();
 async function inicio(){const {data:{session}}=await SB.auth.getSession();
   if(!session){tela('login');return;}
   const {data:ok}=await SB.rpc('is_allowed');
-  if(!ok){await SB.auth.signOut();tela('login');gm('Seu acesso não está liberado. Fale com o Prof. Jazz.');return;}
+  if(!ok){try{localStorage.removeItem('bqufu-sig-v2');}catch(e){}await SB.auth.signOut();tela('login');gm('Seu acesso não está liberado. Fale com o Prof. Jazz.');return;}
   depois();}
 $('gForm').onsubmit=async ev=>{ev.preventDefault();const email=$('gEmail').value.trim().toLowerCase(),password=$('gPass').value;$('gBtn').disabled=true;gm('Aguarde…',true);
   try{
@@ -221,14 +221,14 @@ $('gForm').onsubmit=async ev=>{ev.preventDefault();const email=$('gEmail').value
       if(!data.session){const r=await SB.auth.signInWithPassword({email,password});if(r.error)throw r.error;}
     }else{const {error}=await SB.auth.signInWithPassword({email,password});
       if(error){if(/invalid/i.test(error.message))throw new Error('E-mail ou senha incorretos. Se é o seu primeiro acesso, clique em “Primeiro acesso? Crie sua senha”.');throw error;}}
-    const {data:ok}=await SB.rpc('is_allowed');if(!ok){await SB.auth.signOut();throw new Error('Seu acesso não está liberado. Fale com o Prof. Jazz.');}
+    const {data:ok}=await SB.rpc('is_allowed');if(!ok){try{localStorage.removeItem('bqufu-sig-v2');}catch(e){}await SB.auth.signOut();throw new Error('Seu acesso não está liberado. Fale com o Prof. Jazz.');}
     gm('');depois();
   }catch(e){gm(e.message||'Não foi possível entrar.');}finally{$('gBtn').disabled=false;}};
-$('sairTopo').onclick=async()=>{try{Object.keys(sessionStorage).filter(x=>x.startsWith('bqufu-aviso-venc-')).forEach(x=>sessionStorage.removeItem(x));sessionStorage.removeItem('bqufu-area');sessionStorage.removeItem('bqufu-mentoria-ver');}catch(e){}await SB.auth.signOut();history.replaceState(null,'','/');modo(false);$('gPass').value='';tela('login');};
+$('sairTopo').onclick=async()=>{try{Object.keys(sessionStorage).filter(x=>x.startsWith('bqufu-aviso-venc-')).forEach(x=>sessionStorage.removeItem(x));sessionStorage.removeItem('bqufu-area');sessionStorage.removeItem('bqufu-mentoria-ver');}catch(e){}try{localStorage.removeItem('bqufu-sig-v2');}catch(e){}await SB.auth.signOut();history.replaceState(null,'','/');modo(false);$('gPass').value='';tela('login');};
 inicio();
 })();
 </script>
-<script>(function(){var V='1795628668';var K='bqufu-recarga-';
+<script>(function(){var V='1795629303';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -238,6 +238,6 @@ confere(true);
 document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')confere(false);});
 window.addEventListener('focus',function(){confere(false);});
 setInterval(function(){if(document.visibilityState==='visible')confere(false);},180000);})();</script>
-<script src="js/presenca.js?v=1795628668" defer></script>
+<script src="js/presenca.js?v=1795629303" defer></script>
 </body>
 </html>

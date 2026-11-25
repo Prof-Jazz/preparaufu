@@ -205,7 +205,7 @@ select,input[type=number],input[type=text]{font:500 16px var(--body);padding:11p
 <div id="exBar" hidden>Modo aluno exemplo — é assim que o aluno vê. <button type="button" id="exSair">Sair do modo exemplo</button></div>
 <main id="app"><p class="pend">Carregando…</p></main>
 
-<script>(function(){var V='1795628668';var K='bqufu-recarga-';
+<script>(function(){var V='1795629303';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -240,11 +240,11 @@ const hfmt=s=>{const m=Math.round(s/60);if(m<60)return m+' min';const h=Math.flo
 const hdec=s=>(s/3600).toFixed(1).replace('.',',');
 const MESX=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
 
-$('sair').onclick=async()=>{await SB.auth.signOut();location.href='/';};
+$('sair').onclick=async()=>{try{localStorage.removeItem('bqufu-sig-v2');}catch(e){}await SB.auth.signOut();location.href='/';};
 async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!session){location.replace('/?volta='+encodeURIComponent(location.pathname+location.hash));return;}
   EMAIL=(session.user.email||'').toLowerCase();REAL_ADMIN=EMAIL===ADMIN;
   const [ok,as,pp,ar]=await Promise.all([SB.rpc('is_allowed'),SB.rpc('is_assessoria'),SB.rpc('meu_papel'),SB.rpc('minhas_areas')]);STAFF=REAL_ADMIN||pp.data==='assessor';MENTORADO=!REAL_ADMIN&&!!(ar.data&&ar.data.mentoria);
-  if(!ok.data){await SB.auth.signOut();location.href='/';return;}
+  if(!ok.data){try{localStorage.removeItem('bqufu-sig-v2');}catch(e){}await SB.auth.signOut();location.href='/';return;}
   ASSESSORIA=!!as.data||MENTORADO;ALVO=EMAIL;
   let ex=null,mv=null;try{ex=sessionStorage.getItem('bqufu-exemplo');if(sessionStorage.getItem('bqufu-mentoria-puro'))mv=JSON.parse(sessionStorage.getItem('bqufu-mentoria-ver')||'null');}catch(e){}
   if(REAL_ADMIN&&mv&&mv.email){EXMODO=true;ALVO=mv.email;MENTORADO=true;ASSESSORIA=true;MVER=true;}
@@ -485,6 +485,6 @@ async function telaDen(){abas('tabDen');$('app').innerHTML='<p class="pend">Carr
   $('app').querySelectorAll('[data-r]').forEach(b=>b.onclick=async()=>{await SB.rpc('admin_resolver',{p_id:+b.dataset.id,p:b.dataset.r==='1'});telaDen();});}
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795628668" defer></script>
+<script src="../js/presenca.js?v=1795629303" defer></script>
 </body>
 </html>

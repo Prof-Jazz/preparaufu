@@ -180,7 +180,7 @@ textarea{min-height:70px;resize:vertical}
 <div id="exBar" hidden>Modo aluno exemplo — é assim que o aluno da turma <select id="exTurma"><option value="assessoria">Assessoria PREPARA UFU</option><option value="matematica">Curso de Matemática</option></select> vê esta página. <button type="button" id="exSair">Sair do modo exemplo</button></div>
 <main id="app"></main>
 
-<script>(function(){var V='1795628668';var K='bqufu-recarga-';
+<script>(function(){var V='1795629303';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -242,7 +242,7 @@ $('gForm').onsubmit=async ev=>{ev.preventDefault();const email=$('gEmail').value
 async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!session){location.replace('/?volta='+encodeURIComponent(location.pathname+location.hash));return;}
   EMAIL=(session.user.email||'').toLowerCase();REAL_ADMIN=EMAIL===ADMIN;IS_ADMIN=REAL_ADMIN;
   const {data:ok}=await SB.rpc('is_allowed');
-  if(!ok){await SB.auth.signOut();$('gate').hidden=false;gm('Seu acesso não está liberado. Fale com o Prof. Jazz.');return;}
+  if(!ok){try{localStorage.removeItem('bqufu-sig-v2');}catch(e){}await SB.auth.signOut();$('gate').hidden=false;gm('Seu acesso não está liberado. Fale com o Prof. Jazz.');return;}
   $('gate').hidden=true;
   $('tabAg').onclick=()=>{history.replaceState(null,'','#agenda');telaAgenda();};
   $('tabMat').onclick=()=>{history.replaceState(null,'','#materiais');telaMat();};
@@ -252,7 +252,7 @@ async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!se
 function aplicaEx(){IS_ADMIN=REAL_ADMIN&&!EXT;$('exBar').hidden=!EXT;$('tabEx').hidden=!REAL_ADMIN||!!EXT;if(EXT)$('exTurma').value=EXT;}
 function exemplo(t){EXT=t;try{t?sessionStorage.setItem('bqufu-exemplo',t):sessionStorage.removeItem('bqufu-exemplo');}catch(e){}aplicaEx();
   if($('tabMat').classList.contains('on'))telaMat();else telaAgenda();}
-$('sair').onclick=async()=>{await SB.auth.signOut();location.href='/';};
+$('sair').onclick=async()=>{try{localStorage.removeItem('bqufu-sig-v2');}catch(e){}await SB.auth.signOut();location.href='/';};
 const abas=on=>['tabAg','tabMat'].forEach(t=>$(t).classList.toggle('on',t===on));
 
 async function carregar(){
@@ -394,6 +394,6 @@ function editarPasta(p){const nova=!p;p=p||{nome:'',descricao:'',turmas:['assess
     if(L.length)await SB.storage.from('materiais').remove(L.map(x=>x.path));if(p.capa)await SB.storage.from('capas').remove([p.capa]);const {error}=await SB.from('pastas').delete().eq('id',p.id);if(error){msg(error.message);return;}fecha();await carregar();desenhaPastas();};}
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795628668" defer></script>
+<script src="../js/presenca.js?v=1795629303" defer></script>
 </body>
 </html>

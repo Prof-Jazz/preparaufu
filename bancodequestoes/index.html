@@ -10,6 +10,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Banco de Questões UFU</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://ygdlbhoqyqjsqoyyfizk.supabase.co" crossorigin>
+<link rel="dns-prefetch" href="https://ygdlbhoqyqjsqoyyfizk.supabase.co">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* Layout: cabeçalho grafite com as logos · filtros à esquerda · questões no centro · "Minha lista" à direita */
@@ -227,7 +229,7 @@ td.h{font-weight:700}.z{color:var(--line)}
     <p class="msg" id="pdfMsg" role="status"></p>
   </aside>
 </div>
-<script>(function(){var V='1795628668';var K='bqufu-recarga-';
+<script>(function(){var V='1795629303';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -263,7 +265,7 @@ function card(o){const on=cart.includes(o.i);
   return `<article class="card${on?' on':''}" data-i="${o.i}">
   <div class="head"><span class="src">${esc(label(o))}</span><span class="pill">${esc(o.d)}</span><span class="pill lv${o.n}">${LV[o.n]}</span>${o.g==='N'?'<span class="pill">Anulada</span>':''}</div>
   <div class="path">${esc(o.t)} <span>› ${esc(o.s)}</span></div>
-  <div class="img"><img data-src="${o.i}" alt="Questão ${o.q} da UFU ${o.a}, ${esc(o.d)}: ${esc(o.s)}"></div>
+  <div class="img"><img data-src="${o.i}" decoding="async" alt="Questão ${o.q} da UFU ${o.a}, ${esc(o.d)}: ${esc(o.s)}"></div>
   <div class="foot"><button class="btn" data-a="gab">Ver gabarito</button><span class="gab" hidden></span><span style="flex:1"></span><button class="btn ${on?'sel':''}" data-a="add">${on?'Na lista ✓':'Adicionar à lista'}</button></div></article>`;}
 function renderQ(L){const v=$('viewQ');
   if(!L.length){v.innerHTML='<div class="empty">Nenhuma questão com esses filtros. Limpe a busca ou amplie os anos.</div>';return;}
@@ -272,12 +274,23 @@ function renderQ(L){const v=$('viewQ');
   v.querySelectorAll('img[data-src]').forEach(async im=>{const o=B.find(x=>x.i===im.dataset.src);try{im.src=await imgURL(o);}catch(e){im.alt='Não foi possível carregar a imagem desta questão.';}});}
 const bundles={};
 function bundle(k){return bundles[k]||(bundles[k]=fetch('qb/'+k+'.json').then(r=>{if(!r.ok)throw 0;return r.json();}).catch(e=>{delete bundles[k];throw e;}));}
+/* imagens: links assinados guardados no navegador (24 h) para o cache reaproveitar as imagens; assina primeiro só o que está na tela */
+const SIG_K='bqufu-sig-v2',SIG_VAL=86400;
 let SIG={},SIGEXP=0;
-async function signAll(){const paths=B.map(o=>'q/'+o.i+'.jpg');const m={};
-  for(let i=0;i<paths.length;i+=400){const {data,error}=await SB.storage.from('banco').createSignedUrls(paths.slice(i,i+400),21600);if(error)throw error;data.forEach(d=>{if(d.signedUrl)m[d.path]=d.signedUrl;});}
-  SIG=m;SIGEXP=Date.now()+21000*1000;}
-let signing=null;
-async function imgURL(o){if(Date.now()>SIGEXP){signing=signing||signAll().finally(()=>{signing=null;});await signing;}const u=SIG['q/'+o.i+'.jpg'];if(!u)throw new Error('img');return u;}
+try{const c=JSON.parse(localStorage.getItem(SIG_K)||'null');if(c&&c.exp>Date.now()){SIG=c.m||{};SIGEXP=c.exp;}else localStorage.removeItem(SIG_K);}catch(e){}
+let sigT=null;
+function sigSalva(){clearTimeout(sigT);sigT=setTimeout(()=>{try{localStorage.setItem(SIG_K,JSON.stringify({exp:SIGEXP,m:SIG}));}catch(e){try{localStorage.removeItem(SIG_K);}catch(x){}}},400);}
+async function assina(paths){if(!paths.length)return;const novos=!SIGEXP||Date.now()>SIGEXP;if(novos){SIG={};SIGEXP=Date.now()+(SIG_VAL-3600)*1000;}
+  const lotes=[];for(let i=0;i<paths.length;i+=400)lotes.push(paths.slice(i,i+400));
+  await Promise.all(lotes.map(async l=>{const {data,error}=await SB.storage.from('banco').createSignedUrls(l,SIG_VAL);if(error)throw error;data.forEach(d=>{if(d.signedUrl)SIG[d.path]=d.signedUrl;});}));sigSalva();}
+let fila=new Map(),filaT=null;
+function pedeAssinatura(path){return new Promise((res,rej)=>{if(!fila.has(path))fila.set(path,[]);fila.get(path).push([res,rej]);
+  if(!filaT)filaT=setTimeout(async()=>{const f=fila;fila=new Map();filaT=null;
+    try{await assina([...f.keys()]);f.forEach((cbs,p)=>cbs.forEach(([ok,er])=>SIG[p]?ok(SIG[p]):er(new Error('img'))));}catch(e){f.forEach(cbs=>cbs.forEach(([,er])=>er(e)));}},0);});}
+let resto=null;
+function assinaResto(){if(resto)return resto;resto=new Promise(r=>setTimeout(r,1500)).then(()=>assina(B.map(o=>'q/'+o.i+'.jpg').filter(p=>!SIG[p]||Date.now()>SIGEXP))).catch(()=>{}).finally(()=>{resto=null;});return resto;}
+async function signAll(){await assina(B.map(o=>'q/'+o.i+'.jpg'));}
+async function imgURL(o){const p='q/'+o.i+'.jpg';if(SIG[p]&&Date.now()<SIGEXP)return SIG[p];const u=await pedeAssinatura(p);assinaResto();return u;}
 const PAL=['#3A8CCB','#DDDD24','#EB6834','#1BAF7A','#7B61FF','#E0559B','#1F5F8F','#C9A227','#2BB3C0','#8A93A6'];
 const palText=c=>['#DDDD24','#C9A227','#2BB3C0','#8A93A6'].includes(c)?'#141A2E':'#FFFFFF';
 const lighten=(c,f=.45)=>{const[r,g,b]=[1,3,5].map(i=>parseInt(c.slice(i,i+2),16));return `rgb(${[r,g,b].map(v=>Math.round(v+(255-v)*f)).join(',')})`;};
@@ -574,11 +587,11 @@ $('gForm').onsubmit=async ev=>{ev.preventDefault();const email=$('gEmail').value
   }catch(e){gm(e.message||'Não foi possível entrar.');}finally{$('gBtn').disabled=false;}};
 async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!session){location.replace('/?volta='+encodeURIComponent(location.pathname+location.hash));return;}
   const {data:ok}=await SB.rpc('is_allowed');
-  if(!ok){await SB.auth.signOut();$('gate').hidden=false;gm('Seu acesso não está liberado. Fale com o Prof. Jazz.');return;}
+  if(!ok){try{localStorage.removeItem('bqufu-sig-v2');}catch(e){}await SB.auth.signOut();$('gate').hidden=false;gm('Seu acesso não está liberado. Fale com o Prof. Jazz.');return;}
   $('gate').hidden=true;$('admBtn').hidden=true;
   $('ckBtn').hidden=false;document.querySelectorAll('.lkAul').forEach(a=>a.hidden=false);
   if(!iniciado){iniciado=true;$('viewQ').innerHTML='<div class="empty">Carregando o banco de questões…</div>';await iniciar();}}
-$('sairBtn').onclick=async()=>{await SB.auth.signOut();location.href='/';};
+$('sairBtn').onclick=async()=>{try{localStorage.removeItem('bqufu-sig-v2');}catch(e){}await SB.auth.signOut();location.href='/';};
 /* painel do professor */
 let AL=[];const am=t=>$('admMsg').textContent=t;
 const fdt=d=>d?new Date(d).toLocaleDateString('pt-BR'):'';
@@ -600,6 +613,6 @@ $('admList').onclick=async ev=>{const z=ev.target.dataset.z,r=ev.target.dataset.
   if(r&&confirm('Remover o acesso de '+r+'?')){await SB.rpc('admin_zerar_senha',{e:r});const {error}=await SB.from('allowed_emails').delete().eq('email',r);am(error?error.message:'Acesso removido: '+r);await admLoad();}};
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795628668" defer></script>
+<script src="../js/presenca.js?v=1795629303" defer></script>
 </body>
 </html>
