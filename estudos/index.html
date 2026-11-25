@@ -8,7 +8,14 @@
 <link rel="manifest" href="/site.webmanifest">
 <meta name="theme-color" content="#16304F">
 <script type="speculationrules">{"prerender":[{"where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":"/"}},{"not":{"href_matches":"/mentoria/*"}},{"not":{"href_matches":"/*\\?*area=*"}},{"not":{"selector_matches":"[target=_blank]"}}]},"eagerness":"moderate"}],"prefetch":[{"where":{"or":[{"href_matches":"/"},{"href_matches":"/mentoria/*"}]},"eagerness":"moderate"}]}</script>
-<style>@view-transition{navigation:auto}header{view-transition-name:cab}::view-transition-old(root),::view-transition-new(root){animation-duration:.18s}</style>
+<style>@view-transition{navigation:auto}header{view-transition-name:cab}::view-transition-old(root),::view-transition-new(root){animation-duration:.18s}.revopc{margin:0;font-size:13.5px;color:var(--ink);background:rgba(27,175,122,.12);border:1px solid rgba(27,175,122,.45);border-radius:10px;padding:8px 11px}
+.revopc[hidden]{display:none}
+.opc{font-weight:500;color:var(--muted)}.opc[hidden]{display:none}
+.revm{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.revm label{display:flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:14px;cursor:pointer;background:var(--bg)}
+.revm label:has(input:checked){border-color:#1BAF7A;background:rgba(27,175,122,.14)}
+@media (max-width:560px){.revm{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sala de Estudos · PREPARA UFU</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -207,7 +214,7 @@ select,input[type=number],input[type=text]{font:500 16px var(--body);padding:11p
 <div id="exBar" hidden>Modo aluno exemplo — é assim que o aluno vê. <button type="button" id="exSair">Sair do modo exemplo</button></div>
 <main id="app"><p class="pend">Carregando…</p></main>
 
-<script>(function(){var V='1795629693';var K='bqufu-recarga-';
+<script>(function(){var V='1795630042';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -231,7 +238,8 @@ const tlist=t=>String(t||'').split(',').filter(k=>TIPOS[k]);
 const TI=t=>{const L=tlist(t);if(!L.length)L.push('teoria');return [L.map(k=>TIPOS[k][0]).join(' + '),L.map(k=>TIPOS[k][1]).join(''),'',TIPOS[L[0]][3]];};
 const TIPOS={teoria:['Teoria','📖','Assistir aula, ler e resumir','#3A8CCB'],questoes:['Questões','✏️','Resolver listas e provas','#EB6834'],revisao:['Revisão','🔁','Flashcards, Anki, caderno de erros','#1BAF7A'],correcao:['Correção de simulado','✅','Corrigir e entender os erros','#7B4FC9']};
 const MATS=['Matemática','Física','Química','Biologia','Português','Literatura','Redação','História','Geografia','Filosofia','Sociologia','Inglês','Espanhol','Francês'];
-const CORM={'Matemática':'#D9480F','Física':'#1864AB','Química':'#5F3DC4','Biologia':'#2B8A3E','Português':'#C92A2A','Literatura':'#A61E4D','Redação':'#C2255C','História':'#7F4F24','Geografia':'#5C7A0A','Filosofia':'#495057','Sociologia':'#8C6500','Inglês':'#0B7285','Espanhol':'#0B7285','Francês':'#0B7285'};
+const REVG='Revisão geral';
+const CORM={'Revisão geral':'#1BAF7A','Matemática':'#D9480F','Física':'#1864AB','Química':'#5F3DC4','Biologia':'#2B8A3E','Português':'#C92A2A','Literatura':'#A61E4D','Redação':'#C2255C','História':'#7F4F24','Geografia':'#5C7A0A','Filosofia':'#495057','Sociologia':'#8C6500','Inglês':'#0B7285','Espanhol':'#0B7285','Francês':'#0B7285'};
 const PROVA=new Date(2027,3,4);
 const KEY='bqufu-sessao';
 const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
@@ -296,7 +304,8 @@ function desenhaSala(s){abas('tabSala');clearInterval(TICK);
        <p class="pend" style="margin:0;text-align:center">Pode fechar ou trocar de página: o cronômetro continua contando.</p>`
      :`<div class="lbl">O que você vai fazer? <span style="font-weight:500;color:var(--muted)">(pode marcar mais de um)</span></div>
        <div class="tipos" id="tipos">${Object.entries(TIPOS).map(([k,[n,ic,d,c]])=>`<button class="tipo" data-t="${k}" style="--c:${c}"><span class="ic">${ic}</span><b>${n}</b><small>${d}</small></button>`).join('')}</div>
-       <label class="lbl" for="sMat">Matéria</label><select id="sMat"><option value="">Selecione a matéria</option>${minhas.map(m=>`<option>${esc(m)}</option>`).join('')}</select>
+       <p class="revopc" id="revOpc" hidden>Na <b>Revisão</b>, matéria e assunto são opcionais (Anki, caderno de erros e revisões amplas). Se não escolher, é só iniciar: no fim você conta o que revisou.</p>
+       <label class="lbl" for="sMat">Matéria <span class="opc" id="matOpc" hidden>(opcional)</span></label><select id="sMat"><option value="">Selecione a matéria</option>${minhas.map(m=>`<option>${esc(m)}</option>`).join('')}</select>
        <label class="lbl" for="sAss">Assunto</label><select id="sAss" disabled><option value="">Escolha antes a matéria</option></select>
        <span class="ajuda">Aparecem todos os assuntos do Plano de Estudos, de todas as semanas: pode adiantar conteúdo.</span>
        <label id="lOutro" class="outro" hidden>Qual assunto?<input type="text" id="sOutro" placeholder="ex.: lista de exercícios de funções" maxlength="140"></label>
@@ -312,7 +321,8 @@ function desenhaSala(s){abas('tabSala');clearInterval(TICK);
     $('pp').onclick=()=>{if(s.rodando){s.acum=decorrido(s);s.rodando=false;}else{s.desde=Date.now();s.rodando=true;}gravaS(s);atual();};
     $('fim').onclick=()=>encerrar(s);
   }else{
-    const pronto=()=>{$('go').disabled=!(esc_.tipos.length&&esc_.materia&&esc_.item&&(esc_.item!=='__outro'||$('sOutro').value.trim()));
+    const pronto=()=>{const livre=esc_.tipos.includes('revisao');$('revOpc').hidden=!livre;$('matOpc').hidden=!livre;
+      $('go').disabled=!(esc_.tipos.length&&((livre&&!esc_.materia)||(esc_.materia&&esc_.item&&(esc_.item!=='__outro'||$('sOutro').value.trim()))));
       $('estado').textContent=$('go').disabled?'Pronto para começar':'Tudo certo: aperte Iniciar';};
     $('tipos').querySelectorAll('.tipo').forEach(b=>b.onclick=()=>{b.classList.toggle('on');esc_.tipos=[...$('tipos').querySelectorAll('.tipo.on')].map(x=>x.dataset.t);$('tipos').classList.toggle('esc',esc_.tipos.length>0);$('cron').style.setProperty('--c',esc_.tipos.length?TIPOS[esc_.tipos[0]][3]:'#3A8CCB');pronto();});
     $('sMat').onchange=()=>{esc_.materia=$('sMat').value;esc_.item='';const L=PLANO.filter(x=>x.materia===esc_.materia);
@@ -325,14 +335,17 @@ function desenhaSala(s){abas('tabSala');clearInterval(TICK);
     $('sAss').onchange=()=>{esc_.item=$('sAss').value;$('lOutro').hidden=esc_.item!=='__outro';if(esc_.item==='__outro')$('sOutro').focus();pronto();};
     $('sOutro').oninput=pronto;
     $('go').onclick=()=>{const it=esc_.item!=='__outro'?PLANO.find(x=>String(x.id)===esc_.item):null;
-      const n={email:ALVO,tipo:esc_.tipos.join(','),materia:esc_.materia,assunto:it?it.assunto:$('sOutro').value.trim(),item:it?it.id:null,inicio:Date.now(),desde:Date.now(),acum:0,rodando:true};
+      const livre=!esc_.materia;
+      const n={email:ALVO,tipo:esc_.tipos.join(','),materia:livre?REVG:esc_.materia,assunto:livre?'':(it?it.assunto:$('sOutro').value.trim()),livre,item:it?it.id:null,inicio:Date.now(),desde:Date.now(),acum:0,rodando:true};
       gravaS(n);desenhaSala(n);};}
   desenhaHoje();desenhaVivo();}
 function desenhaRelogio(s){desenhaSala(s);}
 function encerrar(s){const seg=Math.round(decorrido(s)/1000);if(s.rodando){s.acum=decorrido(s);s.rodando=false;gravaS(s);}
   const [n,ic,,c]=TI(s.tipo);const pedeQ=tlist(s.tipo).some(k=>k==='questoes'||k==='correcao');
-  const d=document.createElement('div');d.className='dlg';d.innerHTML=`<div class="box" style="--c:${c}"><div class="top"><h3>${ic} Sessão encerrada: ${hfmt(seg)}</h3><p>${esc(s.materia)} · ${esc(s.assunto||'')}</p></div>
-   <form class="bd"><div><b style="font-size:15px">Questões ${pedeQ?'':'(se você fez alguma)'}</b><p class="pend" style="margin:2px 0 8px">Quantas você fez, acertou e errou nesta sessão?</p>
+  const d=document.createElement('div');d.className='dlg';d.innerHTML=`<div class="box" style="--c:${c}"><div class="top"><h3>${ic} Sessão encerrada: ${hfmt(seg)}</h3><p>${esc(s.materia)}${s.assunto?' · '+esc(s.assunto):''}</p></div>
+   <form class="bd">${s.livre?`<div><b style="font-size:15px">O que você revisou?</b><p class="pend" style="margin:2px 0 8px">Marque o que usou (pode ser mais de um) e, se quiser, conte em poucas palavras.</p>
+    <div class="revm">${['Anki / flashcards','Caderno de erros','Resumos','Mapas mentais','Questões já feitas','Outro'].map(m=>`<label><input type="checkbox" name="rv" value="${m}"> ${m}</label>`).join('')}</div>
+    <input type="text" name="rvt" maxlength="120" placeholder="ex.: Anki de Biologia e Química" style="margin-top:8px;width:100%"></div>`:''}<div><b style="font-size:15px">Questões ${pedeQ?'':'(se você fez alguma)'}</b><p class="pend" style="margin:2px 0 8px">Quantas você fez, acertou e errou nesta sessão?</p>
     <div class="qs"><label>Feitas<input type="number" name="q" min="0" max="999" inputmode="numeric" value="${pedeQ?'':0}"></label><label class="ac">Acertos<input type="number" name="a" min="0" max="999" inputmode="numeric" value="${pedeQ?'':0}"></label><label class="er">Erros<input type="number" name="e" min="0" max="999" inputmode="numeric" value="${pedeQ?'':0}"></label></div></div>
     ${s.item&&ASSESSORIA_ALVO()?`<label class="chk"><input type="checkbox" name="mk" checked> Marcar “${esc(s.assunto)}” como estudado no Plano de Estudos</label>`:''}
     <p class="msg"></p>
@@ -346,6 +359,9 @@ function encerrar(s){const seg=Math.round(decorrido(s)/1000);if(s.rodando){s.acu
   f.onsubmit=async ev=>{ev.preventDefault();const q=num('q'),a=num('a'),e=num('e');
     if(a+e>q){msg('Acertos + erros não pode passar do total de questões feitas.');return;}
     const bt=f.querySelector('[type=submit]');bt.disabled=true;
+    if(s.livre){const ms=[...f.querySelectorAll('[name=rv]:checked')].map(x=>x.value),t=f.rvt.value.trim();
+      if(!ms.length&&!t){msg('Conte o que você revisou: marque uma opção ou escreva em poucas palavras.');bt.disabled=false;return;}
+      s.assunto=(ms.join(', ')+(t?(ms.length?' — ':'')+t:'')).slice(0,200);}
     const fimT=Date.now();const row={email:s.email,inicio:new Date(s.inicio).toISOString(),fim:new Date(fimT).toISOString(),segundos:seg,tipo:s.tipo,materia:s.materia,assunto:s.assunto||null,plano_item:s.item,questoes:q,acertos:a,erros:e};
     let r=await SB.from('sessoes').insert(row);if(r.error&&/plano_item|foreign key/i.test(r.error.message)){row.plano_item=null;r=await SB.from('sessoes').insert(row);}if(r.error){msg('Não foi possível salvar: '+r.error.message);bt.disabled=false;return;}
     if(f.mk&&f.mk.checked)await SB.from(MENTORADO?'m_plano_feito':'plano_feito').insert({email:s.email,item:s.item});
@@ -491,6 +507,6 @@ async function telaDen(){abas('tabDen');$('app').innerHTML='<p class="pend">Carr
   $('app').querySelectorAll('[data-r]').forEach(b=>b.onclick=async()=>{await SB.rpc('admin_resolver',{p_id:+b.dataset.id,p:b.dataset.r==='1'});telaDen();});}
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795629693" defer></script>
+<script src="../js/presenca.js?v=1795630042" defer></script>
 </body>
 </html>
