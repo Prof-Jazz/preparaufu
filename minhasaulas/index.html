@@ -223,7 +223,7 @@ main.va{max-width:1240px}
 </header>
 <main id="app" class="va"><p class="pend">Carregando…</p></main>
 
-<script>(function(){var V='1795625434';var K='bqufu-recarga-';
+<script>(function(){var V='1795625579';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -365,7 +365,7 @@ function alertaErro(e){const d=document.createElement('div');d.className='dlg';d
 
 /* ===== player do YouTube com máscara ===== */
 let PLY=null;
-function paraPlayer(){if(PLY){try{clearInterval(PLY.t);PLY.p&&PLY.p.destroy();}catch(e){}document.removeEventListener('keydown',PLY.k);PLY=null;}}
+function paraPlayer(){if(PLY){try{clearInterval(PLY.t);PLY.ro&&PLY.ro.disconnect();PLY.p&&PLY.p.destroy();}catch(e){}document.removeEventListener('keydown',PLY.k);PLY=null;}}
 let ytPronto=null;
 function carregaYT(){if(ytPronto)return ytPronto;ytPronto=new Promise(r=>{if(window.YT&&YT.Player)return r();window.onYouTubeIframeAPIReady=()=>r();const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';document.head.appendChild(s);});return ytPronto;}
 const tfmt=s=>{s=Math.max(0,Math.floor(s||0));const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return (h?h+':'+String(m).padStart(2,'0'):String(m).padStart(2,'0'))+':'+String(x).padStart(2,'0');};
@@ -437,7 +437,13 @@ function montaPlayer(el,vid,op){paraPlayer();
       (L.length?L.map(x=>`<button class="it ${st.qual===x?'sel':'op'}" data-q="${x}">${QN[x]||x}</button>`).join(''):'<div class="it op" style="cursor:default;color:#AEB6C8">Dê o play para ver as opções</div>');
     menu.querySelector('.hd button').onclick=menuPrin;
     menu.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{const x=b.dataset.q;st.qual=x;
-      try{if(st.p.setPlaybackQualityRange)st.p.setPlaybackQualityRange(x==='auto'?'auto':x,x==='auto'?'auto':x);st.p.setPlaybackQuality(x==='auto'?'default':x);}catch(e){}menu.hidden=true;});};
+      try{st.p.setPlaybackQuality(x==='auto'?'default':x);}catch(e){}aplicaQual();if(tocando()){const t=st.p.getCurrentTime();st.p.seekTo(t,true);}menu.hidden=true;});};
+  // o YouTube escolhe a qualidade pelo tamanho do player: renderizamos o vídeo no tamanho da qualidade pedida e ajustamos à tela
+  const QW={tiny:256,small:426,medium:640,large:854,hd720:1280,hd1080:1920,hd1440:2560,hd2160:3840,highres:3840};
+  const aplicaQual=()=>{const f=R.querySelector('.vw iframe');if(!f)return;const W=QW[st.qual];
+    if(!W){f.style.width=f.style.height=f.style.top=f.style.transform=f.style.transformOrigin='';return;}
+    const h=W*9/16,k=R.clientWidth/W;Object.assign(f.style,{width:W+'px',height:(h*3)+'px',top:'0',transformOrigin:'0 0',transform:`scale(${k}) translateY(${-h}px)`});};
+  st.ro=new ResizeObserver(aplicaQual);st.ro.observe(R);
   q('[data-a=cfg]').onclick=ev=>{ev.stopPropagation();if(menu.hidden){menuPrin();menu.hidden=false;}else menu.hidden=true;};
   menu.onclick=ev=>ev.stopPropagation();
   R.addEventListener('click',ev=>{if(!menu.hidden&&!ev.target.closest('.menu')&&!ev.target.closest('[data-a=cfg]'))menu.hidden=true;});
@@ -524,6 +530,6 @@ async function editaAula(a,cid){const novo=!a;const L=aulasDe(cid);
 }
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795625434" defer></script>
+<script src="../js/presenca.js?v=1795625579" defer></script>
 </body>
 </html>
