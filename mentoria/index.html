@@ -413,7 +413,7 @@ body{}@keyframes fadein{from{opacity:0}to{opacity:1}}
 <div id="exBar" hidden><span id="exTxt"></span> <button type="button" id="exPuro"></button> <button type="button" id="exSair">Voltar aos mentorados</button><button type="button" id="exTroca" hidden></button></div>
 <main id="app"></main>
 
-<script>(function(){var V='1795647604';var K='bqufu-recarga-';
+<script>(function(){var V='1795647810';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -1592,8 +1592,10 @@ async function telaInicio(){abas('tabInicio');$('app').innerHTML='<p class="pend
   const tiles=[['sala','../estudos/',ICO.timer,'Sala de Estudos','Ligue o cronômetro e registre as suas sessões','#EB6834','#E5484D'],
     ['dash',null,ICO.grafico,'Meu Dashboard','Horas, dias estudados, questões e aproveitamento','#C9A227','#8C6500'],
     ['crono',null,ICO.grade,'Cronograma Semanal','A sua semana de estudos organizada, dia a dia','#3A8CCB','#1F4E79'],
+    ['plano',null,ICO.livro,'Plano de Estudos','Os assuntos de cada semana, feito só para você','#EB6834','#A8431D'],
     ['banco','../bancodequestoes/',ICO.lista,'Banco de Questões','Provas da UFU de 2015 a 2026, com gabarito','#7B4FC9','#4C2A8C'],
     ['mat',null,ICO.pasta,'Materiais','Os seus arquivos e os materiais da mentoria','#1BAF7A','#0E7A55'],
+    ['enc',null,ICO.perfil,'Encontros','Datas, links e combinados com o Prof. Jazz','#7B4FC9','#4C2A8C'],
     ['aulasv','../minhasaulas/',ICO.video,'Minhas Aulas','Videoaulas com resoluções e materiais','#D9434F','#8E1F2A'],
     ['agenda','../aulas/#agenda',ICO.cal,'Agenda de estudos','Planeje cada dia com o seu cronograma e o seu plano','#2E7D74','#1B5049']];
   $('app').innerHTML=`<section class="mh2"><div class="mhx"><span class="hk2">Mentoria individual · Prof. Jazz</span><h2>${nome?'Olá, '+esc(nome)+'!':'Olá!'}</h2><p>Este é o seu espaço da mentoria: o plano de estudos feito só para você, o cronograma, os encontros e os materiais.</p>
@@ -1861,6 +1863,6 @@ label.btn{display:inline-flex;align-items:center;cursor:pointer}
 .mvenc b{font:800 18px var(--display)}.mvenc p{margin:4px 0 0;line-height:1.5}
 </style>
 
-<script src="../js/presenca.js?v=1795647604" defer></script>
+<script src="../js/presenca.js?v=1795647810" defer></script>
 </body>
 </html>
