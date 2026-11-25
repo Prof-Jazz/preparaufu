@@ -114,6 +114,7 @@ main.va{max-width:1240px}
 .duv h3{margin:0;font:700 18px var(--display)}
 .dlist{display:flex;flex-direction:column;gap:10px}
 .dq{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--bg);display:flex;flex-direction:column;gap:6px}
+.dq.minha{border-color:rgba(58,140,203,.45)}
 .dq.pend-p{border-color:var(--amarelo);box-shadow:inset 3px 0 0 var(--amarelo)}
 .dq p{margin:0;white-space:pre-line;font-size:14.5px}
 .dq-h{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;font-size:13px}.dq-h b{font-size:14px}.dq-h span{color:var(--muted)}
@@ -263,7 +264,7 @@ main.va{max-width:1240px}
 </header>
 <main id="app" class="va"><p class="pend">Carregando…</p></main>
 
-<script>(function(){var V='1795628448';var K='bqufu-recarga-';
+<script>(function(){var V='1795628668';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -436,13 +437,13 @@ async function montaAval(a){const box=$('aval');if(!box)return;
   box.querySelector('.stars').onmouseleave=()=>pinta(nota);}
 async function montaDuv(a){const box=$('duv');if(!box)return;
   if(IS_ADMIN){const {data}=await SB.rpc('va_duvidas_prof');const L=(data||[]).filter(d=>String(d.aula)===a.id);
-    box.innerHTML=`<h3>Dúvidas dos alunos nesta aula</h3>${L.length?L.map(cartaoDuvProf).join(''):'<p class="pend" style="margin:0">Nenhuma dúvida nesta aula até agora.</p>'}`;ligaDuvProf(box,()=>montaDuv(a));return;}
-  const {data}=await SB.from('va_duvidas').select('*').eq('aula',a.id).eq('email',EMAIL).order('criada');const L=data||[];
-  box.innerHTML=`<h3>Dúvidas e comentários sobre esta aula</h3><p class="pend" style="margin:-6px 0 2px">Só o Prof. Jazz vê o que você escrever aqui. Se a dúvida for de um exercício, diga qual.</p>
-    <div class="dlist">${L.map(d=>`<div class="dq"><div class="dq-h"><b>Você</b><span>${quando(d.criada)}</span>${d.resposta?'':`<button type="button" class="lnk" data-del="${d.id}">Apagar</button>`}</div><p>${esc(d.texto)}</p>
-      ${d.resposta?`<div class="dr${d.vista_aluno?'':' nova'}"><div class="dq-h"><b>Prof. Jazz</b><span>${quando(d.respondida)}</span></div><p>${esc(d.resposta)}</p></div>`:'<div class="dwait">Aguardando resposta do Prof. Jazz</div>'}</div>`).join('')}</div>
-    <form class="dnew"><textarea maxlength="2000" required placeholder="Escreva aqui a sua dúvida ou comentário. Ex.: Na resolução do exercício 3, não entendi por que…"></textarea><div class="dnew-b"><span class="pend" id="dMsg"></span><button class="btn pri" type="submit">Enviar dúvida</button></div></form>`;
-  if(L.some(d=>d.resposta&&!d.vista_aluno))SB.rpc('va_vi_respostas',{p_aula:a.id}).then(()=>{window.avisoVA&&avisoVA();});
+    box.innerHTML=`<h3>Dúvidas e comentários</h3>${L.length?L.map(cartaoDuvProf).join(''):'<p class="pend" style="margin:0">Nenhuma dúvida nesta aula até agora.</p>'}`;ligaDuvProf(box,()=>montaDuv(a));return;}
+  const {data}=await SB.rpc('va_forum',{p_aula:a.id});const L=data||[];
+  box.innerHTML=`<h3>Dúvidas e comentários</h3>
+    <div class="dlist">${L.map(d=>`<div class="dq${d.minha?' minha':''}"><div class="dq-h"><b>${d.minha?'Você':esc(d.nome)}</b><span>${quando(d.criada)}</span>${d.minha&&!d.resposta?`<button type="button" class="lnk" data-del="${d.id}">Apagar</button>`:''}</div><p>${esc(d.texto)}</p>
+      ${d.resposta?`<div class="dr${d.nova_resp?' nova':''}"><div class="dq-h"><b>Prof. Jazz</b><span>${quando(d.respondida)}</span></div><p>${esc(d.resposta)}</p></div>`:'<div class="dwait">Aguardando resposta do Prof. Jazz</div>'}</div>`).join('')}</div>
+    <form class="dnew"><textarea maxlength="2000" required placeholder="Escreva aqui a sua dúvida ou comentário. Se for sobre um exercício, diga qual."></textarea><div class="dnew-b"><span class="pend" id="dMsg"></span><button class="btn pri" type="submit">Enviar</button></div></form>`;
+  if(L.some(d=>d.nova_resp))SB.rpc('va_vi_respostas',{p_aula:a.id}).then(()=>{window.avisoVA&&avisoVA();});
   box.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{if(!b.dataset.ok){b.dataset.ok=1;b.textContent='Confirmar';return;}await SB.from('va_duvidas').delete().eq('id',b.dataset.del);montaDuv(a);});
   const f=box.querySelector('.dnew');f.onsubmit=async ev=>{ev.preventDefault();const t=f.querySelector('textarea').value.trim();if(!t)return;const bt=f.querySelector('button');bt.disabled=true;
     const r=await SB.from('va_duvidas').insert({email:EMAIL,aula:a.id,texto:t});bt.disabled=false;
@@ -464,7 +465,7 @@ async function telaDuvidas(){document.title='Dúvidas dos alunos · Minhas Aulas
   app.innerHTML='<a class="voltar" href="#">‹ Voltar para Minhas Aulas</a><p class="pend">Carregando…</p>';
   const {data,error}=await SB.rpc('va_duvidas_prof');if(location.hash!=='#duvidas')return;
   const T=data||[],P=T.filter(d=>!d.lida_prof),L=FILTRO_D==='pend'?P:T;
-  app.innerHTML=`<a class="voltar" href="#">‹ Voltar para Minhas Aulas</a><div class="vtop"><div><h2>Dúvidas dos alunos</h2><p>Dúvidas e comentários deixados embaixo das videoaulas. Só você vê; a resposta aparece para o aluno na própria aula.</p></div></div>
+  app.innerHTML=`<a class="voltar" href="#">‹ Voltar para Minhas Aulas</a><div class="vtop"><div><h2>Dúvidas dos alunos</h2><p>Dúvidas e comentários deixados embaixo das videoaulas. Sua resposta fica visível para todos os alunos da aula.</p></div></div>
     <div class="dfil"><button class="${FILTRO_D==='pend'?'on':''}" data-f="pend">Novas <b>${P.length}</b></button><button class="${FILTRO_D==='todas'?'on':''}" data-f="todas">Todas <b>${T.length}</b></button></div>
     <section class="apan duv">${error?'<p class="pend">Não foi possível carregar.</p>':L.length?L.map(d=>cartaoDuvProf(d,true)).join(''):`<p class="pend" style="margin:0">${FILTRO_D==='pend'?'Nenhuma dúvida nova. Tudo respondido!':'Nenhuma dúvida até agora.'}</p>`}</section>`;
   app.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{FILTRO_D=b.dataset.f;telaDuvidas();});
@@ -637,6 +638,6 @@ async function editaAula(a,cid){const novo=!a;const L=aulasDe(cid);
 }
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795628448" defer></script>
+<script src="../js/presenca.js?v=1795628668" defer></script>
 </body>
 </html>
