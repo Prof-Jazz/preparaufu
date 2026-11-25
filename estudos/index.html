@@ -237,7 +237,7 @@ select,input[type=number],input[type=text]{font:500 16px var(--body);padding:11p
 <div id="exBar" hidden>Modo aluno exemplo — é assim que o aluno vê. <button type="button" id="exSair">Sair do modo exemplo</button></div>
 <main id="app"><p class="pend">Carregando…</p></main>
 
-<script>(function(){var V='1795630482';var K='bqufu-recarga-';
+<script>(function(){var V='1795630860';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -305,6 +305,7 @@ async function carregaPlano(){if(PLANO)return;
   await carregaPlanoRede();try{sessionStorage.setItem(ck,JSON.stringify({t:Date.now(),p:PLANO,l:LINGUA}));}catch(e){}}
 async function carregaPlanoRede(){const [p,c]=await Promise.all([MENTORADO?SB.from('m_plano').select('id,semana,materia,frente,assunto').eq('email',ALVO).order('semana').order('id'):SB.from('plano_itens').select('id,semana,materia,frente,assunto').order('id'),SB.from('checkup').select('respostas').eq('email',ALVO).maybeSingle()]);
   PLANO=p.data||[];LINGUA=(c.data&&c.data.respostas&&c.data.respostas.lingua)||'';}
+const matSala=x=>x.materia==='Português'&&/^literatura/i.test(x.frente||'')?'Literatura':x.materia==='Português'&&/^reda/i.test(x.frente||'')?'Redação':x.materia;
 const semanas=()=>[...new Set(PLANO.map(x=>x.semana))].sort();
 const semAtual=()=>{const s=semanas(),h=iso(new Date());let i=s.findIndex((x,k)=>h>=x&&(k===s.length-1||h<s[k+1]));return i<0?(h<s[0]?0:s.length-1):i;};
 const lerS=()=>{try{const s=JSON.parse(localStorage.getItem(KEY)||'null');return s&&s.email===ALVO?s:null;}catch(e){return null;}};
@@ -351,7 +352,7 @@ function desenhaSala(s){abas('tabSala');clearInterval(TICK);
       $('go').disabled=!(esc_.tipos.length&&((livre&&!esc_.materia)||(esc_.materia&&esc_.item&&(esc_.item!=='__outro'||$('sOutro').value.trim()))));
       $('estado').textContent=$('go').disabled?'Pronto para começar':'Tudo certo: aperte Iniciar';};
     $('tipos').querySelectorAll('.tipo').forEach(b=>b.onclick=()=>{b.classList.toggle('on');esc_.tipos=[...$('tipos').querySelectorAll('.tipo.on')].map(x=>x.dataset.t);$('tipos').classList.toggle('esc',esc_.tipos.length>0);$('cron').style.setProperty('--c',esc_.tipos.length?TIPOS[esc_.tipos[0]][3]:'#3A8CCB');pronto();});
-    $('sMat').onchange=()=>{esc_.materia=$('sMat').value;esc_.item='';const L=PLANO.filter(x=>x.materia===esc_.materia);
+    $('sMat').onchange=()=>{esc_.materia=$('sMat').value;esc_.item='';const L=PLANO.filter(x=>matSala(x)===esc_.materia);
       let h='<option value="">Selecione o assunto</option>';
       lst.forEach((w,i)=>{const G=L.filter(x=>x.semana===w);if(!G.length)return;h+=`<optgroup label="Semana ${i+1} · ${dm(pData(w))}${i===ca?' (esta semana)':''}">${G.map(x=>`<option value="${x.id}">${esc(x.assunto)}${x.frente?' — '+esc(x.frente):''}</option>`).join('')}</optgroup>`;});
       h+='<option value="__outro">Outro assunto (digitar)</option>';
@@ -565,6 +566,6 @@ async function telaDen(){abas('tabDen');$('app').innerHTML='<p class="pend">Carr
   $('app').querySelectorAll('[data-r]').forEach(b=>b.onclick=async()=>{await SB.rpc('admin_resolver',{p_id:+b.dataset.id,p:b.dataset.r==='1'});telaDen();});}
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795630482" defer></script>
+<script src="../js/presenca.js?v=1795630860" defer></script>
 </body>
 </html>
