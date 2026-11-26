@@ -52,11 +52,15 @@ header{background:var(--head);padding:14px 22px;display:flex;align-items:center;
 }
 @media (max-width:380px){.logos{gap:7px}.logos img.j{height:28px}.logos img.p{height:20px}.logos img.u{height:25px}.tabs button{padding:6px 9px;font-size:12.5px}}
 @media (max-width:760px){html,body{overflow-x:clip}}
-.wrap{display:grid;grid-template-columns:260px minmax(0,1fr) 300px;gap:18px;padding:18px;max-width:1500px;margin:0 auto}
-@media (max-width:1150px){.wrap{grid-template-columns:250px minmax(0,1fr)}.cart{grid-column:1/-1;position:static!important;max-height:none!important}}
+.wrap{display:grid;grid-template-columns:290px minmax(0,1fr);gap:20px;padding:18px;max-width:1440px;margin:0 auto}
+.lado{position:sticky;top:12px;align-self:start;display:flex;flex-direction:column;gap:10px;max-height:calc(100vh - 24px);min-width:0}
+.lado .panel>h2{display:none}.lado .panel{position:static;max-height:none;overflow:auto;min-height:0}.lado .panel[hidden]{display:none}
+.ltabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border-radius:12px;background:var(--card);border:1px solid var(--line)}
+.ltabs button{border:0;background:none;color:var(--muted);font:700 14px var(--body);padding:9px 6px;border-radius:9px;cursor:pointer}.ltabs button.on{background:var(--azul);color:#fff}.ltabs b{display:inline-block;min-width:20px;padding:0 6px;border-radius:9px;background:rgba(0,0,0,.25);font-size:12px}
+@media (max-width:1100px){.wrap{grid-template-columns:250px minmax(0,1fr)}}
 @media (max-width:760px){.wrap{grid-template-columns:1fr}}
 .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:16px;display:flex;flex-direction:column;gap:13px;align-self:start;position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto}
-@media (max-width:760px){.panel{position:static;max-height:none}}
+@media (max-width:760px){.panel{position:static;max-height:none}.lado{position:static;max-height:none}}
 .panel h2{font:700 15px var(--display);margin:0}
 label.t{display:block;font:600 12px var(--display);text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:4px}
 select,input[type=search],input[type=text]{width:100%;font:15px var(--body);padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
@@ -88,7 +92,23 @@ main{min-width:0;display:flex;flex-direction:column;gap:14px}
 .k1{background:#F4F4C4;color:#55550A}.k2{background:#F6E3CF;color:#7A4510}.k3{background:#F6D5D1;color:#7B1E1E}
 .path{padding:8px 14px 0;font-weight:600}.path span{color:var(--muted);font-weight:400}
 .img{padding:12px 14px;background:#fff;border-radius:0}
-.img img{display:block;width:100%;min-height:60px;max-width:760px;height:auto;margin:0 auto}
+.img img{display:block;width:100%;min-height:60px;max-width:1040px;height:auto;margin:0 auto;cursor:zoom-in}
+.resp{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:12px 14px;border-top:1px solid var(--line);background:var(--soft)}
+.resp .rl{font:700 14px var(--display);margin-right:2px}
+.resp .alt{width:46px;height:46px;border-radius:50%;border:2px solid var(--line);background:var(--card);color:var(--ink);font:800 18px var(--display);cursor:pointer;transition:transform .1s}
+.resp .alt:hover:not(:disabled){border-color:var(--azul);transform:scale(1.06)}.resp .alt:disabled{cursor:default}
+.resp .alt.ok{background:var(--ok);border-color:var(--ok);color:#fff}.resp .alt.err{background:var(--bad);border-color:var(--bad);color:#fff}.resp .alt.cor{border-color:var(--ok);color:var(--ok);border-width:3px}
+.resp .rmsg{font:700 15px var(--display);margin-left:6px}.resp .rmsg.ok{color:var(--ok)}.resp .rmsg.err{color:var(--bad)}
+.resp .rmsg small{display:block;font:500 12.5px var(--body);color:var(--muted)}
+.resp .redo{margin-left:auto}
+.mot{display:flex;flex-wrap:wrap;gap:6px;align-items:center;width:100%;padding-top:4px;font-size:13.5px}.mot b{font:700 13px var(--display);margin-right:4px}
+.mot button{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:5px 11px;font:600 13px var(--body);cursor:pointer}.mot button.on{background:var(--m);border-color:var(--m);color:#fff}
+.stq{color:var(--muted);font-size:14.5px}.stq b{font:800 16px var(--display)!important;color:var(--ink)}
+.discs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.dcard{text-align:left;background:var(--card);border:1px solid var(--line);border-top:5px solid var(--c);border-radius:16px;padding:14px 16px;cursor:pointer;color:var(--ink);font:inherit;display:flex;flex-direction:column;gap:6px;min-height:120px;box-shadow:var(--shadow)}
+.dcard:hover{transform:translateY(-2px)}.dcard h4{margin:0;font:800 17px var(--display)}.dcard .n{font:800 26px var(--display)}.dcard .n small{font:600 12.5px var(--body);color:var(--muted);margin-left:4px}.dcard .ft{font-size:12.5px;color:var(--muted)}.dcard .pb{height:7px;border-radius:9px;background:var(--soft);overflow:hidden;margin-top:auto}.dcard .pb i{display:block;height:100%;background:var(--ok)}
+@media (max-width:900px){.discs{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.zoomq{position:fixed;inset:0;z-index:95;background:rgba(5,8,18,.9);display:flex;align-items:flex-start;justify-content:center;padding:24px;overflow:auto;cursor:zoom-out}.zoomq img{width:min(1400px,100%);background:#fff;border-radius:10px}
 .foot{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:10px 14px;border-top:1px solid var(--line)}
 .gab{font:700 15px var(--display);color:var(--ok)}
 .more{align-self:center}
@@ -203,7 +223,8 @@ td.h{font-weight:700}.z{color:var(--line)}
   <nav class="tabs" aria-label="Visões"><button class="theme" id="theme" aria-label="Alternar modo diurno e noturno" title="Modo diurno / noturno"><span class="sun">☀</span><span class="moon">☾</span></button><a class="lkAul" href="../minhasaulas/" hidden style="font:600 14px var(--body);border:1px solid #4A4F55;color:#fff;padding:7px 14px;border-radius:999px;text-decoration:none">Minhas Aulas</a><a class="lkAul" href="../estudos/" hidden style="font:600 14px var(--body);border:1px solid #4A4F55;color:#fff;padding:7px 14px;border-radius:999px;text-decoration:none">Sala de Estudos</a><a class="lkAul" href="../aulas/#agenda" hidden style="font:600 14px var(--body);border:1px solid #4A4F55;color:#fff;padding:7px 14px;border-radius:999px;text-decoration:none">Agenda</a><a class="lkAul" href="../aulas/#materiais" hidden style="font:600 14px var(--body);border:1px solid #4A4F55;color:#fff;padding:7px 14px;border-radius:999px;text-decoration:none">Materiais</a><a id="ckBtn" href="../assessoria/" hidden style="font:600 14px var(--body);border:1px solid var(--amarelo);color:var(--amarelo);padding:7px 14px;border-radius:999px;text-decoration:none">Assessoria</a><button id="admBtn" hidden>Alunos</button><button class="sair" id="sairBtn" title="Sair">Sair</button><button id="tabQ" aria-pressed="true">Questões</button><button id="tabI" aria-pressed="false">Análise de Incidência</button></nav>
 </header>
 <div class="wrap">
-  <aside class="panel" aria-label="Filtros">
+ <div class="lado"><div class="ltabs" role="tablist"><button type="button" id="ltF" class="on">Filtros</button><button type="button" id="ltL">Minha lista <b id="ltN">0</b></button></div>
+  <aside class="panel" id="pFil" aria-label="Filtros">
     <h2>Filtros</h2>
     <div><label class="t" for="fBusca">Busca</label><input id="fBusca" type="search" placeholder="palavra do enunciado ou tópico"></div>
     <div><label class="t" for="fDisc">Disciplina</label><select id="fDisc"></select></div>
@@ -211,15 +232,11 @@ td.h{font-weight:700}.z{color:var(--line)}
     <div><label class="t" for="fSub">Subtópico</label><select id="fSub"></select></div>
     <div><label class="t">Ano <span class="hint">(nenhum marcado = todos)</span></label><div class="years" id="fAno"></div></div>
     <div><label class="t">Dificuldade</label><div class="chips" id="fNivel"></div></div>
+    <div><label class="t" for="fResp">Minhas respostas</label><select id="fResp"><option value="">Todas as questões</option><option value="nao">Ainda não respondi</option><option value="err">Que eu errei</option><option value="ok">Que eu acertei</option></select></div>
     <label class="chip"><input type="checkbox" id="fAnul" checked> Incluir anuladas</label>
     <button class="btn" id="reset">Limpar filtros</button>
   </aside>
-  <main>
-    <div class="count" id="count" aria-live="polite"></div>
-    <section id="viewQ" style="display:flex;flex-direction:column;gap:14px"></section>
-    <section id="viewI" hidden></section>
-  </main>
-  <aside class="panel cart" aria-label="Minha lista">
+  <aside class="panel cart" id="pCart" aria-label="Minha lista" hidden>
     <h2>Minha lista</h2>
     <p class="note" id="cartInfo">Clique em “Adicionar à lista” nas questões. Elas saem numeradas 1, 2, 3… na ordem em que você escolher.</p>
     <div class="list" id="cartList"></div>
@@ -230,8 +247,15 @@ td.h{font-weight:700}.z{color:var(--line)}
     <button class="btn" id="cartClear">Esvaziar lista</button>
     <p class="msg" id="pdfMsg" role="status"></p>
   </aside>
+ </div>
+  <main>
+    <div class="count" id="count" aria-live="polite"></div>
+    <section id="viewQ" style="display:flex;flex-direction:column;gap:14px"></section>
+    <section id="viewI" hidden></section>
+  </main>
+
 </div>
-<script>(function(){var V='1795721137';var K='bqufu-recarga-';
+<script>(function(){var V='1795721657';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -261,13 +285,15 @@ function cascade(){const d=$('fDisc').value,b=d?B.filter(o=>o.d===d):B;opts($('f
 function filtered(){
   const q=norm($('fBusca').value.trim()),d=$('fDisc').value,t=$('fTop').value,s=$('fSub').value,ys=[...document.querySelectorAll('#fAno input:checked')].map(i=>+i.value),an=$('fAnul').checked,
   lv=[...document.querySelectorAll('#fNivel input:checked')].map(i=>i.value);
-  return B.filter(o=>(!d||o.d===d)&&(!t||o.t===t)&&(!s||o.s===s)&&(!ys.length||ys.includes(o.a))&&(an||o.g!=='N')&&lv.includes(o.n)&&(!q||o._s.includes(q)));
+  const fr=$('fResp').value;
+  return B.filter(o=>(!d||o.d===d)&&(!t||o.t===t)&&(!s||o.s===s)&&(!ys.length||ys.includes(o.a))&&(an||o.g!=='N')&&lv.includes(o.n)&&(!q||o._s.includes(q))&&(!fr||(fr==='nao'?!RESP[o.i]:RESP[o.i]&&RESP[o.i].correta===(fr==='ok'))));
 }
 function card(o){const on=cart.includes(o.i);
   return `<article class="card${on?' on':''}" data-i="${o.i}">
   <div class="head"><span class="src">${esc(label(o))}</span><span class="pill">${esc(o.d)}</span><span class="pill lv${o.n}">${LV[o.n]}</span>${o.g==='N'?'<span class="pill">Anulada</span>':''}</div>
   <div class="path">${esc(o.t)} <span>› ${esc(o.s)}</span></div>
   <div class="img"><img data-src="${o.i}" decoding="async" alt="Questão ${o.q} da UFU ${o.a}, ${esc(o.d)}: ${esc(o.s)}"></div>
+  ${linhaResp(o)}
   <div class="foot"><button class="btn" data-a="gab">Ver gabarito</button><span class="gab" hidden></span><span style="flex:1"></span><button class="btn ${on?'sel':''}" data-a="add">${on?'Na lista ✓':'Adicionar à lista'}</button></div></article>`;}
 function renderQ(L){const v=$('viewQ');
   if(!L.length){v.innerHTML='<div class="empty">Nenhuma questão com esses filtros. Limpe a busca ou amplie os anos.</div>';return;}
@@ -275,6 +301,42 @@ function renderQ(L){const v=$('viewQ');
   const m=$('more');if(m)m.onclick=()=>{shown+=20;render(false);};
   v.querySelectorAll('img[data-src]').forEach(async im=>{const o=B.find(x=>x.i===im.dataset.src);try{im.src=await imgURL(o);}catch(e){im.alt='Não foi possível carregar a imagem desta questão.';}});}
 const bundles={};
+/* ===== Responder direto no banco ===== */
+let RESP={},EMAIL_B='';const LETRAS=['A','B','C','D'];
+const MATB=d=>d==='Língua Portuguesa'?'Português':d;
+const MOTB=[['lacuna','Lacuna teórica','#E5484D'],['interpretacao','Interpretação','#EB6834'],['distracao','Distração','#C9A227'],['tempo','Gestão de tempo','#7B4FC9']];
+const CORD={'Matemática':'#D9480F','Física':'#1864AB','Química':'#5F3DC4','Biologia':'#2B8A3E','Língua Portuguesa':'#C92A2A','Literatura':'#A61E4D','História':'#7F4F24','Geografia':'#5C7A0A','Filosofia':'#495057','Sociologia':'#8C6500','Inglês':'#0B7285','Espanhol':'#0B7285'};
+const dmB=d=>{d=new Date(d);return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0');};
+async function carregaResp(){try{const {data:{session}}=await SB.auth.getSession();EMAIL_B=((session&&session.user.email)||'').toLowerCase();
+  const {data}=await SB.from('banco_resp').select('questao,escolha,correta,criado').eq('email',EMAIL_B).order('criado');RESP={};(data||[]).forEach(r=>RESP[r.questao]=r);}catch(e){}}
+function linhaResp(o){const r=RESP[o.i];
+  if(o.g==='N')return `<div class="resp"><span class="rl">Questão anulada</span><span class="rmsg"><small>Não vale para responder: a UFU anulou esta questão.</small></span></div>`;
+  if(r)return `<div class="resp" data-feito="1"><span class="rl">Sua resposta:</span>${LETRAS.map(l=>`<button class="alt${l===r.escolha?(r.correta?' ok':' err'):''}${!r.correta&&l===o.g?' cor':''}" disabled>${l}</button>`).join('')}<span class="rmsg ${r.correta?'ok':'err'}">${r.correta?'Você acertou':'Você errou · gabarito '+o.g}<small>respondida em ${dmB(r.criado)}</small></span><button class="btn redo" data-a="redo">Responder de novo</button></div>`;
+  return `<div class="resp"><span class="rl">Sua resposta:</span>${LETRAS.map(l=>`<button class="alt" data-a="resp" data-l="${l}" aria-label="Responder ${l}">${l}</button>`).join('')}<span class="rmsg"><small>Toque na alternativa: o site corrige na hora e soma nas suas estatísticas.</small></span></div>`;}
+async function responde(c,o,l){const box=c.querySelector('.resp');if(box.dataset.feito)return;box.dataset.feito='1';
+  const ok=l===o.g;box.querySelectorAll('.alt').forEach(b=>{b.disabled=true;if(b.dataset.l===l)b.classList.add(ok?'ok':'err');if(!ok&&b.dataset.l===o.g)b.classList.add('cor');});
+  const m=box.querySelector('.rmsg');m.className='rmsg '+(ok?'ok':'err');m.innerHTML=ok?'Você acertou!<small>Somou como acerto nas suas estatísticas.</small>':'Você errou · gabarito '+o.g+'<small>Somou como erro e foi para o seu Caderno de Erros.</small>';
+  const row={questao:o.i,materia:MATB(o.d),topico:o.t,subtopico:o.s,escolha:l,correta:ok};
+  const {error}=await SB.from('banco_resp').insert(row);
+  if(error){m.className='rmsg err';m.innerHTML='Não foi possível salvar a resposta<small>'+esc(error.message)+'</small>';delete box.dataset.feito;box.querySelectorAll('.alt').forEach(b=>{b.disabled=false;b.classList.remove('ok','err','cor');});return;}
+  RESP[o.i]={...row,criado:new Date().toISOString()};atualizaStat();
+  if(!ok){let cid=null;try{const {data:ja}=await SB.from('caderno_erros').select('id').eq('email',EMAIL_B).eq('questao',o.i).eq('revisada',false).limit(1);
+      if(ja&&ja.length)cid=ja[0].id;else{const r2=await SB.from('caderno_erros').insert({materia:MATB(o.d),assunto:o.t,item:null,motivo:null,fonte:label(o)+' · '+o.s,obs:'Gabarito '+o.g+' · você marcou '+l,img:'banco:q/'+o.i+'.jpg',questao:o.i}).select('id').single();cid=r2.data&&r2.data.id;}}catch(e){}
+    const mt=document.createElement('div');mt.className='mot';mt.innerHTML='<b>Por que você errou?</b>'+MOTB.map(([k,n,cc])=>`<button type="button" data-k="${k}" style="--m:${cc}">${n}</button>`).join('');box.appendChild(mt);
+    mt.querySelectorAll('button').forEach(b=>b.onclick=async()=>{mt.querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on');if(cid)await SB.from('caderno_erros').update({motivo:b.dataset.k}).eq('id',cid);});}}
+function atualizaStat(){const L=filtered();const R=L.filter(o=>RESP[o.i]),A=R.filter(o=>RESP[o.i].correta).length;const e=$('stq');
+  if(e)e.innerHTML=R.length?` · você já respondeu <b>${R.length}</b> · <b style="color:${A/R.length>=.7?'var(--ok)':A/R.length>=.5?'var(--warn)':'var(--bad)'}">${Math.round(100*A/R.length)}%</b> de acerto`:' · responda direto nas alternativas de cada questão';}
+function telaDiscs(){const v=$('viewQ');const ds=uniq(B.map(o=>o.d));
+  v.innerHTML=`<div class="discs">${ds.map(d=>{const L=B.filter(o=>o.d===d&&o.g!=='N'),R=L.filter(o=>RESP[o.i]),A=R.filter(o=>RESP[o.i].correta).length;
+    return `<button class="dcard" data-d="${esc(d)}" style="--c:${CORD[d]||'#3A8CCB'}"><h4>${esc(d)}</h4><div class="n">${L.length}<small>questões</small></div><span class="ft">${R.length?`você respondeu ${R.length} · ${Math.round(100*A/R.length)}% de acerto`:'nenhuma respondida ainda'}</span><span class="pb"><i style="width:${Math.round(100*R.length/Math.max(1,L.length))}%"></i></span></button>`;}).join('')}</div>
+    <button class="btn more" id="verTodas" style="margin-top:6px">Ver todas as questões, de todas as disciplinas</button>`;
+  v.querySelectorAll('.dcard').forEach(b=>b.onclick=()=>{$('fDisc').value=b.dataset.d;$('fTop').value='';cascade();render();window.scrollTo({top:0,behavior:'smooth'});});
+  $('verTodas').onclick=()=>{TODAS=true;render();};}
+let TODAS=false;
+function semFiltro(){return !$('fDisc').value&&!$('fBusca').value.trim()&&!$('fResp').value&&!document.querySelector('#fAno input:checked');}
+$('ltF').onclick=()=>{$('ltF').classList.add('on');$('ltL').classList.remove('on');$('pFil').hidden=false;$('pCart').hidden=true;};
+$('ltL').onclick=()=>{$('ltL').classList.add('on');$('ltF').classList.remove('on');$('pFil').hidden=true;$('pCart').hidden=false;};
+
 function bundle(k){return bundles[k]||(bundles[k]=fetch('qb/'+k+'.json').then(r=>{if(!r.ok)throw 0;return r.json();}).catch(e=>{delete bundles[k];throw e;}));}
 /* imagens: links assinados guardados no navegador (24 h) para o cache reaproveitar as imagens; assina primeiro só o que está na tela */
 const SIG_K='bqufu-sig-v2',SIG_VAL=86400;
@@ -391,16 +453,21 @@ async function analysisPdf(defName){
   }
   return {blob:doc.output('blob'),name:defName};
 }
-function render(reset=true){if(reset)shown=20;const L=filtered();$('count').innerHTML=`<b>${L.length}</b><span>questões encontradas</span>`;$('viewI').hidden?renderQ(L):renderI(L);}
+function render(reset=true){if(reset)shown=20;const L=filtered();
+  if($('viewI').hidden&&semFiltro()&&!TODAS){$('count').innerHTML=`<b>${B.length}</b><span>questões no banco · escolha a disciplina para começar</span>`;telaDiscs();return;}
+  $('count').innerHTML=`<b>${L.length}</b><span>questões encontradas<span class="stq" id="stq"></span></span>`;atualizaStat();$('viewI').hidden?renderQ(L):renderI(L);}
 function renderCart(){
   $('cartList').innerHTML=cart.map((id,n)=>{const o=B.find(x=>x.i===id);return `<div class="li"><b>${n+1}</b><span title="${esc(label(o)+' · '+o.s)}">${esc(o.d)} · ${esc(o.s)}</span><button aria-label="Subir" data-m="up" data-i="${id}">↑</button><button aria-label="Remover" data-m="rm" data-i="${id}">×</button></div>`}).join('');
   $('cartInfo').textContent=cart.length?`${cart.length} ${cart.length>1?'questões selecionadas':'questão selecionada'}.`:'Clique em “Adicionar à lista” nas questões. Elas saem numeradas 1, 2, 3… na ordem em que você escolher.';
-  $('pdfBtn').disabled=!cart.length;$('docBtn').disabled=!cart.length;
+  $('pdfBtn').disabled=!cart.length;$('docBtn').disabled=!cart.length;$('ltN').textContent=cart.length;
 }
 $('cartList').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const i=cart.indexOf(b.dataset.i);
   if(b.dataset.m==='rm')cart.splice(i,1);if(b.dataset.m==='up'&&i>0)[cart[i-1],cart[i]]=[cart[i],cart[i-1]];renderCart();render(false);});
 $('cartClear').onclick=()=>{cart=[];renderCart();render(false);};
-$('viewQ').addEventListener('click',e=>{const b=e.target.closest('button[data-a]');if(!b)return;const c=b.closest('.card'),o=B.find(x=>x.i===c.dataset.i);
+$('viewQ').addEventListener('click',e=>{const im=e.target.closest('.img img');if(im&&im.src){const z=document.createElement('div');z.className='zoomq';z.innerHTML=`<img src="${im.src}" alt="Questão ampliada">`;z.onclick=()=>z.remove();document.body.appendChild(z);return;}
+  const b=e.target.closest('button[data-a]');if(!b)return;const c=b.closest('.card'),o=B.find(x=>x.i===c.dataset.i);
+  if(b.dataset.a==='resp'){responde(c,o,b.dataset.l);return;}
+  if(b.dataset.a==='redo'){delete RESP[o.i];const t=document.createElement('div');t.innerHTML=linhaResp(o);c.querySelector('.resp').replaceWith(t.firstElementChild);return;}
   if(b.dataset.a==='gab'){const g=c.querySelector('.gab'),show=g.hidden;g.hidden=!show;g.textContent=o.g==='N'?'Questão anulada':'Gabarito: '+o.g;b.textContent=show?'Ocultar gabarito':'Ver gabarito';}
   if(b.dataset.a==='add'){const i=cart.indexOf(o.i);i<0?cart.push(o.i):cart.splice(i,1);const on=cart.includes(o.i);c.classList.toggle('on',on);b.classList.toggle('sel',on);b.textContent=on?'Na lista ✓':'Adicionar à lista';renderCart();}
 });
@@ -551,18 +618,18 @@ $('docBtn').onclick=()=>savePdf(makeDocx,'',$('docBtn'));
 (async()=>{try{dl=window.claude&&window.claude.use?await window.claude.use('downloads'):null;}catch(e){dl=null;}
   renderCart();})();
 
-function iniciar(){return sbJSON('banco.json').then(d=>{
+function iniciar(){return Promise.all([sbJSON('banco.json'),carregaResp()]).then(([d])=>{
   B=d.map(o=>({...o,_s:norm(o.x+' '+o.t+' '+o.s+' '+o.d)}));
   B.sort((a,b)=>b.a-a.a||a.p.localeCompare(b.p)||a.q-b.q||a.d.localeCompare(b.d));
   opts($('fDisc'),uniq(B.map(o=>o.d)),'Todas');
   const ys=uniq(B.map(o=>o.a)).reverse();$('fAno').innerHTML=ys.map(y=>`<label><input type="checkbox" value="${y}"> ${y}</label>`).join('');$('fAno').addEventListener('change',()=>render());
   $('fNivel').innerHTML=['F','M','D'].map(k=>`<label class="chip"><input type="checkbox" value="${k}" checked> ${LV[k]}</label>`).join('');
   cascade();
-  ['fBusca','fSub','fAnul'].forEach(id=>$(id).addEventListener('input',()=>render()));
+  ['fBusca','fSub','fAnul','fResp'].forEach(id=>$(id).addEventListener('input',()=>render()));
   $('fNivel').addEventListener('change',()=>render());
   $('fDisc').addEventListener('input',()=>{$('fTop').value='';cascade();render();});
   $('fTop').addEventListener('input',()=>{cascade();render();});
-  $('reset').onclick=()=>{['fBusca','fDisc'].forEach(i=>$(i).value='');document.querySelectorAll('#fAno input').forEach(i=>i.checked=false);$('fAnul').checked=true;document.querySelectorAll('#fNivel input').forEach(i=>i.checked=true);cascade();render();};
+  $('reset').onclick=()=>{TODAS=false;['fBusca','fDisc','fResp'].forEach(i=>$(i).value='');document.querySelectorAll('#fAno input').forEach(i=>i.checked=false);$('fAnul').checked=true;document.querySelectorAll('#fNivel input').forEach(i=>i.checked=true);cascade();render();};
   render();renderCart();
 }).catch(()=>{$('viewQ').innerHTML='<div class="empty">Não foi possível carregar o banco. Recarregue a página.</div>';});}
 /* ===== Acesso restrito (Supabase) ===== */
@@ -615,7 +682,7 @@ $('admList').onclick=async ev=>{const z=ev.target.dataset.z,r=ev.target.dataset.
   if(r&&confirm('Remover o acesso de '+r+'?')){await SB.rpc('admin_zerar_senha',{e:r});const {error}=await SB.from('allowed_emails').delete().eq('email',r);am(error?error.message:'Acesso removido: '+r);await admLoad();}};
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795721137" defer></script>
-<script src="../js/menu.js?v=1795721137" defer></script>
+<script src="../js/presenca.js?v=1795721657" defer></script>
+<script src="../js/menu.js?v=1795721657" defer></script>
 </body>
 </html>

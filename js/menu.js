@@ -23,8 +23,11 @@
     ver:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
     den:'<path d="M4 21V4h11l-1 4 6 0-2 6H4"/>',
     ment:'<circle cx="12" cy="8" r="4"/><path d="M6 21v-1a6 6 0 0 1 12 0v1"/><path d="M17 4l2-2M19 6h2"/>',
+    livro:'<path d="M2 5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v15a2 2 0 0 0-2-2H2z"/><path d="M22 5a2 2 0 0 0-2-2h-6a2 2 0 0 0-2 2v15a2 2 0 0 1 2-2h8z"/>',
     lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'
   };
+  var GI={Estudar:'livro',Organizar:'agenda',Progresso:'dash',Equipe:'enc'};
+  function mini(){try{var v=localStorage.getItem('bqufu-menu-mini-'+PG);return v===null?PG==='bancodequestoes':v==='1';}catch(e){return false;}}
   function svg(k){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(IC[k]||'')+'</svg>';}
   function ss(k,v){try{if(v===undefined)return sessionStorage.getItem(k);if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v);}catch(e){return null;}}
 
@@ -97,6 +100,13 @@ body.mn>header nav.tabs>a,.mn-esc{display:none!important}\
 #mnSide .ex{margin:0 12px 12px;padding:9px 11px;border-radius:11px;background:rgba(242,200,17,.14);border:1px solid rgba(242,200,17,.5);font:600 12.5px var(--body,system-ui);color:var(--ink,#fff)}\
 #mnSide .ex button{display:block;width:100%;margin-top:8px;border:0;border-radius:9px;padding:8px;background:#F2C811;color:#16304F;font:800 12.5px var(--body,system-ui);cursor:pointer}\
 #mnSide .hd{display:none}\
+#mnSide .gi{display:none}#mnSide .gi svg{width:19px;height:19px}\
+#mnSide .mnMini{margin:8px 12px 12px;border:1px solid var(--line,#2a3a55);background:none;color:var(--muted,#8a97ad);border-radius:10px;padding:8px;font:700 12.5px var(--body,system-ui);cursor:pointer}#mnSide .mnMini:hover{color:var(--ink,#fff)}\
+@media (min-width:1001px){body.mn.mn-mini{padding-left:72px}body.mn.mn-mini>header{margin-left:-72px}body.mn-mini #mnSide{width:72px}\
+ body.mn-mini #mnSide .tb{grid-template-columns:1fr!important;margin:10px 8px}body.mn-mini #mnSide .gt{display:none}body.mn-mini #mnSide .gi{display:inline-flex}body.mn-mini #mnSide .tb button{padding:8px 0}\
+ body.mn-mini #mnSide .ls{padding:4px 8px}body.mn-mini #mnSide a.it{justify-content:center;padding:11px 0}body.mn-mini #mnSide a.it span{display:none}body.mn-mini #mnSide a.it svg{width:22px;height:22px}\
+ body.mn-mini #mnSide .ex{margin:8px;padding:6px;font-size:0}body.mn-mini #mnSide .ex button{margin:0;font-size:15px;padding:6px 0}body.mn-mini #mnSide .mnMini{margin:8px;font-size:16px}}\
+@media (max-width:1000px){#mnSide .mnMini{display:none}}\
 #mnBtn{display:none;width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;font-size:20px;cursor:pointer;flex:none}\
 #mnVeu{display:none}\
 @media (max-width:1000px){body.mn{padding-left:0}body.mn>header{margin-left:0}\
@@ -121,10 +131,11 @@ body.mn>header nav.tabs>a,.mn-esc{display:none!important}\
     if(!GRP||gs.indexOf(GRP)<0){var a=M.L.filter(function(x){return !x.dup&&ativo(x);})[0];GRP=a?a.g:gs[0];}
     s.innerHTML='<div class="hd"><span>Menu</span><button type="button" aria-label="Fechar menu">✕</button></div>'+
       (M.ex?'<div class="ex">Você está vendo a plataforma como aluno: o menu Equipe some, como para ele.<button type="button" id="mnSaiEx">← Voltar à visão do professor</button></div>':'')+
-      (gs.length>1?'<div class="tb" style="grid-template-columns:repeat('+(gs.length>3?2:gs.length)+',minmax(0,1fr))">'+gs.map(function(g){return '<button type="button" data-g="'+g+'"'+(g===GRP?' class="on"':'')+'>'+g+'</button>';}).join('')+'</div>':'<div style="height:10px"></div>')+
-      '<nav class="ls" aria-label="Menu da plataforma">'+M.L.filter(function(x){return x.g===GRP;}).map(function(x,i){return '<a class="it'+(x.lock?' lock':'')+'" href="'+x.href+'" data-i="'+M.L.indexOf(x)+'">'+svg(x.lock?'lock':x.k)+'<span>'+x.t+'</span></a>';}).join('')+'</nav>';
+      (gs.length>1?'<div class="tb" style="grid-template-columns:repeat('+(gs.length>3?2:gs.length)+',minmax(0,1fr))">'+gs.map(function(g){return '<button type="button" data-g="'+g+'" title="'+g+'"'+(g===GRP?' class="on"':'')+'><span class="gi">'+svg(GI[g])+'</span><span class="gt">'+g+'</span></button>';}).join('')+'</div>':'<div style="height:10px"></div>')+
+      '<nav class="ls" aria-label="Menu da plataforma">'+M.L.filter(function(x){return x.g===GRP;}).map(function(x,i){return '<a class="it'+(x.lock?' lock':'')+'" href="'+x.href+'" title="'+x.t+'" data-i="'+M.L.indexOf(x)+'">'+svg(x.lock?'lock':x.k)+'<span>'+x.t+'</span></a>';}).join('')+'</nav><button type="button" class="mnMini" id="mnMini" title="'+(mini()?'Abrir o menu':'Recolher o menu')+'">'+(mini()?'»':'« Recolher menu')+'</button>';
     s.querySelectorAll('.tb button').forEach(function(b){b.onclick=function(){GRP=b.dataset.g;desenha();};});
     s.querySelectorAll('a.it').forEach(function(a){a.onclick=function(ev){vaiPara(M.L[+a.dataset.i],ev);};});
+    var mb=el('mnMini');if(mb)mb.onclick=function(){try{localStorage.setItem('bqufu-menu-mini-'+PG,mini()?'0':'1');}catch(e){}document.body.classList.toggle('mn-mini',mini());desenha();};
     var sx=el('mnSaiEx');if(sx)sx.onclick=function(){ss('bqufu-exemplo',null);ss('bqufu-ver',null);location.href='/estudos/#alunos';};
     var f=s.querySelector('.hd button');if(f)f.onclick=function(){document.body.classList.remove('mn-aberto');};
     marca();}
@@ -145,7 +156,7 @@ body.mn>header nav.tabs>a,.mn-esc{display:none!important}\
     var v=document.createElement('div');v.id='mnVeu';v.onclick=function(){document.body.classList.remove('mn-aberto');};document.body.appendChild(v);
     var hd=document.querySelector('body>header');var bt=document.createElement('button');bt.id='mnBtn';bt.type='button';bt.setAttribute('aria-label','Abrir menu');bt.textContent='☰';
     bt.onclick=function(){document.body.classList.add('mn-aberto');};hd.insertBefore(bt,hd.firstChild);
-    document.body.classList.add('mn');desenha();posiciona();abreHash();
+    document.body.classList.add('mn');document.body.classList.toggle('mn-mini',mini());desenha();posiciona();abreHash();
     addEventListener('scroll',posiciona,{passive:true});addEventListener('resize',posiciona);
     setInterval(function(){marca();posiciona();},700);
     window.menuPlataforma={redesenha:function(){ss('bqufu-menu-'+email,null);papel(email).then(function(r){R=r;M=itens(r);GRP=null;desenha();});}};}
