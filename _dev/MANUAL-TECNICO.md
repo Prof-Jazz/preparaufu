@@ -16,7 +16,7 @@ Plataforma do Prof. Jazz (preparação para o vestibular da UFU). Este manual ex
 - Chave pública do Supabase (publishable) fica no próprio HTML: é pública por natureza; **a segurança está nas regras RLS** do banco.
 - Arquivos JS compartilhados em `/js/`:
   - `menu.js` — menu híbrido de todas as páginas (ver seção 4).
-  - `presenca.js` — "online/estudando agora", avisos de mensagens e de dúvidas.
+  - `presenca.js` — "online/estudando agora", avisos de mensagens e de dúvidas. O aviso de mensagem leva a `/estudos/#mensagens/<uid>/<nome>`, que abre direto a conversa (`abreDoHash` em estudos).
   - `estatisticas.js` — `bancoSessoes(R)`: transforma respostas do Banco de Questões em "sessões de estudo" para dashboards e Comportamento da turma.
 - `versao.txt` + `var V='...'` em cada página: aviso de versão nova / recarga automática.
 
