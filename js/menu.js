@@ -27,7 +27,8 @@
     lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'
   };
   var GI={Estudar:'livro',Organizar:'agenda',Progresso:'dash',Equipe:'enc'};
-  function mini(){try{var v=localStorage.getItem('bqufu-menu-mini-'+PG);return v===null?PG==='bancodequestoes':v==='1';}catch(e){return false;}}
+  var TOPO=PG==='bancodequestoes';
+  function mini(){try{var v=localStorage.getItem('bqufu-menu-mini-'+PG);return v==='1';}catch(e){return false;}}
   function svg(k){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(IC[k]||'')+'</svg>';}
   function ss(k,v){try{if(v===undefined)return sessionStorage.getItem(k);if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v);}catch(e){return null;}}
 
@@ -107,6 +108,15 @@ body.mn>header nav.tabs>a,.mn-esc{display:none!important}\
  body.mn-mini #mnSide .ls{padding:4px 8px}body.mn-mini #mnSide a.it{justify-content:center;padding:11px 0}body.mn-mini #mnSide a.it span{display:none}body.mn-mini #mnSide a.it svg{width:22px;height:22px}\
  body.mn-mini #mnSide .ex{margin:8px;padding:6px;font-size:0}body.mn-mini #mnSide .ex button{margin:0;font-size:15px;padding:6px 0}body.mn-mini #mnSide .mnMini{margin:8px;font-size:16px}}\
 @media (max-width:1000px){#mnSide .mnMini{display:none}}\
+#mnTop{display:none}\
+@media (min-width:1001px){body.mn-topo{padding-left:0!important}body.mn-topo>header{margin-left:0!important;position:relative;z-index:65}body.mn-topo #mnSide{display:none}\
+ body.mn-topo #mnTop{display:flex;flex-basis:100%;align-items:center;gap:8px;flex-wrap:wrap;padding-top:10px;margin-top:2px;border-top:1px solid rgba(255,255,255,.12)}\
+ #mnTop .gr{position:relative}#mnTop .gb{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.06);color:#fff;border-radius:999px;padding:8px 16px;font:700 14px var(--body,system-ui);cursor:pointer}\
+ #mnTop .gb svg{width:18px;height:18px}#mnTop .gb.on{background:#3A8CCB;border-color:#3A8CCB}#mnTop .gb i{font-style:normal;opacity:.7;font-size:11px}\
+ #mnTop .dd{position:absolute;left:0;top:calc(100% + 8px);z-index:70;min-width:260px;background:var(--card,#151C2E);border:1px solid var(--line,#262E46);border-radius:14px;box-shadow:0 18px 40px rgba(0,0,0,.35);padding:6px;display:none}\
+ #mnTop .gr.ab .dd{display:block}#mnTop .dd a{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:10px;color:var(--ink,#eef0f7);text-decoration:none;font:600 14.5px var(--body,system-ui)}\
+ #mnTop .dd a svg{width:19px;height:19px;opacity:.8}#mnTop .dd a:hover{background:var(--soft,rgba(127,140,160,.12))}#mnTop .dd a.on{background:rgba(58,140,203,.16);color:var(--ink,#fff)}\
+ #mnTop .vx{margin-left:auto;border:0;border-radius:999px;padding:8px 16px;background:#F2C811;color:#16304F;font:800 13.5px var(--body,system-ui);cursor:pointer}}\
 #mnBtn{display:none;width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;font-size:20px;cursor:pointer;flex:none}\
 #mnVeu{display:none}\
 @media (max-width:1000px){body.mn{padding-left:0}body.mn>header{margin-left:0}\
@@ -138,7 +148,15 @@ body.mn>header nav.tabs>a,.mn-esc{display:none!important}\
     var mb=el('mnMini');if(mb)mb.onclick=function(){try{localStorage.setItem('bqufu-menu-mini-'+PG,mini()?'0':'1');}catch(e){}document.body.classList.toggle('mn-mini',mini());desenha();};
     var sx=el('mnSaiEx');if(sx)sx.onclick=function(){ss('bqufu-exemplo',null);ss('bqufu-ver',null);location.href='/estudos/#alunos';};
     var f=s.querySelector('.hd button');if(f)f.onclick=function(){document.body.classList.remove('mn-aberto');};
-    marca();}
+    desenhaTopo();marca();}
+  function desenhaTopo(){var t=el('mnTop');if(!t)return;var gs=[];M.L.forEach(function(x){if(gs.indexOf(x.g)<0)gs.push(x.g);});
+    t.innerHTML=gs.map(function(g){var its=M.L.filter(function(x){return x.g===g;});var on=its.some(function(x){return !x.dup&&ativo(x);});
+      return '<div class="gr"><button type="button" class="gb'+(on?' on':'')+'" data-g="'+g+'">'+svg(GI[g])+g+' <i>▾</i></button><div class="dd">'+its.map(function(x){return '<a href="'+x.href+'" data-i="'+M.L.indexOf(x)+'"'+(ativo(x)?' class="on"':'')+'>'+svg(x.lock?'lock':x.k)+'<span>'+x.t+'</span></a>';}).join('')+'</div></div>';}).join('')+
+      (M.ex?'<button type="button" class="vx" id="mnSaiEx2">← Voltar à visão do professor</button>':'');
+    t.querySelectorAll('.gb').forEach(function(b){b.onclick=function(ev){ev.stopPropagation();var gr=b.parentNode,ab=gr.classList.contains('ab');t.querySelectorAll('.gr').forEach(function(x){x.classList.remove('ab');});if(!ab)gr.classList.add('ab');};});
+    t.querySelectorAll('.dd a').forEach(function(a){a.onclick=function(ev){t.querySelectorAll('.gr').forEach(function(x){x.classList.remove('ab');});vaiPara(M.L[+a.dataset.i],ev);};});
+    var v=el('mnSaiEx2');if(v)v.onclick=function(){ss('bqufu-exemplo',null);ss('bqufu-ver',null);location.href='/estudos/#alunos';};}
+  document.addEventListener('click',function(){var t=el('mnTop');if(t)t.querySelectorAll('.gr.ab').forEach(function(x){x.classList.remove('ab');});});
   function marca(){var s=el('mnSide');if(!s)return;s.querySelectorAll('a.it').forEach(function(a){a.classList.toggle('on',ativo(M.L[+a.dataset.i]));});
     // esconde no topo as abas desta página que já estão na lateral
     M.L.forEach(function(x){if(x.pg===PG&&x.btn){var b=el(x.btn);if(b)b.classList.add('mn-esc');}});
@@ -156,6 +174,7 @@ body.mn>header nav.tabs>a,.mn-esc{display:none!important}\
     var v=document.createElement('div');v.id='mnVeu';v.onclick=function(){document.body.classList.remove('mn-aberto');};document.body.appendChild(v);
     var hd=document.querySelector('body>header');var bt=document.createElement('button');bt.id='mnBtn';bt.type='button';bt.setAttribute('aria-label','Abrir menu');bt.textContent='☰';
     bt.onclick=function(){document.body.classList.add('mn-aberto');};hd.insertBefore(bt,hd.firstChild);
+    if(TOPO){var tp=document.createElement('nav');tp.id='mnTop';tp.setAttribute('aria-label','Menu da plataforma');hd.appendChild(tp);document.body.classList.add('mn-topo');}
     document.body.classList.add('mn');document.body.classList.toggle('mn-mini',mini());desenha();posiciona();abreHash();
     addEventListener('scroll',posiciona,{passive:true});addEventListener('resize',posiciona);
     setInterval(function(){marca();posiciona();},700);
