@@ -26,7 +26,7 @@ Plataforma do Prof. Jazz (preparação para o vestibular da UFU). Este manual ex
 |---|---|
 | `/` (index.html) | Login e página de entrada (escolha entre áreas). |
 | `/estudos/` | **Sala de Estudos** (cronômetro, tipos de estudo, Estudos Extras, "Hoje"), **Meu Dashboard**, **Caderno de Erros**, Dashboard dos alunos (equipe), Denúncias (admin), Ver como aluno, mensagens entre alunos. |
-| `/bancodequestoes/` | **Banco de Questões UFU** 2015–2026: filtros, responder A–D (corrige na hora, grava em `banco_resp`, erro vai ao Caderno), lista para PDF/Word, Análise de Incidência. Menu da plataforma fica no cabeçalho só aqui. |
+| `/bancodequestoes/` | **Banco de Questões UFU** 2015–2026: filtros, responder A–D (corrige na hora, grava em `banco_resp`, erro vai ao Caderno), "Minha lista" com questões de várias matérias (salva no navegador, `localStorage bqufu-lista-<email>`) para baixar em PDF/Word ou **resolver ali** ("Resolver a lista aqui", com Embaralhar), Análise de Incidência. Menu da plataforma fica no cabeçalho só aqui. |
 | `/assessoria/` | Área das turmas: **Perfil de estudos**, **Cronograma Semanal** (gerador automático + edição), **Plano de Estudos** (reagendar), Dúvidas; para a equipe: Comportamento da turma, Alunos, Cadastro (liberar alunos, recursos, assessores, zerar senha), Plano da turma. |
 | `/mentoria/` | Mentoria individual: o mentorado tem Início, Dashboard, Plano individual (`m_plano`), Cronograma, Encontros, Materiais próprios, Perfil, Dúvidas; o admin gerencia mentorados, cobranças, raio-x. |
 | `/aulas/` | **Agenda** (aulas ao vivo da turma + planejamento do aluno, `agenda_estudos`) e **Materiais** (pastas com capa 1080×1920). |
@@ -117,4 +117,4 @@ git add -A && git -c user.name=Prof-Jazz commit -m "..." && git push origin HEAD
 - Identidade: azul `#3A8CCB`, amarelo `#DDDD24`/`#F2C811`, verde `#1BAF7A`, laranja `#EB6834`, grafite; logos em `/bancodequestoes/logo/`.
 
 ## 8. Histórico resumido (nov./2026)
-22/11 site no ar (banco + assessoria) · 23/11 Aulas e materiais, Cronograma Semanal · 24/11 Sala de Estudos, mensagens, mentoria individual, assessores · 25/11 Minhas Aulas, Agenda com cronograma, recursos por aluno do Curso, reagendar plano, Estudos Extras, regras do gerador · 26/11 Caderno de Erros, menu híbrido, Banco com resposta direta (conta como estudo), aluno exemplo com dados fictícios, auditoria de permissões, migração de perfis antigos.
+22/11 site no ar (banco + assessoria) · 23/11 Aulas e materiais, Cronograma Semanal · 24/11 Sala de Estudos, mensagens, mentoria individual, assessores · 25/11 Minhas Aulas, Agenda com cronograma, recursos por aluno do Curso, reagendar plano, Estudos Extras, regras do gerador · 26/11 Caderno de Erros, menu híbrido, Banco com resposta direta (conta como estudo), aluno exemplo com dados fictícios, auditoria de permissões, migração de perfis antigos, resolver a Minha lista no Banco.
