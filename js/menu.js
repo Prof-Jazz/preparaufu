@@ -66,7 +66,7 @@
       if(rec('plano'))I('Organizar','plano','Plano de Estudos','/assessoria/#plano','assessoria','tabPlano');}
     if(al)I('Organizar','agenda','Agenda','/aulas/#agenda','aulas','tabAg');
     if(mt){I('Organizar','perfil','Perfil de estudos','/mentoria/#perfil','mentoria','tabForm');I('Organizar','duv','Dúvidas','/mentoria/#duvidas','mentoria','tabFaq');}
-    else if(al&&(ass||r.rec.length)){I('Organizar','perfil','Perfil de estudos','/assessoria/#perfil','assessoria','tabForm');I('Organizar','duv','Dúvidas','/assessoria/#duvidas','assessoria','tabFaq');}
+    else if(al&&(ass||r.rec.length)){if(rec('crono'))I('Organizar','perfil','Perfil de estudos','/assessoria/#perfil','assessoria','tabForm');I('Organizar','duv','Dúvidas','/assessoria/#duvidas','assessoria','tabFaq');}
     if(al&&!ass&&!r.rec.length)I('Organizar','lock','Assessoria PREPARA UFU','/assessoria/','assessoria',null,{lock:true});
     // Acompanhar
     if(mt)I('Progresso','dash','Meu Dashboard','/mentoria/#dashboard','mentoria','tabDash');
@@ -128,7 +128,7 @@ body.mn>header nav.tabs>a,.mn-esc{display:none!important}\
  body.mn-aberto #mnVeu{display:block;position:fixed;inset:0;z-index:89;background:rgba(5,8,18,.55)}}\
 @media print{#mnSide,#mnBtn{display:none!important}body.mn{padding-left:0}body.mn>header{margin-left:0}}';
 
-  var R=null,M=null,GRP=null;
+  var R=null,M=null,GRP=null,GRPU=false;
   function el(id){return document.getElementById(id);}
   function ativo(it){if(it.pg!==PG)return false;if(it.fora||!it.btn)return true;var b=el(it.btn);return !!(b&&!it.ver&&b.classList.contains('on'));}
   function vaiPara(it,ev){
@@ -143,7 +143,7 @@ body.mn>header nav.tabs>a,.mn-esc{display:none!important}\
       (M.ex?'<div class="ex">Você está vendo a plataforma como aluno: o menu Equipe some, como para ele.<button type="button" id="mnSaiEx">← Voltar à visão do professor</button></div>':'')+
       (gs.length>1?'<div class="tb" style="grid-template-columns:repeat('+(gs.length>3?2:gs.length)+',minmax(0,1fr))">'+gs.map(function(g){return '<button type="button" data-g="'+g+'" title="'+g+'"'+(g===GRP?' class="on"':'')+'><span class="gi">'+svg(GI[g])+'</span><span class="gt">'+g+'</span></button>';}).join('')+'</div>':'<div style="height:10px"></div>')+
       '<nav class="ls" aria-label="Menu da plataforma">'+M.L.filter(function(x){return x.g===GRP;}).map(function(x,i){return '<a class="it'+(x.lock?' lock':'')+'" href="'+x.href+'" title="'+x.t+'" data-i="'+M.L.indexOf(x)+'">'+svg(x.lock?'lock':x.k)+'<span>'+x.t+'</span></a>';}).join('')+'</nav><button type="button" class="mnMini" id="mnMini" title="'+(mini()?'Abrir o menu':'Recolher o menu')+'">'+(mini()?'»':'« Recolher menu')+'</button>';
-    s.querySelectorAll('.tb button').forEach(function(b){b.onclick=function(){GRP=b.dataset.g;desenha();};});
+    s.querySelectorAll('.tb button').forEach(function(b){b.onclick=function(){GRP=b.dataset.g;GRPU=true;desenha();};});
     s.querySelectorAll('a.it').forEach(function(a){a.onclick=function(ev){vaiPara(M.L[+a.dataset.i],ev);};});
     var mb=el('mnMini');if(mb)mb.onclick=function(){try{localStorage.setItem('bqufu-menu-mini-'+PG,mini()?'0':'1');}catch(e){}document.body.classList.toggle('mn-mini',mini());desenha();};
     var sx=el('mnSaiEx');if(sx)sx.onclick=function(){ss('bqufu-exemplo',null);ss('bqufu-ver',null);location.href='/estudos/#alunos';};
@@ -157,7 +157,9 @@ body.mn>header nav.tabs>a,.mn-esc{display:none!important}\
     t.querySelectorAll('.dd a').forEach(function(a){a.onclick=function(ev){t.querySelectorAll('.gr').forEach(function(x){x.classList.remove('ab');});vaiPara(M.L[+a.dataset.i],ev);};});
     var v=el('mnSaiEx2');if(v)v.onclick=function(){ss('bqufu-exemplo',null);ss('bqufu-ver',null);location.href='/estudos/#alunos';};}
   document.addEventListener('click',function(){var t=el('mnTop');if(t)t.querySelectorAll('.gr.ab').forEach(function(x){x.classList.remove('ab');});});
-  function marca(){var s=el('mnSide');if(!s)return;s.querySelectorAll('a.it').forEach(function(a){a.classList.toggle('on',ativo(M.L[+a.dataset.i]));});
+  function marca(){var s=el('mnSide');if(!s)return;
+    if(!GRPU&&M){var at=M.L.filter(function(x){return !x.dup&&ativo(x);})[0];if(at&&at.g!==GRP){GRP=at.g;desenha();return;}}
+   s.querySelectorAll('a.it').forEach(function(a){a.classList.toggle('on',ativo(M.L[+a.dataset.i]));});
     // esconde no topo as abas desta página que já estão na lateral
     M.L.forEach(function(x){if(x.pg===PG&&x.btn){var b=el(x.btn);if(b)b.classList.add('mn-esc');}});
     document.querySelectorAll('nav.subnav').forEach(function(n){var vs=[].some.call(n.querySelectorAll('button,a,span'),function(b){return !b.hidden&&!b.classList.contains('mn-esc')&&b.offsetParent!==null&&b.textContent.trim();});n.style.display=vs?'':'none';});}
@@ -176,6 +178,7 @@ body.mn>header nav.tabs>a,.mn-esc{display:none!important}\
     bt.onclick=function(){document.body.classList.add('mn-aberto');};hd.insertBefore(bt,hd.firstChild);
     if(TOPO){var tp=document.createElement('nav');tp.id='mnTop';tp.setAttribute('aria-label','Menu da plataforma');hd.appendChild(tp);document.body.classList.add('mn-topo');}
     document.body.classList.add('mn');document.body.classList.toggle('mn-mini',mini());desenha();posiciona();abreHash();
+    addEventListener('hashchange',function(){abreHash();setTimeout(function(){GRP=null;GRPU=false;desenha();},500);});
     addEventListener('scroll',posiciona,{passive:true});addEventListener('resize',posiciona);
     setInterval(function(){marca();posiciona();},700);
     window.menuPlataforma={redesenha:function(){ss('bqufu-menu-'+email,null);papel(email).then(function(r){R=r;M=itens(r);GRP=null;desenha();});}};}
