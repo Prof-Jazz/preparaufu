@@ -65,11 +65,11 @@
     else if(al&&(ass||r.rec.length)){I('Organizar','perfil','Perfil de estudos','/assessoria/#perfil','assessoria','tabForm');I('Organizar','duv','Dúvidas','/assessoria/#duvidas','assessoria','tabFaq');}
     if(al&&!ass&&!r.rec.length)I('Organizar','lock','Assessoria PREPARA UFU','/assessoria/','assessoria',null,{lock:true});
     // Acompanhar
-    if(mt)I('Acompanhar','dash','Meu Dashboard','/mentoria/#dashboard','mentoria','tabDash');
-    else if(al&&rec('dash'))I('Acompanhar','dash','Meu Dashboard','/estudos/#painel','estudos','tabPainel');
-    if(al)I('Acompanhar','cad','Caderno de Erros','/estudos/#caderno','estudos','tabCad',{dup:true});
+    if(mt)I('Progresso','dash','Meu Dashboard','/mentoria/#dashboard','mentoria','tabDash');
+    else if(al&&rec('dash'))I('Progresso','dash','Meu Dashboard','/estudos/#painel','estudos','tabPainel');
+    if(al)I('Progresso','cad','Caderno de Erros','/estudos/#caderno','estudos','tabCad',{dup:true});
     // Equipe
-    if(r.staff){
+    if(r.staff&&!ex){
       if(!al){I('Estudar','agenda','Agenda','/aulas/#agenda','aulas','tabAg');}
       I('Equipe','turma','Comportamento da turma','/assessoria/#turma','assessoria','tabGeral');
       I('Equipe','alunos','Alunos','/assessoria/#alunos','assessoria','tabResp');
@@ -95,6 +95,7 @@ body.mn>header nav.tabs>a,.mn-esc{display:none!important}\
 #mnSide a.it.on{background:rgba(58,140,203,.16);border-color:rgba(58,140,203,.45);color:var(--ink,#fff)}#mnSide a.it.on svg{opacity:1;color:#3A8CCB}\
 #mnSide a.it.lock{color:#C9A227}#mnSide a.it.lock svg{opacity:1}\
 #mnSide .ex{margin:0 12px 12px;padding:9px 11px;border-radius:11px;background:rgba(242,200,17,.14);border:1px solid rgba(242,200,17,.5);font:600 12.5px var(--body,system-ui);color:var(--ink,#fff)}\
+#mnSide .ex button{display:block;width:100%;margin-top:8px;border:0;border-radius:9px;padding:8px;background:#F2C811;color:#16304F;font:800 12.5px var(--body,system-ui);cursor:pointer}\
 #mnSide .hd{display:none}\
 #mnBtn{display:none;width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;font-size:20px;cursor:pointer;flex:none}\
 #mnVeu{display:none}\
@@ -119,11 +120,12 @@ body.mn>header nav.tabs>a,.mn-esc{display:none!important}\
   function desenha(){var s=el('mnSide');var gs=[];M.L.forEach(function(x){if(gs.indexOf(x.g)<0)gs.push(x.g);});
     if(!GRP||gs.indexOf(GRP)<0){var a=M.L.filter(function(x){return !x.dup&&ativo(x);})[0];GRP=a?a.g:gs[0];}
     s.innerHTML='<div class="hd"><span>Menu</span><button type="button" aria-label="Fechar menu">✕</button></div>'+
-      (M.ex?'<div class="ex">Você está vendo a plataforma como aluno.</div>':'')+
+      (M.ex?'<div class="ex">Você está vendo a plataforma como aluno: o menu Equipe some, como para ele.<button type="button" id="mnSaiEx">← Voltar à visão do professor</button></div>':'')+
       (gs.length>1?'<div class="tb" style="grid-template-columns:repeat('+(gs.length>3?2:gs.length)+',minmax(0,1fr))">'+gs.map(function(g){return '<button type="button" data-g="'+g+'"'+(g===GRP?' class="on"':'')+'>'+g+'</button>';}).join('')+'</div>':'<div style="height:10px"></div>')+
       '<nav class="ls" aria-label="Menu da plataforma">'+M.L.filter(function(x){return x.g===GRP;}).map(function(x,i){return '<a class="it'+(x.lock?' lock':'')+'" href="'+x.href+'" data-i="'+M.L.indexOf(x)+'">'+svg(x.lock?'lock':x.k)+'<span>'+x.t+'</span></a>';}).join('')+'</nav>';
     s.querySelectorAll('.tb button').forEach(function(b){b.onclick=function(){GRP=b.dataset.g;desenha();};});
     s.querySelectorAll('a.it').forEach(function(a){a.onclick=function(ev){vaiPara(M.L[+a.dataset.i],ev);};});
+    var sx=el('mnSaiEx');if(sx)sx.onclick=function(){ss('bqufu-exemplo',null);ss('bqufu-ver',null);location.href='/estudos/#alunos';};
     var f=s.querySelector('.hd button');if(f)f.onclick=function(){document.body.classList.remove('mn-aberto');};
     marca();}
   function marca(){var s=el('mnSide');if(!s)return;s.querySelectorAll('a.it').forEach(function(a){a.classList.toggle('on',ativo(M.L[+a.dataset.i]));});

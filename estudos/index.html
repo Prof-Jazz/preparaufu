@@ -278,7 +278,7 @@ select,input[type=number],input[type=text]{font:500 16px var(--body);padding:11p
 <div id="exBar" hidden>Vendo como <select id="exAluno" aria-label="Escolher o aluno"><option>Aluno exemplo</option></select> — é assim que esse aluno vê. <button type="button" id="exSair">Sair do modo aluno</button></div>
 <main id="app"><p class="pend">Carregando…</p></main>
 
-<script>(function(){var V='1795720777';var K='bqufu-recarga-';
+<script>(function(){var V='1795721137';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -539,7 +539,7 @@ function formSessao(x,depois){const novo=!x;const simu=!!(x&&x.detalhe&&x.detalh
 /* ---------- Caderno de Erros ---------- */
 const MOTV=Object.fromEntries(TERR.map(([k,n,d,c])=>[k,{n,d,c}]));
 const CADIMG={};
-async function cadUrl(p){if(!p)return '';const c=CADIMG[p];if(c&&c.t>Date.now())return c.u;
+async function cadUrl(p){if(!p)return '';if(/^(\/|https?:)/.test(p))return p;const c=CADIMG[p];if(c&&c.t>Date.now())return c.u;
   const {data}=await SB.storage.from('caderno').createSignedUrl(p,3600);const u=data&&data.signedUrl||'';CADIMG[p]={u,t:Date.now()+50*60000};return u;}
 function cadComprime(file){return new Promise((ok,no)=>{const im=new Image(),u=URL.createObjectURL(file);
   im.onload=()=>{const M=1800,k=Math.min(1,M/Math.max(im.width,im.height));const cv=document.createElement('canvas');cv.width=Math.round(im.width*k);cv.height=Math.round(im.height*k);
@@ -659,6 +659,7 @@ async function cardCaderno(email,cab){const {data}=await SB.from('caderno_erros'
   const L=Object.values(G).sort((a,b)=>b.r-a.r||b.n-a.n).slice(0,7);const mx=Math.max(1,...L.map(x=>x.n));
   return `<div class="chart"><h3 style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><i class="hi a"></i>Assuntos que mais erro<span style="margin-left:auto"><button class="btn avbtn" id="dCad">Abrir o Caderno de Erros</button></span></h3>
    <p class="sub">${T.length?`Do Caderno de Erros: ${T.length} quest${T.length>1?'ões':'ão'} anotada${T.length>1?'s':''}, ${T.filter(x=>!x.revisada).length} ainda a revisar. A barra clara mostra o que já foi revisado.`:'Aparece quando houver questões anotadas no Caderno de Erros (o site pergunta ao encerrar uma sessão com erros).'}</p>
+   ${T.length?`<div class="cdg" style="margin:4px 0 16px">${Object.entries(T.reduce((g,x)=>{const z=g[x.materia]=g[x.materia]||{n:0,r:0,a:new Set()};z.n++;if(!x.revisada)z.r++;z.a.add(x.assunto||'');return g;},{})).sort((a,b)=>b[1].r-a[1].r||b[1].n-a[1].n).map(([m,z])=>`<button class="cdc" data-cm="${esc(m)}" style="--c:${CORM[m]||'#3A8CCB'}"><h4>${esc(m)}<em>›</em></h4><div class="n">${z.r}<small>a revisar de ${z.n}</small></div><span class="ft">${z.a.size} assunto${z.a.size>1?'s':''} com erro</span><span class="pb"><i style="width:${Math.round(100*(z.n-z.r)/z.n)}%"></i></span></button>`).join('')}</div>`:''}
    ${L.length?`<div class="cdtop">${L.map(x=>{const c=CORM[x.m]||'#3A8CCB';return `<div class="lin"><span title="${esc(x.m)} · ${esc(x.a||'só pela foto')}"><b style="color:${c}">${esc(x.m)}</b> · ${esc(x.a||'só pela foto')}</span><span style="background:var(--soft);border-radius:9px"><i style="width:${Math.round(100*x.n/mx)}%;background:linear-gradient(90deg,${c} ${Math.round(100*x.r/x.n)}%,color-mix(in srgb,${c} 35%,transparent) ${Math.round(100*x.r/x.n)}%)"></i></span><b>${x.r}/${x.n}</b></div>`;}).join('')}</div>`:''}</div>`;}
 
 /* ---------- Dashboard ---------- */
@@ -722,6 +723,7 @@ async function telaPainel(email,cab){if(!cab)abas('tabPainel');$('app').innerHTM
    ${cardCad}
    <div class="chart"><h3 style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><i class="hi c"></i>Atividade recente${!cab&&!VER_REAL()?'<span style="margin-left:auto;display:flex;gap:8px"><button class="btn avbtn" id="dAv">+ Estudos Extras</button>'+(S.length>8?'<button class="btn avbtn" id="dTodas">Ver todas as sessões</button>':'')+'</span>':''}</h3><div class="hoje" style="margin-top:10px">${S.length?'':'<p class="pend">Nenhuma sessão registrada ainda. As últimas sessões aparecem aqui.</p>'}${S.slice(-8).reverse().map(x=>{const [n,ic,,c]=TI(x.tipo);const h=new Date(x.inicio);return `<div class="ses" style="--c:${c}"><span style="font-size:20px">${ic}</span><div class="tx"><b>${esc(x.materia)} · ${x.detalhe&&(x.detalhe.extra||x.detalhe.avulsa)?'Estudos Extras':esc(n)}</b><span>${dm(h)} às ${String(h.getHours()).padStart(2,'0')}:${String(h.getMinutes()).padStart(2,'0')} · ${esc(x.assunto||'')}${x.questoes?` · ${x.acertos}/${x.questoes} acertos`:''}</span></div><span class="du">${hfmt(x.segundos)}</span>${!cab&&!VER_REAL()?`<button class="edt" data-id="${x.id}" title="Corrigir sessão">✎</button>`:''}</div>`;}).join('')}</div></div>`;
   const recar=()=>telaPainel(email,cab);
+  $('app').querySelectorAll('.cdc[data-cm]').forEach(b=>b.onclick=()=>{CADV={f:'todos',m:b.dataset.cm,a:null};if(cab)telaCaderno(email,cab);else{history.replaceState(null,'','#caderno');abas('tabCad');telaCaderno(email);}});
   if($('dCad'))$('dCad').onclick=()=>{CADV={f:'rev',m:null,a:null};if(cab)telaCaderno(email,cab);else{history.replaceState(null,'','#caderno');telaCaderno(email);}};
   if($('dAv'))$('dAv').onclick=async()=>{try{await carregaPlano();}catch(e){}formSessao(null,recar);};
   $('app').querySelectorAll('.edt').forEach(b=>b.onclick=async()=>{try{await carregaPlano();}catch(e){}formSessao(S.find(x=>String(x.id)===b.dataset.id),recar);});
@@ -809,7 +811,7 @@ async function telaDen(){abas('tabDen');$('app').innerHTML='<p class="pend">Carr
   $('app').querySelectorAll('[data-r]').forEach(b=>b.onclick=async()=>{await SB.rpc('admin_resolver',{p_id:+b.dataset.id,p:b.dataset.r==='1'});telaDen();});}
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795720777" defer></script>
-<script src="../js/menu.js?v=1795720777" defer></script>
+<script src="../js/presenca.js?v=1795721137" defer></script>
+<script src="../js/menu.js?v=1795721137" defer></script>
 </body>
 </html>
