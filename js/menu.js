@@ -86,7 +86,7 @@ body.mn{padding-left:248px}body.mn>header{margin-left:-248px}\
 body.mn>header nav.tabs>a,.mn-esc{display:none!important}\
 #mnSide{position:fixed;left:0;top:0;bottom:0;width:248px;z-index:40;background:var(--card,#132238);border-right:1px solid var(--line,#2a3a55);display:flex;flex-direction:column;font-family:var(--body,system-ui)}\
 #mnSide .tb{display:grid;gap:3px;margin:12px 12px 8px;padding:3px;border-radius:12px;background:var(--soft,rgba(127,140,160,.15))}\
-#mnSide .tb button{border:0;background:none;color:var(--muted,#8a97ad);font:700 12.5px var(--body,system-ui);padding:8px 2px;border-radius:9px;cursor:pointer;white-space:nowrap}\
+#mnSide .tb button{border:0;background:none;color:var(--muted,#8a97ad);font:700 12px var(--body,system-ui);padding:8px 2px;overflow:hidden;text-overflow:ellipsis;border-radius:9px;cursor:pointer;white-space:nowrap}\
 #mnSide .tb button.on{background:var(--bg,#0b1424);color:var(--ink,#fff);box-shadow:0 1px 4px rgba(0,0,0,.18)}\
 #mnSide .ls{flex:1;overflow:auto;padding:4px 10px 12px;display:flex;flex-direction:column;gap:2px}\
 #mnSide a.it{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:11px;color:var(--ink,#e8eef7);text-decoration:none;font:600 14.5px var(--body,system-ui);border:1px solid transparent}\
@@ -120,7 +120,7 @@ body.mn>header nav.tabs>a,.mn-esc{display:none!important}\
     if(!GRP||gs.indexOf(GRP)<0){var a=M.L.filter(function(x){return !x.dup&&ativo(x);})[0];GRP=a?a.g:gs[0];}
     s.innerHTML='<div class="hd"><span>Menu</span><button type="button" aria-label="Fechar menu">✕</button></div>'+
       (M.ex?'<div class="ex">Você está vendo a plataforma como aluno.</div>':'')+
-      (gs.length>1?'<div class="tb" style="grid-template-columns:repeat('+gs.length+',minmax(0,1fr))">'+gs.map(function(g){return '<button type="button" data-g="'+g+'"'+(g===GRP?' class="on"':'')+'>'+g+'</button>';}).join('')+'</div>':'<div style="height:10px"></div>')+
+      (gs.length>1?'<div class="tb" style="grid-template-columns:repeat('+(gs.length>3?2:gs.length)+',minmax(0,1fr))">'+gs.map(function(g){return '<button type="button" data-g="'+g+'"'+(g===GRP?' class="on"':'')+'>'+g+'</button>';}).join('')+'</div>':'<div style="height:10px"></div>')+
       '<nav class="ls" aria-label="Menu da plataforma">'+M.L.filter(function(x){return x.g===GRP;}).map(function(x,i){return '<a class="it'+(x.lock?' lock':'')+'" href="'+x.href+'" data-i="'+M.L.indexOf(x)+'">'+svg(x.lock?'lock':x.k)+'<span>'+x.t+'</span></a>';}).join('')+'</nav>';
     s.querySelectorAll('.tb button').forEach(function(b){b.onclick=function(){GRP=b.dataset.g;desenha();};});
     s.querySelectorAll('a.it').forEach(function(a){a.onclick=function(ev){vaiPara(M.L[+a.dataset.i],ev);};});
