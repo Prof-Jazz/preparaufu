@@ -255,7 +255,7 @@ td.h{font-weight:700}.z{color:var(--line)}
   </main>
 
 </div>
-<script>(function(){var V='1795727713';var K='bqufu-recarga-';
+<script>(function(){var V='1795728189';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -682,7 +682,7 @@ $('admList').onclick=async ev=>{const z=ev.target.dataset.z,r=ev.target.dataset.
   if(r&&confirm('Remover o acesso de '+r+'?')){await SB.rpc('admin_zerar_senha',{e:r});const {error}=await SB.from('allowed_emails').delete().eq('email',r);am(error?error.message:'Acesso removido: '+r);await admLoad();}};
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795727713" defer></script>
-<script src="../js/menu.js?v=1795727713" defer></script>
+<script src="../js/presenca.js?v=1795728189" defer></script>
+<script src="../js/menu.js?v=1795728189" defer></script>
 </body>
 </html>

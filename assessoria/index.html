@@ -35,6 +35,9 @@
 .dlg .top .x{margin-left:auto;background:none;border:0;color:#fff;font-size:24px;cursor:pointer;line-height:1}
 .dlg .bd{padding:16px 20px;display:flex;flex-direction:column;gap:12px}
 .dlg .btns{display:flex;gap:8px;flex-wrap:wrap}
+.f.novo{outline:3px solid #F2C811;outline-offset:4px;border-radius:12px}.f.falta{outline:3px solid #E5484D;outline-offset:4px;border-radius:12px}
+.avnovo{margin-top:10px;padding:10px 12px;border-radius:10px;background:rgba(242,200,17,.15);border:1px solid #F2C811;font-weight:600}
+.toastfalta{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:90;max-width:min(620px,92vw);background:#E5484D;color:#fff;padding:14px 18px;border-radius:14px;box-shadow:0 12px 30px rgba(0,0,0,.35);font-size:15px;line-height:1.4}.toastfalta[hidden]{display:none}
 </style>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Assessoria PREPARA UFU</title>
@@ -445,8 +448,8 @@ body{}@keyframes fadein{from{opacity:0}to{opacity:1}}
 <div id="exBar" hidden>Vendo como <select id="exAluno" aria-label="Escolher o aluno"><option>Aluno exemplo</option></select> — é assim que esse aluno vê. <span id="exObs"></span><button type="button" id="exSair">Sair do modo aluno</button></div>
 <main id="app"></main>
 
-<script src="../js/estatisticas.js?v=1795727713"></script>
-<script>(function(){var V='1795727713';var K='bqufu-recarga-';
+<script src="../js/estatisticas.js?v=1795728189"></script>
+<script>(function(){var V='1795728189';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,.adlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -560,6 +563,20 @@ function ler(){const fm=$('ck'),r={};
     else if(f.type==='scale'){r.nivel={};AREAS.forEach((a,i)=>{const c=fm.querySelector(`input[name="nivel_${i}"]:checked`);r.nivel[a]=c?+c.value:null;});}
     else r[f.k]=(fm.querySelector(`[name="${f.k}"]`).value||'').trim();});
   return r;}
+
+/* perfil preenchido antes das perguntas novas: pré-preenche a partir das respostas antigas e destaca para o aluno conferir */
+const VER_SO_LEITURA=()=>false;
+function migraPerfil(ant){const fm=$('ck');const novos=[];if(!ant)return novos;
+  const conv=v=>!v?'':/não/i.test(v)?'Não estudo':HORAS.includes(v)?v:'';
+  if(!ant.horas_dia||!Object.keys(ant.horas_dia).length){DS.forEach((d,i)=>{const e=fm.querySelector(`[name="hd_${d}"]`);if(e&&!e.value)e.value=i<5?conv(ant.horas_semana):d==='Sáb'?conv(ant.horas_sab):conv(ant.horas_dom);});novos.push('horas_dia');}
+  if(!ant.rev_tempo){const M={'Até 15 min':'15 min','15 a 30 min':'30 min','30 min a 1 h':'45 min','Mais de 1 h':'1 h'};const v=(ant.anki||'').startsWith('Sim')?M[ant.anki_min]:'';if(v){const i=fm.querySelector(`input[name="rev_tempo"][value="${v}"]`);if(i)i.checked=true;}novos.push('rev_tempo');}
+  const faltam=faltando(ler()).map(x=>x.k);faltam.forEach(k=>{if(!novos.includes(k))novos.push(k);});
+  novos.forEach(k=>{const el=fm.querySelector(`.f[data-k="${k}"]`);if(el)el.classList.add('novo');});
+  if(novos.length)$('intro').insertAdjacentHTML('beforeend',`<p class="avnovo">O perfil de estudos ganhou perguntas novas. Confira as que estão <b>destacadas em amarelo</b> (já deixamos uma sugestão a partir das suas respostas antigas) e clique em <b>Atualizar perfil de estudos</b> no fim da página.</p>`);
+  return novos;}
+function avisaFalta(f){const fm=$('ck');fm.querySelectorAll('.f.falta').forEach(e=>e.classList.remove('falta'));f.forEach(x=>{const e=fm.querySelector(`.f[data-k="${x.k}"]`);if(e)e.classList.add('falta');});
+  let t=document.getElementById('toastFalta');if(!t){t=document.createElement('div');t.id='toastFalta';t.className='toastfalta';document.body.appendChild(t);}
+  t.innerHTML=`<b>Seu perfil ainda não foi salvo.</b> Falta responder ${f.length===1?'1 pergunta':f.length+' perguntas'} (marcada${f.length>1?'s':''} em vermelho): ${esc(f[0].l.replace(/\?.*$/,'?'))}${f.length>1?' e mais '+(f.length-1):''}`;t.hidden=false;clearTimeout(t._t);t._t=setTimeout(()=>t.hidden=true,9000);}
 function preencher(r){const fm=$('ck');
   CAMPOS.forEach(f=>{const v=r[f.k];if(v==null)return;
     if(f.type==='checks'||f.type==='grid')fm.querySelectorAll(`input[name="${f.k}"]`).forEach(i=>i.checked=(v||[]).includes(i.value));
@@ -582,9 +599,10 @@ async function telaForm(){
   const fm=$('ck');fm.addEventListener('input',visiveis);fm.addEventListener('change',visiveis);
   let {data}=await SB.from('checkup').select('respostas,atualizado_em').eq('email',ALVO).maybeSingle();
   if(data){preencher(data.respostas);$('intro').classList.add('done');$('intro').insertAdjacentHTML('beforeend',`<p style="margin-top:8px;color:var(--ok);font-weight:600">✓ Perfil de estudos enviado em ${new Date(data.atualizado_em).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}. Se algo mudou, altere e envie de novo.</p>`);$('enviar').textContent='Atualizar perfil de estudos';}
+  if(data&&!VER_SO_LEITURA())migraPerfil(data.respostas);
   visiveis();
   fm.onsubmit=async ev=>{ev.preventDefault();const r=ler();CAMPOS.forEach(f=>{if(f.show&&!f.show(r))delete r[f.k];});const f=faltando(r),m=$('msg');
-    if(f.length){m.className='err';m.textContent='Falta responder: '+f.map(x=>x.l.replace(/\?.*$/,'?')).slice(0,3).join(' · ')+(f.length>3?` (e mais ${f.length-3})`:'');
+    if(f.length){avisaFalta(f);m.className='err';m.textContent='Falta responder: '+f.map(x=>x.l.replace(/\?.*$/,'?')).slice(0,3).join(' · ')+(f.length>3?` (e mais ${f.length-3})`:'');
       document.querySelector(`.f[data-k="${f[0].k}"]`).scrollIntoView({behavior:'smooth',block:'center'});return;}
     const ch=choques(r);if(ch.length&&!confirm(ch.join('\n')+'\n\nHá compromissos com choque de horário. Quer enviar assim mesmo?')){document.getElementById('choqueBox').scrollIntoView({behavior:'smooth',block:'center'});return;}
     const inc=fxIncompleto(r.fixos||[]);
@@ -1463,7 +1481,7 @@ async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!se
 $('sair').onclick=async()=>{try{localStorage.removeItem('bqufu-sig-v2');}catch(e){}await SB.auth.signOut();location.href='/';};
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795727713" defer></script>
-<script src="../js/menu.js?v=1795727713" defer></script>
+<script src="../js/presenca.js?v=1795728189" defer></script>
+<script src="../js/menu.js?v=1795728189" defer></script>
 </body>
 </html>
