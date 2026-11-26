@@ -45,6 +45,40 @@
 .dlg .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .dlg label.f{display:flex;flex-direction:column;gap:5px;font-weight:600;font-size:14px}
 .dlg label.f input,.dlg label.f select{font:500 15px var(--body);padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink)}
+/* Caderno de Erros */
+.cdk{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:14px}
+.cdk>div{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px}.cdk span{display:block;font:700 11.5px var(--body);text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.cdk b{display:block;font:800 30px var(--display);line-height:1.15;margin-top:4px}.cdk small{color:var(--muted);font-size:12.5px}
+.cdbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:4px 0 14px}.cdbar .vol{font:700 14px var(--body);background:none;border:0;color:var(--ink);cursor:pointer;padding:6px 0}
+.cdf{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;background:var(--soft);border-radius:11px;padding:3px}.cdf button{border:0;background:none;color:var(--muted);font:700 13px var(--body);padding:7px 12px;border-radius:9px;cursor:pointer}.cdf button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.15)}
+.cdg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.cdc{text-align:left;background:var(--card);border:1px solid var(--line);border-top:5px solid var(--c);border-radius:16px;padding:14px 16px;cursor:pointer;color:var(--ink);font:inherit;display:flex;flex-direction:column;gap:6px;min-height:118px;transition:transform .12s,box-shadow .12s}
+.cdc:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(0,0,0,.18)}.cdc h4{margin:0;font:800 16px var(--display);display:flex;justify-content:space-between;gap:8px}.cdc h4 em{font-style:normal;color:var(--muted);font-size:18px}
+.cdc .n{font:800 28px var(--display);line-height:1}.cdc .n small{font:600 12.5px var(--body);color:var(--muted);margin-left:4px}.cdc .pb{height:7px;border-radius:9px;background:var(--soft);overflow:hidden;margin-top:auto}.cdc .pb i{display:block;height:100%;background:#1BAF7A}
+.cdc .ft{font-size:12px;color:var(--muted)}
+.cdq{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.cdi{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}.cdi.ok{opacity:.72}
+.cdi .im{display:block;width:100%;aspect-ratio:16/9;object-fit:contain;background:#fff;cursor:zoom-in;border:0;border-bottom:1px solid var(--line)}
+.cdi .sem{padding:16px 12px!important;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:center;background:var(--soft);color:var(--muted);font-size:13px;text-align:center;padding:10px}
+.cdi .tx{padding:12px 14px;display:flex;flex-direction:column;gap:6px;flex:1}.cdi .tx b{font:800 15px var(--display)}.cdi .tx p{margin:0;font-size:13.5px;color:var(--muted)}
+.cdi .cmt{display:inline-flex;align-self:flex-start;align-items:center;gap:6px;border-radius:20px;padding:3px 10px;font:700 12px var(--body);background:color-mix(in srgb,var(--c) 18%,transparent);color:var(--ink);border:1px solid var(--c)}
+.cdi .ac{display:grid;grid-template-columns:1fr auto auto;gap:6px;padding:0 14px 12px}.cdi .ac button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:8px 10px;font:700 13px var(--body);cursor:pointer}
+.cdi .ac .rv{border-color:#1BAF7A;color:#1BAF7A}.cdi.ok .ac .rv{background:#1BAF7A;color:#fff}
+.cdz{position:fixed;inset:0;z-index:80;background:rgba(5,8,18,.88);display:flex;align-items:center;justify-content:center;padding:20px;cursor:zoom-out}.cdz img{max-width:100%;max-height:100%;border-radius:10px;background:#fff}
+.ane{display:flex;flex-direction:column;gap:10px;max-height:58vh;overflow:auto;padding-right:2px}
+.anq{border:1px solid var(--line);border-left:5px solid var(--c,#E5484D);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;background:var(--bg)}
+.anq .hd{display:flex;align-items:center;justify-content:space-between;font:800 14px var(--display)}.anq .hd button{border:0;background:none;color:var(--muted);font-size:18px;cursor:pointer}
+.anq select,.anq input[type=text]{font:500 14px var(--body);padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--ink);width:100%}
+.anq .r2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.anq .mot{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}.anq .mot button{border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--ink);font:700 12px var(--body);padding:7px 4px;cursor:pointer}
+.anq .mot button.on{background:var(--m);border-color:var(--m);color:#fff}
+.anq .ft{display:flex;align-items:center;gap:10px}.anq .ft label{display:inline-flex;align-items:center;gap:6px;border:1px dashed var(--line);border-radius:10px;padding:7px 12px;font:700 13px var(--body);cursor:pointer;background:var(--card)}
+.anq .ft input{display:none}.anq .ft img{height:54px;max-width:120px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+.anb{display:grid;grid-template-columns:1fr 1fr;gap:8px}.anb label{display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer}.anb input{display:none}
+.cdtop{display:flex;flex-direction:column;gap:6px}.cdtop .lin{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,3fr) 46px;gap:10px;align-items:center;font-size:13.5px}
+.cdtop .lin span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.cdtop .lin i{display:block;height:10px;border-radius:9px}.cdtop .lin b{text-align:right}
+@media (max-width:820px){.cdg{grid-template-columns:repeat(2,minmax(0,1fr))}.cdk{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.cdq{grid-template-columns:1fr}.anq .mot{grid-template-columns:repeat(2,minmax(0,1fr))}.anq .r2{grid-template-columns:1fr}}
 </style>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sala de Estudos · PREPARA UFU</title>
@@ -240,11 +274,11 @@ select,input[type=number],input[type=text]{font:500 16px var(--body);padding:11p
   <a class="logos" href="/" title="Início da plataforma PREPARA UFU"><img class="j" src="../bancodequestoes/logo/jazz_claro.png" alt="Jazz, Professor de Matemática"><span class="sep"></span><img class="p" src="../bancodequestoes/logo/prepara_transp.png" alt="Prepara UFU"></a>
   <nav class="tabs"><button class="theme" id="theme" aria-label="Alternar modo diurno e noturno" title="Modo diurno / noturno"><span class="sun">☀</span><span class="moon">☾</span></button><a href="../minhasaulas/">Minhas Aulas</a><a href="../bancodequestoes/">Banco de Questões</a><a href="../aulas/#agenda">Agenda</a><a href="../aulas/#materiais">Materiais</a><a class="am" href="../assessoria/">Assessoria</a><button id="sair">Sair</button></nav>
 </header>
-<nav class="subnav" aria-label="Sala de Estudos"><div class="in"><button id="tabSala" class="on">Sala de Estudos</button><button id="tabPainel" hidden>Meu Dashboard</button><button id="tabAlunos" hidden>Dashboard dos alunos</button><button id="tabDen" hidden>Denúncias</button><button id="tabEx" hidden>Ver como aluno</button></div></nav>
+<nav class="subnav" aria-label="Sala de Estudos"><div class="in"><button id="tabSala" class="on">Sala de Estudos</button><button id="tabPainel" hidden>Meu Dashboard</button><button id="tabCad" hidden>Caderno de Erros</button><button id="tabAlunos" hidden>Dashboard dos alunos</button><button id="tabDen" hidden>Denúncias</button><button id="tabEx" hidden>Ver como aluno</button></div></nav>
 <div id="exBar" hidden>Vendo como <select id="exAluno" aria-label="Escolher o aluno"><option>Aluno exemplo</option></select> — é assim que esse aluno vê. <button type="button" id="exSair">Sair do modo aluno</button></div>
 <main id="app"><p class="pend">Carregando…</p></main>
 
-<script>(function(){var V='1795654758';var K='bqufu-recarga-';
+<script>(function(){var V='1795716973';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -296,6 +330,7 @@ async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!se
   menus();
   $('tabSala').onclick=()=>{history.replaceState(null,'','#sala');telaSala();};
   $('tabPainel').onclick=()=>{history.replaceState(null,'','#painel');telaPainel(ALVO);};
+  $('tabCad').onclick=()=>{history.replaceState(null,'','#caderno');CADV={f:'rev',m:null,a:null};telaCaderno(ALVO);};
   $('tabDen').onclick=()=>{history.replaceState(null,'','#denuncias');telaDen();};
   $('tabAlunos').onclick=()=>{history.replaceState(null,'','#alunos');telaAlunos();};
   $('tabEx').onclick=()=>{EXMODO=true;const v=verGet();ALVO=(v&&v.email)||EXEMPLO;PLANO=null;try{sessionStorage.setItem('bqufu-exemplo','assessoria');}catch(e){}menus();verOpcoes();telaSala();};
@@ -304,10 +339,11 @@ async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!se
   const al=new URLSearchParams(location.search).get('aluno');
   if(REAL_ADMIN&&!EXMODO&&location.hash==='#denuncias')telaDen();else if(STAFF&&!EXMODO&&(al||location.hash==='#alunos'||(!REAL_ADMIN&&location.hash!=='#sala')))telaAlunos(al);
   else if(location.hash==='#painel'&&$('tabPainel').hidden===false)telaPainel(ALVO);
+  else if(location.hash==='#caderno'&&$('tabCad').hidden===false)telaCaderno(ALVO);
   else telaSala();
   if(location.hash==='#mensagens'){history.replaceState(null,'','#sala');setTimeout(()=>{if(typeof abreCaixa==='function')abreCaixa();},900);}}
-function menus(){const adm=REAL_ADMIN&&!EXMODO,stf=STAFF&&!EXMODO;$('tabPainel').hidden=!((ASSESSORIA||REC.includes('dash'))&&!stf);$('tabPainel').textContent='Meu Dashboard';$('tabAlunos').hidden=!stf;$('tabDen').hidden=!adm;$('tabEx').hidden=!stf;$('exBar').hidden=!EXMODO||MVER;}
-const abas=on=>['tabSala','tabPainel','tabAlunos','tabDen'].forEach(t=>$(t).classList.toggle('on',t===on));
+function menus(){const adm=REAL_ADMIN&&!EXMODO,stf=STAFF&&!EXMODO;$('tabPainel').hidden=!((ASSESSORIA||REC.includes('dash'))&&!stf);$('tabCad').hidden=stf;$('tabPainel').textContent='Meu Dashboard';$('tabAlunos').hidden=!stf;$('tabDen').hidden=!adm;$('tabEx').hidden=!stf;$('exBar').hidden=!EXMODO||MVER;}
+const abas=on=>['tabSala','tabPainel','tabCad','tabAlunos','tabDen'].forEach(t=>$(t).classList.toggle('on',t===on));
 
 async function carregaPlano(){if(PLANO)return;
   const ck='bqufu-plano-'+(MENTORADO?'m-':'t-')+ALVO;
@@ -438,9 +474,10 @@ function encerrar(s){const seg=Math.round(decorrido(s)/1000);if(s.rodando){s.acu
       if(!ms.length&&!t){msg('Conte o que você revisou: marque uma opção ou escreva em poucas palavras.');bt.disabled=false;return;}
       s.assunto=(ms.join(', ')+(t?(ms.length?' — ':'')+t:'')).slice(0,200);}
     const fimT=Date.now();const row={email:s.email,inicio:new Date(s.inicio).toISOString(),fim:new Date(fimT).toISOString(),segundos:seg,tipo:s.tipo,materia:s.materia,assunto:s.assunto||null,plano_item:s.item,questoes:q,acertos:a,erros:e,detalhe:det};
-    let r=await SB.from('sessoes').insert(row);if(r.error&&/plano_item|foreign key/i.test(r.error.message)){row.plano_item=null;r=await SB.from('sessoes').insert(row);}if(r.error){msg('Não foi possível salvar: '+r.error.message);bt.disabled=false;return;}
+    let r=await SB.from('sessoes').insert(row).select('id').single();if(r.error&&/plano_item|foreign key/i.test(r.error.message)){row.plano_item=null;r=await SB.from('sessoes').insert(row).select('id').single();}if(r.error){msg('Não foi possível salvar: '+r.error.message);bt.disabled=false;return;}
     if(f.mk&&f.mk.checked)await SB.from(MENTORADO?'m_plano_feito':'plano_feito').insert({email:s.email,item:s.item});
-    gravaS(null);d.remove();telaSala();};}
+    gravaS(null);d.remove();telaSala();
+    if(e>0&&!VER_REAL())anotaErros({sessao:r.data&&r.data.id,materia:s.livre?'':s.materia,item:s.item,assunto:s.assunto,n:e,disc:det&&det.disc},()=>{});};}
 function verGet(){try{return JSON.parse(sessionStorage.getItem('bqufu-ver')||'null');}catch(e){return null;}}
 function verSet(v){try{v?sessionStorage.setItem('bqufu-ver',JSON.stringify(v)):sessionStorage.removeItem('bqufu-ver');}catch(e){}}
 const VER_REAL=()=>EXMODO&&!MVER&&ALVO!==EXEMPLO;
@@ -474,10 +511,12 @@ function formSessao(x,depois){const novo=!x;const simu=!!(x&&x.detalhe&&x.detalh
     <label class="f"><span>Quanto tempo você estudou? <span class="opc">(em minutos)</span></span><input type="number" name="min" min="0" max="720" inputmode="numeric" value="${x&&x.segundos?Math.round(x.segundos/60):''}" placeholder="ex.: 50"${novo?' required':''}></label>
     <p class="msg"></p>
     <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn pri" type="submit" style="flex:1">${novo?'Registrar':'Salvar correção'}</button><button class="btn" type="button" data-x="fecha">Cancelar</button></div>
+    ${!novo&&!simu&&x.erros>0?'<button class="btn" type="button" data-x="cad">📒 Anotar os erros desta sessão no Caderno</button>':''}
     ${novo?'':'<button class="btn del" type="button" data-x="apaga" style="background:none;border:0">Apagar esta sessão</button>'}</form></div>`;
   document.body.appendChild(d);const f=d.querySelector('form'),msg=t=>d.querySelector('.msg').textContent=t,fecha=()=>d.remove();
   d.querySelector('[data-x=fecha]').onclick=fecha;d.addEventListener('mousedown',e=>{if(e.target===d)fecha();});
   if(!simu){const er=()=>{const q=parseInt(f.q.value,10),a=parseInt(f.a.value,10);f.e.value=isNaN(q)?'':Math.max(0,q-(isNaN(a)?0:a));};f.q.oninput=er;f.a.oninput=er;er();}
+  const cb=d.querySelector('[data-x=cad]');if(cb)cb.onclick=()=>{fecha();anotaErros({sessao:x.id,materia:x.materia,item:x.plano_item,assunto:x.assunto,n:x.erros},depois);};
   const ap=d.querySelector('[data-x=apaga]');if(ap)ap.onclick=async()=>{if(!ap.dataset.ok){ap.dataset.ok=1;ap.textContent='Confirmar: apagar esta sessão';return;}
     const {error}=await SB.from('sessoes').delete().eq('id',x.id);if(error){msg(error.message);return;}fecha();depois&&depois();};
   f.onsubmit=async ev=>{ev.preventDefault();const bt=f.querySelector('[type=submit]');
@@ -491,11 +530,136 @@ function formSessao(x,depois){const novo=!x;const simu=!!(x&&x.detalhe&&x.detalh
       Object.assign(row,{materia:f.mat.value,assunto:top||null,questoes:q,acertos:a,erros:q-a});if(novo)row.plano_item=null;}
     if(novo&&!seg){msg('Informe quanto tempo você estudou.');return;}
     bt.disabled=true;let r;
-    if(novo)r=await SB.from('sessoes').insert({...row,email:ALVO,tipo:'questoes',detalhe:{extra:true}});
+    if(novo)r=await SB.from('sessoes').insert({...row,email:ALVO,tipo:'questoes',detalhe:{extra:true}}).select('id').single();
     else r=await SB.from('sessoes').update(row).eq('id',x.id);
-    if(r.error&&/plano_item|foreign key/i.test(r.error.message)){delete row.plano_item;r=novo?await SB.from('sessoes').insert({...row,email:ALVO,tipo:'questoes',detalhe:{extra:true}}):await SB.from('sessoes').update(row).eq('id',x.id);}
+    if(r.error&&/plano_item|foreign key/i.test(r.error.message)){delete row.plano_item;r=novo?await SB.from('sessoes').insert({...row,email:ALVO,tipo:'questoes',detalhe:{extra:true}}).select('id').single():await SB.from('sessoes').update(row).eq('id',x.id);}
     if(r.error){msg('Não foi possível salvar: '+r.error.message);bt.disabled=false;return;}
+    fecha();depois&&depois();if(novo&&row.erros>0)anotaErros({sessao:r.data&&r.data.id,materia:row.materia,n:row.erros},depois);};}
+
+/* ---------- Caderno de Erros ---------- */
+const MOTV=Object.fromEntries(TERR.map(([k,n,d,c])=>[k,{n,d,c}]));
+const CADIMG={};
+async function cadUrl(p){if(!p)return '';const c=CADIMG[p];if(c&&c.t>Date.now())return c.u;
+  const {data}=await SB.storage.from('caderno').createSignedUrl(p,3600);const u=data&&data.signedUrl||'';CADIMG[p]={u,t:Date.now()+50*60000};return u;}
+function cadComprime(file){return new Promise((ok,no)=>{const im=new Image(),u=URL.createObjectURL(file);
+  im.onload=()=>{const M=1800,k=Math.min(1,M/Math.max(im.width,im.height));const cv=document.createElement('canvas');cv.width=Math.round(im.width*k);cv.height=Math.round(im.height*k);
+    const g=cv.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,cv.width,cv.height);g.drawImage(im,0,0,cv.width,cv.height);URL.revokeObjectURL(u);cv.toBlob(b=>b?ok(b):no(new Error('imagem')),'image/jpeg',.85);};
+  im.onerror=()=>{URL.revokeObjectURL(u);no(new Error('Não consegui abrir essa imagem. Envie uma foto em JPG ou PNG.'));};im.src=u;});}
+async function cadSobe(file){const b=await cadComprime(file);const p=ALVO+'/'+(crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(36).slice(2))+'.jpg';
+  const {error}=await SB.storage.from('caderno').upload(p,b,{contentType:'image/jpeg',upsert:false});if(error)throw error;return p;}
+const cadMats=()=>MATS.filter(m=>m!=='Redação'&&!(m==='Inglês'&&LINGUA==='Espanhol')&&!(m==='Espanhol'&&LINGUA==='Inglês')&&!(m==='Francês'&&LINGUA!=='Francês'));
+function cadAssuntos(m){const L=(PLANO||[]).filter(x=>matSala(x)===m);const vis=new Set(),out=[];L.forEach(x=>{const k=x.assunto;if(vis.has(k))return;vis.add(k);out.push(x);});return out;}
+/* o: {sessao, materia, item, assunto, n, disc:{mat:{e}}, edit:linha existente} */
+async function anotaErros(o,depois){try{await carregaPlano();}catch(e){}
+  const edit=o.edit,mats=cadMats();let nq=0;
+  const discE=o.disc?Object.entries(o.disc).filter(([,v])=>v&&v.e>0).map(([m,v])=>[m,v.e]):[];
+  const d=document.createElement('div');d.className='dlg';
+  d.innerHTML=`<div class="box" style="--c:#E5484D;max-width:620px"><div class="top"><h3>📒 ${edit?'Editar erro':'Caderno de Erros'}</h3><p>${edit?'Ajuste o assunto, o motivo ou a foto desta questão.':o.n?`Você errou ${o.n} quest${o.n>1?'ões':'ão'}. Anote de que assunto era cada uma e por que errou: é assim que o seu caderno mostra o que você precisa rever. Pode anotar só algumas, ou só mandar a foto.`:'Anote uma questão que você errou: o assunto e o motivo, ou só a foto.'}</p></div>
+   <div class="bd" style="display:flex;flex-direction:column;gap:12px;padding:16px 18px">
+    <div class="ane" id="aneL"></div>
+    ${edit?'':`<div class="anb"><button class="btn" type="button" id="aneMais">+ Outra questão</button><label class="btn">📷 Várias fotos de uma vez<input type="file" accept="image/*" multiple id="aneFotos"></label></div>`}
+    <p class="msg" style="margin:0"></p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn pri" type="button" id="aneOk" style="flex:1">${edit?'Salvar':'Salvar no Caderno de Erros'}</button><button class="btn" type="button" id="aneNao">${edit?'Cancelar':'Agora não'}</button></div>
+    ${edit?'<button class="btn del" type="button" id="aneDel" style="background:none;border:0">Apagar esta questão do caderno</button>':''}</div></div>`;
+  document.body.appendChild(d);const msg=t=>d.querySelector('.msg').textContent=t,L=d.querySelector('#aneL');
+  const optsAss=(m,sel)=>{const A=cadAssuntos(m);const temSel=sel&&!A.some(x=>x.assunto===sel);
+    return `<option value="">Escolha o assunto</option>${A.map(x=>`<option value="${x.id}"${x.assunto===sel?' selected':''}>${esc(x.assunto)}${x.frente?' — '+esc(x.frente):''}</option>`).join('')}${temSel?`<option value="__t" selected>${esc(sel)}</option>`:''}<option value="__outro">Outro assunto (digitar)</option>`;};
+  const novaQ=(pre={})=>{nq++;const q=document.createElement('div');q.className='anq';const m0=pre.materia||'';q.style.setProperty('--c',CORM[m0]||'#E5484D');
+    q.innerHTML=`<div class="hd"><span>Questão ${L.children.length+1}</span>${edit?'':'<button type="button" title="Tirar esta questão">✕</button>'}</div>
+     <div class="r2"><select class="qm"><option value="">Matéria</option>${mats.map(m=>`<option${m===m0?' selected':''}>${esc(m)}</option>`).join('')}</select><select class="qa"${m0?'':' disabled'}>${m0?optsAss(m0,pre.assunto):'<option value="">Escolha antes a matéria</option>'}</select></div>
+     <input type="text" class="qo" maxlength="140" placeholder="Qual assunto?" hidden>
+     <div class="mot">${TERR.map(([k,n,dd,c])=>`<button type="button" data-k="${k}" style="--m:${c}" title="${esc(dd)}"${pre.motivo===k?' class="on"':''}>${n}</button>`).join('')}</div>
+     <input type="text" class="qf" maxlength="120" placeholder="Onde está a questão? ex.: Lista 3 de Química, questão 12 (opcional)" value="${esc(pre.fonte||'')}">
+     <div class="ft"><label>📷 ${pre.img||pre.file?'Trocar foto':'Foto da questão'}<input type="file" accept="image/*"></label><span class="pv"></span></div>`;
+    L.appendChild(q);q._file=pre.file||null;q._img=pre.img||null;q._mot=pre.motivo||null;
+    const qm=q.querySelector('.qm'),qa=q.querySelector('.qa'),qo=q.querySelector('.qo');
+    qm.onchange=()=>{q.style.setProperty('--c',CORM[qm.value]||'#E5484D');qa.disabled=!qm.value;qa.innerHTML=qm.value?optsAss(qm.value):'<option value="">Escolha antes a matéria</option>';qo.hidden=true;};
+    qa.onchange=()=>{qo.hidden=qa.value!=='__outro';if(!qo.hidden)qo.focus();};
+    q.querySelectorAll('.mot button').forEach(b=>b.onclick=()=>{const on=!b.classList.contains('on');q.querySelectorAll('.mot button').forEach(x=>x.classList.remove('on'));if(on)b.classList.add('on');q._mot=on?b.dataset.k:null;});
+    const pv=q.querySelector('.pv');const mostra=async()=>{if(q._file){const u=URL.createObjectURL(q._file);pv.innerHTML=`<img src="${u}" alt="Foto da questão">`;}else if(q._img){pv.innerHTML=`<img src="${await cadUrl(q._img)}" alt="Foto da questão">`;}};mostra();
+    q.querySelector('.ft input').onchange=e=>{const f=e.target.files[0];if(f){q._file=f;q.querySelector('.ft label').firstChild.textContent='📷 Trocar foto';mostra();}};
+    const x=q.querySelector('.hd button');if(x)x.onclick=()=>{q.remove();[...L.children].forEach((c,i)=>c.querySelector('.hd span').textContent='Questão '+(i+1));};
+    return q;};
+  const mPad=o.materia&&mats.includes(o.materia)?o.materia:'';
+  if(edit)novaQ(edit);
+  else if(discE.length){discE.forEach(([m,e])=>{for(let i=0;i<Math.min(e,6);i++)novaQ({materia:m});});}
+  else{const n=Math.max(1,Math.min(o.n||1,8));for(let i=0;i<n;i++)novaQ({materia:mPad,assunto:o.assunto&&o.item?o.assunto:''});}
+  if(!edit){d.querySelector('#aneMais').onclick=()=>{const q=novaQ({materia:mPad});q.scrollIntoView({block:'nearest'});};
+    d.querySelector('#aneFotos').onchange=e=>{const fs=[...e.target.files];if(!fs.length)return;
+      const vaz=[...L.children].filter(q=>!q._file&&!q._img&&!q.querySelector('.qa').value&&!q._mot);
+      fs.forEach(f=>{const q=vaz.shift();if(q){q._file=f;q.querySelector('.ft input').dispatchEvent(new Event('x'));const u=URL.createObjectURL(f);q.querySelector('.pv').innerHTML=`<img src="${u}" alt="Foto da questão">`;q.querySelector('.ft label').firstChild.textContent='📷 Trocar foto';}else novaQ({materia:mPad,file:f});});
+      e.target.value='';};}
+  const fecha=()=>{d.remove();};
+  d.querySelector('#aneNao').onclick=fecha;
+  if(edit)d.querySelector('#aneDel').onclick=async ev=>{const b=ev.target;if(!b.dataset.ok){b.dataset.ok=1;b.textContent='Confirmar: apagar do caderno';return;}
+    const {error}=await SB.from('caderno_erros').delete().eq('id',edit.id);if(error){msg(error.message);return;}if(edit.img)SB.storage.from('caderno').remove([edit.img]);fecha();depois&&depois();};
+  d.querySelector('#aneOk').onclick=async ev=>{const bt=ev.target;msg('');const linhas=[];
+    for(const [i,q] of [...L.children].entries()){const m=q.querySelector('.qm').value,av=q.querySelector('.qa').value,ot=q.querySelector('.qo').value.trim();
+      const it=av&&av!=='__outro'&&av!=='__t'?(PLANO||[]).find(x=>String(x.id)===av):null;
+      const ass=it?it.assunto:av==='__outro'?ot:av==='__t'?(edit&&edit.assunto)||'':'';const tem=!!(q._file||q._img);
+      if(!m&&!ass&&!tem&&!q._mot)continue;
+      if(!m){msg(`Questão ${i+1}: escolha a matéria.`);return;}
+      if(!ass&&!tem){msg(`Questão ${i+1}: escolha o assunto ou mande a foto da questão.`);return;}
+      linhas.push({q,row:{materia:m,assunto:ass||null,item:it?it.id:null,motivo:q._mot,fonte:q.querySelector('.qf').value.trim()||null}});}
+    if(!linhas.length){if(edit){msg('Escolha o assunto ou mande a foto.');return;}fecha();return;}
+    bt.disabled=true;
+    try{for(const [i,l] of linhas.entries()){if(l.q._file){bt.textContent=`Enviando foto ${i+1} de ${linhas.length}…`;l.row.img=await cadSobe(l.q._file);}else if(edit)l.row.img=edit.img||null;}}
+    catch(e){msg('Não foi possível enviar a foto: '+(e.message||e));bt.disabled=false;bt.textContent='Tentar de novo';return;}
+    bt.textContent='Salvando…';let r;
+    if(edit){r=await SB.from('caderno_erros').update(linhas[0].row).eq('id',edit.id);if(!r.error&&linhas[0].q._file&&edit.img)SB.storage.from('caderno').remove([edit.img]);}
+    else r=await SB.from('caderno_erros').insert(linhas.map(l=>({...l.row,email:ALVO,sessao:o.sessao||null})));
+    if(r.error){msg('Não foi possível salvar: '+r.error.message);bt.disabled=false;bt.textContent='Tentar de novo';return;}
     fecha();depois&&depois();};}
+let CADV={f:'rev',m:null,a:null};
+async function telaCaderno(email,cab){if(!cab)abas('tabCad');const meu=!cab&&!VER_REAL();
+  $('app').innerHTML=(cab||'')+'<p class="pend">Abrindo o caderno…</p>';
+  const [r,s]=await Promise.all([SB.from('caderno_erros').select('*').eq('email',email).order('criado',{ascending:false}),SB.from('sessoes').select('erros').eq('email',email)]);
+  if(cab)ligaCab();
+  if(r.error){$('app').innerHTML=(cab||'')+`<div class="card"><p class="pend">${esc(r.error.message)}</p></div>`;if(cab)ligaCab();return;}
+  const T=r.data||[],errS=(s.data||[]).reduce((t,x)=>t+(x.erros||0),0);const recar=()=>telaCaderno(email,cab);
+  const rev=T.filter(x=>x.revisada).length,arev=T.length-rev;const MC={};T.forEach(x=>{if(x.motivo)MC[x.motivo]=(MC[x.motivo]||0)+1;});
+  const top=Object.entries(MC).sort((a,b)=>b[1]-a[1])[0];const comMot=Object.values(MC).reduce((a,b)=>a+b,0);
+  const F=T.filter(x=>CADV.f==='todos'||(CADV.f==='rev'?!x.revisada:x.revisada));
+  const grp=(L,k)=>{const g={};L.forEach(x=>{const v=x[k]||'';(g[v]=g[v]||[]).push(x);});return g;};
+  let corpo='';
+  if(!T.length){corpo=`<div class="card vazio" style="text-align:center;padding:30px 20px"><div style="font-size:40px">📒</div><b style="font:800 19px var(--display)">${meu?'Seu caderno de erros está vazio':'O caderno de erros ainda está vazio'}</b><p class="pend" style="max-width:520px;margin:8px auto 0">${meu?'Quando você encerrar uma sessão com questões erradas, o site pergunta de que assunto era cada uma e por que você errou (ou você manda só a foto da questão). Também dá para anotar agora mesmo pelo botão abaixo.':'Os erros aparecem aqui quando o aluno anotar as questões que errou.'}</p>${meu?'<button class="btn pri" id="cdAdd2" style="margin-top:14px">+ Anotar erro</button>':''}</div>`;}
+  else if(!CADV.m){const G=grp(F,'materia');const ks=Object.keys(G).sort((a,b)=>G[b].length-G[a].length);
+    corpo=ks.length?`<div class="cdg">${ks.map(m=>{const all=T.filter(x=>x.materia===m),ok=all.filter(x=>x.revisada).length,na=new Set(all.map(x=>x.assunto||'')).size;
+      return `<button class="cdc" data-m="${esc(m)}" style="--c:${CORM[m]||'#3A8CCB'}"><h4>${esc(m)}<em>›</em></h4><div class="n">${G[m].length}<small>${CADV.f==='rev'?'a revisar':CADV.f==='ok'?'revisados':'erros'}</small></div><span class="ft">${na} assunto${na>1?'s':''} · ${ok} de ${all.length} revisados</span><span class="pb"><i style="width:${Math.round(100*ok/all.length)}%"></i></span></button>`;}).join('')}</div>`
+      :`<div class="card"><p class="pend" style="margin:0">${CADV.f==='rev'?'Nenhuma questão para revisar: tudo revisado. 👏':'Nenhuma questão aqui.'}</p></div>`;}
+  else if(CADV.a===null){const Fm=F.filter(x=>x.materia===CADV.m),G=grp(Fm,'assunto');const ks=Object.keys(G).sort((a,b)=>G[b].length-G[a].length);const cor=CORM[CADV.m]||'#3A8CCB';
+    corpo=ks.length?`<div class="cdg">${ks.map(a=>{const all=T.filter(x=>x.materia===CADV.m&&(x.assunto||'')===a),ok=all.filter(x=>x.revisada).length;const ult=all.reduce((t,x)=>x.criado>t?x.criado:t,'');
+      return `<button class="cdc" data-a="${esc(a)}" style="--c:${cor}"><h4>${a?esc(a):'Só pela foto (sem assunto)'}<em>›</em></h4><div class="n">${G[a].length}<small>${G[a].length>1?'questões':'questão'}</small></div><span class="ft">${ok} de ${all.length} revisadas · último erro em ${dm(new Date(ult))}</span><span class="pb"><i style="width:${Math.round(100*ok/all.length)}%"></i></span></button>`;}).join('')}</div>`
+      :`<div class="card"><p class="pend" style="margin:0">Nenhuma questão de ${esc(CADV.m)} neste filtro.</p></div>`;}
+  else{const Q=F.filter(x=>x.materia===CADV.m&&(x.assunto||'')===CADV.a);
+    corpo=Q.length?`<div class="cdq">${Q.map(x=>{const mv=MOTV[x.motivo];return `<div class="cdi${x.revisada?' ok':''}" data-id="${x.id}">${x.img?`<img class="im" data-img="${esc(x.img)}" alt="Questão errada" loading="lazy">`:`<div class="sem">Sem foto${x.fonte?'<br>'+esc(x.fonte):''}</div>`}
+      <div class="tx">${mv?`<span class="cmt" style="--c:${mv.c}">${mv.n}</span>`:'<span class="cmt" style="--c:var(--line)">Sem motivo</span>'}<p>${x.fonte?esc(x.fonte)+' · ':''}errou em ${dm(new Date(x.criado))}${x.revisada&&x.revisada_em?' · revisada em '+dm(new Date(x.revisada_em)):''}</p></div>
+      ${meu?`<div class="ac"><button class="rv">${x.revisada?'✓ Revisada':'Marcar como revisada'}</button><button class="ed" title="Editar">✎</button><button class="dl" title="Apagar">🗑</button></div>`:''}</div>`;}).join('')}</div>`
+      :`<div class="card"><p class="pend" style="margin:0">Nenhuma questão neste filtro.</p></div>`;}
+  const migalha=CADV.m?`<button class="vol" id="cdVol">← ${CADV.a!==null?esc(CADV.m):'Todas as matérias'}</button><b style="font:800 17px var(--display)">${CADV.a!==null?(CADV.a?esc(CADV.a):'Só pela foto'):esc(CADV.m)}</b>`:(cab?`<button class="vol" id="cdDash">← Dashboard do aluno</button>`:'')+`<b style="font:800 18px var(--display)">${cab?'Caderno de erros':'Meu Caderno de Erros'}</b>`;
+  $('app').innerHTML=(cab||'')+`<div class="cdk"><div><span>Questões no caderno</span><b>${T.length}</b><small>${errS>T.length?`de ${errS} erros registrados nas sessões`:'anotadas com assunto ou foto'}</small></div>
+    <div><span>A revisar</span><b style="color:#E5484D">${arev}</b><small>ainda não revisadas</small></div><div><span>Revisadas</span><b style="color:#1BAF7A">${rev}</b><small>${T.length?Math.round(100*rev/T.length)+'% do caderno':'—'}</small></div>
+    <div><span>Motivo mais comum</span><b style="font-size:21px;margin-top:9px;color:${top?MOTV[top[0]].c:'inherit'}">${top?MOTV[top[0]].n:'—'}</b><small>${top?Math.round(100*top[1]/comMot)+'% dos erros com motivo':'anote o motivo dos erros'}</small></div></div>
+   ${T.length?`<div class="cdbar">${migalha}<span style="margin-left:auto"></span><div class="cdf">${[['rev','A revisar'],['todos','Todas'],['ok','Revisadas']].map(([k,n])=>`<button data-f="${k}"${CADV.f===k?' class="on"':''}>${n}</button>`).join('')}</div>${meu?'<button class="btn pri" id="cdAdd">+ Anotar erro</button>':''}</div>`:''}${corpo}`;
+  if(cab)ligaCab();
+  const ap=$('app');
+  ap.querySelectorAll('.cdf button').forEach(b=>b.onclick=()=>{CADV.f=b.dataset.f;recar();});
+  ap.querySelectorAll('.cdc[data-m]').forEach(b=>b.onclick=()=>{CADV.m=b.dataset.m;CADV.a=null;recar();});
+  ap.querySelectorAll('.cdc[data-a]').forEach(b=>b.onclick=()=>{CADV.a=b.dataset.a;recar();});
+  if($('cdDash'))$('cdDash').onclick=()=>telaAlunos(email);
+  if($('cdVol'))$('cdVol').onclick=()=>{if(CADV.a!==null)CADV.a=null;else CADV.m=null;recar();};
+  [$('cdAdd'),$('cdAdd2')].forEach(b=>{if(b)b.onclick=()=>anotaErros({materia:CADV.m||'',n:0},recar);});
+  ap.querySelectorAll('img[data-img]').forEach(async im=>{im.src=await cadUrl(im.dataset.img);im.onclick=()=>{const z=document.createElement('div');z.className='cdz';z.innerHTML=`<img src="${im.src}" alt="Questão errada">`;z.onclick=()=>z.remove();document.body.appendChild(z);};});
+  ap.querySelectorAll('.cdi').forEach(c=>{const x=T.find(y=>String(y.id)===c.dataset.id);if(!x)return;
+    const rv=c.querySelector('.rv');if(rv)rv.onclick=async()=>{rv.disabled=true;const v=!x.revisada;const {error}=await SB.from('caderno_erros').update({revisada:v,revisada_em:v?new Date().toISOString():null}).eq('id',x.id);if(error){alert(error.message);rv.disabled=false;return;}recar();};
+    const ed=c.querySelector('.ed');if(ed)ed.onclick=()=>anotaErros({edit:x},recar);
+    const dl=c.querySelector('.dl');if(dl)dl.onclick=async()=>{if(!dl.dataset.ok){dl.dataset.ok=1;dl.textContent='Apagar?';return;}const {error}=await SB.from('caderno_erros').delete().eq('id',x.id);if(error){alert(error.message);return;}if(x.img)SB.storage.from('caderno').remove([x.img]);recar();};});}
+async function cardCaderno(email,cab){const {data}=await SB.from('caderno_erros').select('materia,assunto,revisada').eq('email',email);const T=data||[];
+  const G={};T.forEach(x=>{const k=x.materia+'|'+(x.assunto||'');const g=G[k]=G[k]||{m:x.materia,a:x.assunto,n:0,r:0};g.n++;if(!x.revisada)g.r++;});
+  const L=Object.values(G).sort((a,b)=>b.r-a.r||b.n-a.n).slice(0,7);const mx=Math.max(1,...L.map(x=>x.n));
+  return `<div class="chart"><h3 style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><i class="hi a"></i>Assuntos que mais erro<span style="margin-left:auto"><button class="btn avbtn" id="dCad">Abrir o Caderno de Erros</button></span></h3>
+   <p class="sub">${T.length?`Do Caderno de Erros: ${T.length} quest${T.length>1?'ões':'ão'} anotada${T.length>1?'s':''}, ${T.filter(x=>!x.revisada).length} ainda a revisar. A barra clara mostra o que já foi revisado.`:'Aparece quando houver questões anotadas no Caderno de Erros (o site pergunta ao encerrar uma sessão com erros).'}</p>
+   ${L.length?`<div class="cdtop">${L.map(x=>{const c=CORM[x.m]||'#3A8CCB';return `<div class="lin"><span title="${esc(x.m)} · ${esc(x.a||'só pela foto')}"><b style="color:${c}">${esc(x.m)}</b> · ${esc(x.a||'só pela foto')}</span><span style="background:var(--soft);border-radius:9px"><i style="width:${Math.round(100*x.n/mx)}%;background:linear-gradient(90deg,${c} ${Math.round(100*x.r/x.n)}%,color-mix(in srgb,${c} 35%,transparent) ${Math.round(100*x.r/x.n)}%)"></i></span><b>${x.r}/${x.n}</b></div>`;}).join('')}</div>`:''}</div>`;}
 
 /* ---------- Dashboard ---------- */
 const anel=(p,cor)=>{const R=24,C=2*Math.PI*R;return `<svg class="ring" viewBox="0 0 60 60"><circle cx="30" cy="30" r="${R}" fill="none" stroke="var(--soft)" stroke-width="7"/><circle cx="30" cy="30" r="${R}" fill="none" stroke="${cor}" stroke-width="7" stroke-linecap="round" stroke-dasharray="${(C*p/100).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 30 30)"/><text class="rv" x="30" y="35" text-anchor="middle">${p}%</text></svg>`;};
@@ -530,6 +694,7 @@ async function telaPainel(email,cab){if(!cab)abas('tabPainel');$('app').innerHTM
     if(dd&&Object.keys(dd).length)Object.entries(dd).forEach(([k,v])=>{const z=nv(k);z.q+=v.q||0;z.a+=v.a||0;z.e+=v.e||0;});else{m.q+=x.questoes;m.a+=x.acertos;m.e+=x.erros;}});
   const TE={};TERR.forEach(([k])=>TE[k]=0);let nSim=0;S.forEach(x=>{const er=x.detalhe&&x.detalhe.erros;if(er){nSim++;TERR.forEach(([k])=>TE[k]+=er[k]||0);}});
   const teTot=TERR.reduce((t,[k])=>t+TE[k],0),teMax=Math.max(1,...TERR.map(([k])=>TE[k]));const teTop=teTot?TERR.slice().sort((a,b)=>TE[b[0]]-TE[a[0]])[0]:null;
+  let cardCad='';try{cardCad=await cardCaderno(email,cab);}catch(e){}
   const cardErros=`<div class="chart"><h3><i class="hi b"></i>Tipos de erro nos simulados</h3><p class="sub">${teTot?`Soma de ${nSim} correç${nSim===1?'ão':'ões'} de simulado. Erro mais comum: <b style="color:${teTop[3]}">${teTop[1]}</b> (${Math.round(100*TE[teTop[0]]/teTot)}% dos erros).`:'Aparece quando houver correções de simulado registradas na Sala de Estudos, com os erros classificados.'}</p>
     <div class="tebars">${TERR.map(([k,nm,dd,cc])=>`<div class="teb"><span class="tn"><b>${nm}</b><small>${dd}</small></span><span class="tt"><i style="width:${teTot?Math.max(2,Math.round(100*TE[k]/teMax)):0}%;background:${cc}"></i></span><span class="tv"><b>${TE[k]}</b><small>${teTot?Math.round(100*TE[k]/teTot)+'%':'—'}</small></span></div>`).join('')}</div></div>`;
   const ML=S.length?Object.entries(M).sort((a,b)=>b[1].s-a[1].s):Object.keys(CORM).filter(n=>!['Inglês','Espanhol','Francês'].includes(n)||n===(LINGUA||'Inglês')).map(n=>[n,{s:0,q:0,a:0,e:0}]);const smax=Math.max(1,...ML.map(x=>x[1].s));
@@ -554,8 +719,10 @@ async function telaPainel(email,cab){if(!cab)abas('tabPainel');$('app').innerHTM
      <div style="overflow-x:auto"><table class="mt"><thead><tr><th>Matéria</th><th>Tempo</th><th class="opt"></th><th>Questões</th><th>Acertos × erros</th><th>Aproveitamento</th></tr></thead><tbody>
      ${ML.map(([n,m])=>{const p=m.q?Math.round(100*m.a/m.q):null;const cor=CORM[n]||'#3A8CCB';return `<tr><td><span class="nm"><i style="background:${cor}"></i>${esc(n)}</span></td><td style="white-space:nowrap;font-weight:700">${hfmt(m.s)}</td><td class="opt" style="width:28%"><div class="tbar"><em style="width:${Math.round(100*m.s/smax)}%;background:${cor}"></em></div></td><td style="font-weight:700">${m.q||'—'}</td><td>${m.q?`<div class="ae" title="${m.a} acertos · ${m.e} erros"><span class="a" style="width:${100*m.a/m.q}%"></span><span class="e" style="width:${100*m.e/m.q}%"></span></div><small class="pend">${m.a} ✓ · ${m.e} ✗</small>`:'<small class="pend">sem questões</small>'}</td><td><span class="pc ${pcCls(p)}">${p==null?'—':p+'%'}</span></td></tr>`;}).join('')}</tbody></table></div></div>
    ${cardErros}
+   ${cardCad}
    <div class="chart"><h3 style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><i class="hi c"></i>Atividade recente${!cab&&!VER_REAL()?'<span style="margin-left:auto;display:flex;gap:8px"><button class="btn avbtn" id="dAv">+ Estudos Extras</button>'+(S.length>8?'<button class="btn avbtn" id="dTodas">Ver todas as sessões</button>':'')+'</span>':''}</h3><div class="hoje" style="margin-top:10px">${S.length?'':'<p class="pend">Nenhuma sessão registrada ainda. As últimas sessões aparecem aqui.</p>'}${S.slice(-8).reverse().map(x=>{const [n,ic,,c]=TI(x.tipo);const h=new Date(x.inicio);return `<div class="ses" style="--c:${c}"><span style="font-size:20px">${ic}</span><div class="tx"><b>${esc(x.materia)} · ${x.detalhe&&(x.detalhe.extra||x.detalhe.avulsa)?'Estudos Extras':esc(n)}</b><span>${dm(h)} às ${String(h.getHours()).padStart(2,'0')}:${String(h.getMinutes()).padStart(2,'0')} · ${esc(x.assunto||'')}${x.questoes?` · ${x.acertos}/${x.questoes} acertos`:''}</span></div><span class="du">${hfmt(x.segundos)}</span>${!cab&&!VER_REAL()?`<button class="edt" data-id="${x.id}" title="Corrigir sessão">✎</button>`:''}</div>`;}).join('')}</div></div>`;
   const recar=()=>telaPainel(email,cab);
+  if($('dCad'))$('dCad').onclick=()=>{CADV={f:'rev',m:null,a:null};if(cab)telaCaderno(email,cab);else{history.replaceState(null,'','#caderno');telaCaderno(email);}};
   if($('dAv'))$('dAv').onclick=async()=>{try{await carregaPlano();}catch(e){}formSessao(null,recar);};
   $('app').querySelectorAll('.edt').forEach(b=>b.onclick=async()=>{try{await carregaPlano();}catch(e){}formSessao(S.find(x=>String(x.id)===b.dataset.id),recar);});
   if($('dTodas'))$('dTodas').onclick=()=>{const d=document.createElement('div');d.className='dlg';
@@ -642,6 +809,6 @@ async function telaDen(){abas('tabDen');$('app').innerHTML='<p class="pend">Carr
   $('app').querySelectorAll('[data-r]').forEach(b=>b.onclick=async()=>{await SB.rpc('admin_resolver',{p_id:+b.dataset.id,p:b.dataset.r==='1'});telaDen();});}
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795654758" defer></script>
+<script src="../js/presenca.js?v=1795716973" defer></script>
 </body>
 </html>
