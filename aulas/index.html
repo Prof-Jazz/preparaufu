@@ -208,7 +208,7 @@ textarea{min-height:70px;resize:vertical}
 <div id="exBar" hidden>Modo aluno exemplo — é assim que o aluno da turma <select id="exTurma"><option value="assessoria">Assessoria PREPARA UFU</option><option value="matematica">Curso de Matemática</option></select> vê esta página. <button type="button" id="exSair">Sair do modo exemplo</button></div>
 <main id="app"></main>
 
-<script>(function(){var V='1795724872';var K='bqufu-recarga-';
+<script>(function(){var V='1795725153';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -507,7 +507,7 @@ function editarPasta(p){const nova=!p;p=p||{nome:'',descricao:'',turmas:['assess
     if(L.length)await SB.storage.from('materiais').remove(L.map(x=>x.path));if(p.capa)await SB.storage.from('capas').remove([p.capa]);const {error}=await SB.from('pastas').delete().eq('id',p.id);if(error){msg(error.message);return;}fecha();await carregar();desenhaPastas();};}
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795724872" defer></script>
-<script src="../js/menu.js?v=1795724872" defer></script>
+<script src="../js/presenca.js?v=1795725153" defer></script>
+<script src="../js/menu.js?v=1795725153" defer></script>
 </body>
 </html>
