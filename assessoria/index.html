@@ -445,8 +445,8 @@ body{}@keyframes fadein{from{opacity:0}to{opacity:1}}
 <div id="exBar" hidden>Vendo como <select id="exAluno" aria-label="Escolher o aluno"><option>Aluno exemplo</option></select> — é assim que esse aluno vê. <span id="exObs"></span><button type="button" id="exSair">Sair do modo aluno</button></div>
 <main id="app"></main>
 
-<script src="../js/estatisticas.js?v=1795725336"></script>
-<script>(function(){var V='1795725336';var K='bqufu-recarga-';
+<script src="../js/estatisticas.js?v=1795727713"></script>
+<script>(function(){var V='1795727713';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,.adlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -961,8 +961,9 @@ function gerar0(p,aj,enxuto){
   // 1º: todas as disciplinas uma vez (longas antes das curtas); 2º: repetições, das mais difíceis/pesadas para as demais
   // 1º: Matemática, Física e Química em todas as repetições; 2º: Biologia e Redação; 3º: as demais uma vez; 4º: repetições das demais
   const EXs=plano.filter(x=>x.g==='EX').sort((a,b)=>(ORDP[a.k]??20)-(ORDP[b.k]??20)),OUT=plano.filter(x=>x.g!=='EX').sort((a,b)=>(b.v-a.v)||((ORDP[a.k]??20)-(ORDP[b.k]??20)));
-  for(let r=1;r<=maxV;r++)EXs.filter(x=>x.v>=r).forEach(x=>fila.push(x));
-  [90,60].forEach(dur=>{OUT.filter(x=>x.dur===dur).forEach(x=>fila.push(x));if(dur===90)fila.push(red);});
+  EXs.forEach(x=>fila.push(x));fila.push(red); // Redação garantida (1× de 1h30) logo depois da 1ª rodada das exatas
+  for(let r=2;r<=maxV;r++)EXs.filter(x=>x.v>=r).forEach(x=>fila.push(x));
+  [90,60].forEach(dur=>{OUT.filter(x=>x.dur===dur).forEach(x=>fila.push(x));});
   for(let r=2;r<=maxV;r++)[90,60].forEach(dur=>OUT.filter(x=>x.dur===dur&&x.v>=r).forEach(x=>fila.push(x)));
   const dIdx=d=>DS.indexOf(d);
   const exNoDia=d=>out.dias[d].filter(b=>b.g==='EX'||b.tipo==='prepara').length;
@@ -1019,12 +1020,16 @@ function gerar0(p,aj,enxuto){
   out.curso=pc;return {out,plano,red};}
 function gerar(p){
   const HD=horasDia(p);const totSem=DS.slice(0,6).reduce((t,d)=>t+Math.round((HD[d]||0)*60),0);
-  const enxuto=totSem<DISC.reduce((t,x)=>t+x[3],0)+90+6*30;
-  const aj={},trocas=[];let res;
-  for(let it=0;it<25;it++){res=gerar0(p,aj,enxuto);const todas=[...res.plano,res.red];const zero=todas.filter(x=>x.feito===0);
+  let enxuto=totSem<DISC.reduce((t,x)=>t+x[3],0)+90+6*30;
+  let aj={},trocas=[],res;
+  const roda=()=>{aj={};trocas=[];for(let it=0;it<25;it++){res=gerar0(p,aj,enxuto);const todas=[...res.plano,res.red];const zero=todas.filter(x=>x.feito===0);
     if(!zero.length)break;
     const d=todas.filter(x=>x.feito>=2).sort((a,b)=>b.feito-a.feito||(a.v-b.v)||(a.g==='EX')-(b.g==='EX'))[0];if(!d)break;
-    aj[d.k]=d.feito-1;trocas.push([d.n,d.feito,d.feito-1,zero[0].n]);}
+    aj[d.k]=d.feito-1;trocas.push([d.n,d.feito,d.feito-1,zero[0].n]);}};
+  roda();
+  // o tempo livre de verdade (trabalho, escola, aulas) pode ser menor que as horas declaradas: tenta blocos de 1h antes de deixar matéria de fora
+  if(!enxuto&&[...res.plano,res.red].some(x=>x.feito===0)){const ant={res,aj,trocas};enxuto=true;roda();
+    if([...res.plano,res.red].filter(x=>x.feito===0).length>=[...ant.res.plano,ant.res.red].filter(x=>x.feito===0).length){({res,aj,trocas}=ant);enxuto=false;}}
   const out=res.out,todas=[...res.plano,res.red];const vz=n=>n===1?'1 vez':n+' vezes';
   const fim=todas.filter(x=>x.feito===0).map(x=>x.n);
   const tg={};trocas.forEach(([y,de,para])=>{tg[y]=tg[y]?[tg[y][0],para]:[de,para];});
@@ -1458,7 +1463,7 @@ async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!se
 $('sair').onclick=async()=>{try{localStorage.removeItem('bqufu-sig-v2');}catch(e){}await SB.auth.signOut();location.href='/';};
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795725336" defer></script>
-<script src="../js/menu.js?v=1795725336" defer></script>
+<script src="../js/presenca.js?v=1795727713" defer></script>
+<script src="../js/menu.js?v=1795727713" defer></script>
 </body>
 </html>
