@@ -445,7 +445,7 @@ body{}@keyframes fadein{from{opacity:0}to{opacity:1}}
 <div id="exBar" hidden>Vendo como <select id="exAluno" aria-label="Escolher o aluno"><option>Aluno exemplo</option></select> — é assim que esse aluno vê. <span id="exObs"></span><button type="button" id="exSair">Sair do modo aluno</button></div>
 <main id="app"></main>
 
-<script>(function(){var V='1795654695';var K='bqufu-recarga-';
+<script>(function(){var V='1795654758';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,.adlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -953,14 +953,14 @@ function gerar0(p,aj,enxuto){
    const bi=plano.find(x=>x.k==='BIO');if(bi){const lim=Math.min(...plano.filter(y=>y.g==='EX').map(y=>y.v))-1;bi.v=Math.max(1,Math.min(lim,Math.max(bi.v,...plano.filter(x=>x.g!=='EX').map(x=>x.v))));}}
   plano.forEach(x=>{if(aj[x.k]!=null)x.v=Math.min(x.v,aj[x.k]);});
   plano.sort((a,b)=>b.v-a.v||(b.g==='EX'||b.g==='BIO')-(a.g==='EX'||a.g==='BIO'));
-  const red={k:'RED',n:'Redação',g:'LIN',dur:enxuto?60:90,v:1,why:(difn.RED||0)>=3?[DIFN[difn.RED-1].toLowerCase()+' (1× por semana)']:[],feito:0,dias:[]};
+  const red={k:'RED',n:'Redação',g:'LIN',dur:90,v:1,why:(difn.RED||0)>=3?[DIFN[difn.RED-1].toLowerCase()+' (1× por semana)']:[],feito:0,dias:[]};
   const fila=[];const maxV=Math.max(...plano.map(x=>x.v));
   // blocos longos (1h30) primeiro, em rodadas; depois os de 1h ocupam os espaços que sobram
   // 1º: todas as disciplinas uma vez (longas antes das curtas); 2º: repetições, das mais difíceis/pesadas para as demais
   // 1º: Matemática, Física e Química em todas as repetições; 2º: Biologia e Redação; 3º: as demais uma vez; 4º: repetições das demais
-  const EXs=plano.filter(x=>x.g==='EX').sort((a,b)=>(a.k==='MAT'?0:1)-(b.k==='MAT'?0:1)),OUT=plano.filter(x=>x.g!=='EX');
+  const EXs=plano.filter(x=>x.g==='EX').sort((a,b)=>(ORDP[a.k]??20)-(ORDP[b.k]??20)),OUT=plano.filter(x=>x.g!=='EX').sort((a,b)=>(b.v-a.v)||((ORDP[a.k]??20)-(ORDP[b.k]??20)));
   for(let r=1;r<=maxV;r++)EXs.filter(x=>x.v>=r).forEach(x=>fila.push(x));
-  [90,60].forEach(dur=>{OUT.filter(x=>x.dur===dur).forEach(x=>fila.push(x));if(dur===(enxuto?60:90))fila.push(red);});
+  [90,60].forEach(dur=>{OUT.filter(x=>x.dur===dur).forEach(x=>fila.push(x));if(dur===90)fila.push(red);});
   for(let r=2;r<=maxV;r++)[90,60].forEach(dur=>OUT.filter(x=>x.dur===dur&&x.v>=r).forEach(x=>fila.push(x)));
   const dIdx=d=>DS.indexOf(d);
   const exNoDia=d=>out.dias[d].filter(b=>b.g==='EX'||b.tipo==='prepara').length;
@@ -988,7 +988,7 @@ function gerar0(p,aj,enxuto){
     if(!feito)break;}
   // tempo que sobra: mais repetições, por prioridade — difíceis para o aluno > peso do curso > exatas > demais
   if(!falta.length){const capDe=x=>x.g==='EX'?5:4;
-    const tier=x=>(difn[x.k]||0)>=3?0:pc.k.includes(x.k)?1:x.g==='EX'?2:x.k==='BIO'?3:4;const rk=x=>x.k==='MAT'?0:x.g==='EX'?1:x.k==='BIO'?2:3;
+    const tier=x=>(difn[x.k]||0)>=3?0:pc.k.includes(x.k)?1:2;const rk=x=>ORDP[x.k]??20;
     const prio=plano.slice().sort((a,b)=>(tier(a)-tier(b))||(rk(a)-rk(b))||((difn[b.k]||0)-(difn[a.k]||0))||(b.v-a.v));
     for(let rodada=0;rodada<6;rodada++){let pos=0;
       for(const x of prio){if(x.feito>=capDe(x))continue;
@@ -1031,6 +1031,7 @@ function gerar(p){
   if(fim.length)out.avisos.push(`Não coube ${fim.join(', ')} nem uma vez na semana. Toda matéria precisa aparecer pelo menos uma vez: aumente as suas horas de estudo no perfil ou fale com o seu mentor.`);
   if(enxuto)out.avisos.push('Como o seu tempo de estudo está curto, os blocos ficaram de 1h para caber todas as matérias.');
   return out;}
+const ORDP={MAT:0,FIS:1,QUI:2,BIO:3,HIS:4,GEO:5,LP:6,LIT:7,FIL:8,SOC:9,LE:10,RED:11}; // prioridade geral do Prof. Jazz
 const GRUPO={MAT:'EX',FIS:'EX',QUI:'EX',BIO:'BIO',LP:'LIN',LIT:'LIN',LE:'LIN',HIS:'HUM',GEO:'HUM',FIL:'HUM',SOC:'HUM',RED:'LIN'};
 
 CORD.OUT='#364FC7';
@@ -1455,6 +1456,6 @@ async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!se
 $('sair').onclick=async()=>{try{localStorage.removeItem('bqufu-sig-v2');}catch(e){}await SB.auth.signOut();location.href='/';};
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795654695" defer></script>
+<script src="../js/presenca.js?v=1795654758" defer></script>
 </body>
 </html>
