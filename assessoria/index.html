@@ -445,7 +445,7 @@ body{}@keyframes fadein{from{opacity:0}to{opacity:1}}
 <div id="exBar" hidden>Vendo como <select id="exAluno" aria-label="Escolher o aluno"><option>Aluno exemplo</option></select> — é assim que esse aluno vê. <span id="exObs"></span><button type="button" id="exSair">Sair do modo aluno</button></div>
 <main id="app"></main>
 
-<script>(function(){var V='1795647810';var K='bqufu-recarga-';
+<script>(function(){var V='1795654222';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,.adlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -984,6 +984,21 @@ function gerar0(p,aj,enxuto){
         plano.forEach(z=>{if(z.k===k)z.dias=z.dias.map(q=>q===d?e:q);if(z.k==='QUI')z.dias=z.dias.map(q=>q===e?d:q);});feito=true;break;}
       if(feito)break;}
     if(!feito)break;}
+  // tempo que sobra: mais repetições, por prioridade — difíceis para o aluno > peso do curso > exatas > demais
+  if(!falta.length){const capDe=x=>x.g==='EX'?5:4;
+    const tier=x=>(difn[x.k]||0)>=3?0:pc.k.includes(x.k)?1:x.g==='EX'?2:3;
+    const prio=plano.slice().sort((a,b)=>(tier(a)-tier(b))||((b.g==='EX')-(a.g==='EX'))||((difn[b.k]||0)-(difn[a.k]||0))||(b.v-a.v));
+    for(let rodada=0;rodada<6;rodada++){let pos=0;
+      for(const x of prio){if(x.feito>=capDe(x))continue;
+        if(x.g!=='EX'&&x.feito+1>=Math.min(...EXs.map(y=>y.feito)))continue;
+        const lista=junto=>DS.slice(0,6).filter(d=>!x.dias.includes(d)&&!(x.g==='EX'&&exNoDia(d)>=2)&&(junto||!(PARMF[x.k]&&out.dias[d].some(b=>b.k===PARMF[x.k])))).map(d=>{
+          const dist=x.dias.length?Math.min(...x.dias.map(e=>Math.abs(dIdx(e)-dIdx(d)))):6;const m=achaIv(d,x.dur,x.g,true);return {d,dist,w:m?m.w:1e9,per:m?m.per:9};}).filter(c=>c.w<1e9)
+          .sort((a,b)=>b.dist-a.dist||a.per-b.per||a.w-b.w);
+        let cands=lista(false);if(!cands.length&&tier(x)===0)cands=lista(true);
+        let melhor=null;for(const c of cands){const r=coloca(c.d,x.dur,x.g,true);if(r){melhor={d:c.d,r};break;}}
+        if(melhor){x.dias.push(melhor.d);x.feito++;x.v=Math.max(x.v,x.feito);if(!x.extra){x.extra=0;x.why.push('mais horas de estudo');}x.extra++;
+          out.dias[melhor.d].push({tipo:'estudo',k:x.k,g:x.g,ini:melhor.r[0],fim:melhor.r[1],label:x.n});pos++;}}
+      if(!pos)break;}}
   // domingo: só de manhã
   let dom=[[Math.max(W+30,420),720]];fixosDia('Dom').forEach(f=>dom=subtrai(dom,f.ini-15,f.fim+15));
   const dm=dom.sort((a,b)=>(b[1]-b[0])-(a[1]-a[0]))[0];
@@ -1436,6 +1451,6 @@ async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!se
 $('sair').onclick=async()=>{try{localStorage.removeItem('bqufu-sig-v2');}catch(e){}await SB.auth.signOut();location.href='/';};
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795647810" defer></script>
+<script src="../js/presenca.js?v=1795654222" defer></script>
 </body>
 </html>
