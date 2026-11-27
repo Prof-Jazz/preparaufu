@@ -21,6 +21,7 @@
     alunos:'<path d="M16 20v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/>',
     cadastro:'<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h4"/>',
     ver:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+    envio:'<path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/>',
     den:'<path d="M4 21V4h11l-1 4 6 0-2 6H4"/>',
     ment:'<circle cx="12" cy="8" r="4"/><path d="M6 21v-1a6 6 0 0 1 12 0v1"/><path d="M17 4l2-2M19 6h2"/>',
     livro:'<path d="M2 5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v15a2 2 0 0 0-2-2H2z"/><path d="M22 5a2 2 0 0 0-2-2h-6a2 2 0 0 0-2 2v15a2 2 0 0 1 2-2h8z"/>',
@@ -82,7 +83,8 @@
       if(r.adm)I('Equipe','cadastro','Cadastro','/assessoria/#cadastro','assessoria','tabCad');
       I('Equipe','ver','Ver como aluno','/estudos/#ver','estudos','tabEx',{ver:true});
       if(r.adm)I('Equipe','den','Denúncias','/estudos/#denuncias','estudos','tabDen');
-      if(r.adm)I('Equipe','ment','Mentoria individual','/mentoria/','mentoria',null,{fora:true});}
+      if(r.adm)I('Equipe','ment','Mentoria individual','/mentoria/','mentoria',null,{fora:true});
+      if(r.adm)I('Equipe','envio','Envios pelos Correios','/envio/painel/','envio',null,{fora:true});}
     return {L:L,al:al,ex:ex};}
 
   var CSS='\

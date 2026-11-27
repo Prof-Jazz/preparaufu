@@ -31,6 +31,8 @@ Plataforma do Prof. Jazz (preparação para o vestibular da UFU). Este manual ex
 | `/mentoria/` | Mentoria individual: o mentorado tem Início, Dashboard, Plano individual (`m_plano`), Cronograma, Encontros, Materiais próprios, Perfil, Dúvidas; o admin gerencia mentorados, cobranças, raio-x. |
 | `/aulas/` | **Agenda** (aulas ao vivo da turma + planejamento do aluno, `agenda_estudos`) e **Materiais** (pastas com capa 1080×1920). |
 | `/minhasaulas/` | **Minhas Aulas**: videoaulas do YouTube com player próprio (sem marca), seções com capa 1280×720, grupos renomeáveis, links "Conteúdo da aula", estrelas, fórum "Dúvidas e comentários". |
+| `/envio/` | **Envio de material pelos Correios** (pública, sem login): o aluno escolhe nacional/internacional, preenche nome, e-mail, celular, CPF (nacional obrigatório, com validação), turma, quem recebe, endereço (CEP automático pelo ViaCEP) ou endereço no exterior (país, código postal, documento), ponto de referência; confere a etiqueta antes de enviar. Grava em `envios`. |
+| `/envio/painel/` | Painel do admin (menu Equipe › Envios pelos Correios): cartões e gráficos, filtros, status e rastreio editáveis na tabela, só o último cadastro de cada aluno (mesmo CPF/e-mail), Excel (abas Nacional/Internacional/Todos), CSV e impressão de etiquetas A4. |
 | `/img/exemplo/` | Questões fictícias usadas no aluno exemplo. |
 
 ## 2. Papéis e o que cada um acessa
@@ -66,6 +68,7 @@ Tabelas principais:
 | `agenda_estudos` | planejamento do aluno na Agenda (`origem` manual/crono). |
 | `aulas`, `pastas`, `arquivos`, `m_pastas`, `m_arquivos`, `m_encontros`, `m_pagamentos` | Agenda/Materiais das turmas e da mentoria. |
 | `va_cursos`, `va_aulas`, `va_links`, `va_feito`, `va_aval`, `va_duvidas` | Minhas Aulas. |
+| `envios` | cadastros de envio pelos Correios: qualquer pessoa (anon) só INSERE (status forçado `pendente`); só `is_admin()` lê, edita e apaga. SQL: `_dev/sql/envios_correios.sql`. |
 | `presenca`, `acessos`, `mensagens`, `bloqueios`, `denuncias` | online/estudando, acessos diários, chat entre alunos. |
 
 Buckets de arquivos: `banco` (privado: `banco.json`, `q/*.jpg`, `docx/*`), `caderno` (privado, fotos do Caderno, pasta = e-mail do aluno), `capas`, `materiais`, `mentoria`.
@@ -117,4 +120,4 @@ git add -A && git -c user.name=Prof-Jazz commit -m "..." && git push origin HEAD
 - Identidade: azul `#3A8CCB`, amarelo `#DDDD24`/`#F2C811`, verde `#1BAF7A`, laranja `#EB6834`, grafite; logos em `/bancodequestoes/logo/`.
 
 ## 8. Histórico resumido (nov./2026)
-22/11 site no ar (banco + assessoria) · 23/11 Aulas e materiais, Cronograma Semanal · 24/11 Sala de Estudos, mensagens, mentoria individual, assessores · 25/11 Minhas Aulas, Agenda com cronograma, recursos por aluno do Curso, reagendar plano, Estudos Extras, regras do gerador · 26/11 Caderno de Erros, menu híbrido, Banco com resposta direta (conta como estudo), aluno exemplo com dados fictícios, auditoria de permissões, migração de perfis antigos, resolver a Minha lista no Banco.
+22/11 site no ar (banco + assessoria) · 23/11 Aulas e materiais, Cronograma Semanal · 24/11 Sala de Estudos, mensagens, mentoria individual, assessores · 25/11 Minhas Aulas, Agenda com cronograma, recursos por aluno do Curso, reagendar plano, Estudos Extras, regras do gerador · 26/11 Caderno de Erros, menu híbrido, Banco com resposta direta (conta como estudo), aluno exemplo com dados fictícios, auditoria de permissões, migração de perfis antigos, resolver a Minha lista no Banco. · 27/11 Envio de material pelos Correios (/envio, tabela `envios`, painel com Excel).
