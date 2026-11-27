@@ -82,25 +82,17 @@
 .cdi .refaz{margin:0 14px 8px;border:0;border-radius:10px;padding:10px;background:#3A8CCB;color:#fff;font:800 14px var(--body);cursor:pointer}
 .cdi .tent{font-size:12.5px!important}
 .cdres{border-color:#3A8CCB!important;color:#3A8CCB!important;font-weight:800!important}
-.dlg.rcad .box{max-width:980px}.dlg.rcad .top{position:relative;padding-right:56px}.dlg.rcad .x{position:absolute;right:14px;top:14px;width:34px;height:34px;border-radius:50%;border:0;background:rgba(255,255,255,.18);color:#fff;font:700 16px var(--body);cursor:pointer}
+.dlg.rcad .box{max-width:620px}.dlg.rcad .top{position:relative;padding-right:56px}.dlg.rcad .x{position:absolute;right:14px;top:14px;width:34px;height:34px;border-radius:50%;border:0;background:rgba(255,255,255,.18);color:#fff;font:700 16px var(--body);cursor:pointer}
 .dlg.rcad .bd{display:flex;flex-direction:column;gap:14px;padding:16px 18px}
-.rim{width:100%;max-height:62vh;object-fit:contain;background:#fff;border-radius:12px;cursor:zoom-in}
+.rim{width:100%;max-height:48vh;object-fit:contain;background:#fff;border-radius:12px;cursor:zoom-in}
 .rsem{padding:26px;text-align:center;border:1px dashed var(--line);border-radius:12px;color:var(--muted)}
 .rmot{margin:0;font-size:14px;color:var(--muted)}
 .ralt{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.ralt span{font:700 15px var(--display);margin-right:4px}
-.ralt button{width:52px;height:52px;border-radius:50%;border:2px solid var(--line);background:var(--card);color:var(--ink);font:800 19px var(--display);cursor:pointer}
+.ralt button{width:42px;height:42px;border-radius:50%;border:2px solid var(--line);background:var(--card);color:var(--ink);font:800 16px var(--display);cursor:pointer}
+.cres{padding:0 14px 10px;display:flex;flex-direction:column;gap:6px}.cres .ralt{gap:7px}.cres .ralt span{font-size:13.5px}.cres .ralt button{width:36px;height:36px;font-size:14px}.cres .rres{font-size:13.5px;min-height:0}
 .ralt button:hover:not(:disabled){border-color:#3A8CCB}.ralt button.ok{background:#1BAF7A;border-color:#1BAF7A;color:#fff}.ralt button.err{background:#E5484D;border-color:#E5484D;color:#fff}.ralt button.cor{border:3px solid #1BAF7A;color:#1BAF7A}.ralt button.sel{background:#3A8CCB;border-color:#3A8CCB;color:#fff}
 .rres{min-height:24px;font-size:15px}.rres .btn{padding:6px 14px}.rres .btn.ok{background:#1BAF7A;border-color:#1BAF7A;color:#fff}.rres .lnk{border:0;background:none;color:#3A8CCB;text-decoration:underline;cursor:pointer;font:inherit}
 .rnav{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center}.rnav span{text-align:center;color:var(--muted);font-weight:700}
-/* cartões do caderno compactos */
-.cdq{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:12px!important}
-.cdi .im{aspect-ratio:auto!important;height:150px;object-fit:contain;object-position:center top;background:#fff}
-.cdi .sem{padding:12px!important;font-size:12.5px}
-.cdi .tx{padding:9px 11px!important;gap:4px!important}.cdi .tx p{font-size:12.5px!important}.cdi .cmt{font-size:11.5px!important;padding:2px 8px!important}
-.cdi .refaz{margin:0 11px 7px!important;padding:8px!important;font-size:13px!important}
-.cdi .ac{padding:0 11px 10px!important;gap:5px!important}.cdi .ac button{padding:6px 8px!important;font-size:12px!important}
-@media (max-width:980px){.cdq{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
-@media (max-width:560px){.cdq{grid-template-columns:1fr!important}}
 </style>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sala de Estudos · PREPARA UFU</title>
@@ -300,8 +292,8 @@ select,input[type=number],input[type=text]{font:500 16px var(--body);padding:11p
 <div id="exBar" hidden>Vendo como <select id="exAluno" aria-label="Escolher o aluno"><option>Aluno exemplo</option></select> — é assim que esse aluno vê. <button type="button" id="exSair">Sair do modo aluno</button></div>
 <main id="app"><p class="pend">Carregando…</p></main>
 
-<script src="../js/estatisticas.js?v=1795786156"></script>
-<script>(function(){var V='1795786156';var K='bqufu-recarga-';
+<script src="../js/estatisticas.js?v=1795786224"></script>
+<script>(function(){var V='1795786224';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -660,7 +652,7 @@ async function telaCaderno(email,cab){if(!cab)abas('tabCad');const meu=!cab&&!VE
     corpo=Q.length?`<div class="cdq">${Q.map(x=>{const mv=MOTV[x.motivo];return `<div class="cdi${x.revisada?' ok':''}" data-id="${x.id}">${x.img?`<img class="im" data-img="${esc(x.img)}" alt="Questão errada" loading="lazy">`:`<div class="sem">Sem foto${x.fonte?'<br>'+esc(x.fonte):''}</div>`}
       <div class="tx">${mv?`<span class="cmt" style="--c:${mv.c}">${mv.n}</span>`:'<span class="cmt" style="--c:var(--line)">Sem motivo</span>'}${x.obs?`<p style="color:var(--ink);font-weight:700">${esc(x.obs)}</p>`:''}<p>${x.questao?'<b style="color:#3A8CCB">Banco de Questões</b> · ':''}${x.fonte?esc(x.fonte)+' · ':''}errou em ${dm(new Date(x.criado))}${x.revisada&&x.revisada_em?' · revisada em '+dm(new Date(x.revisada_em)):''}</p></div>
       ${(x.tentativas||[]).length?`<p class="tent">Refeita ${x.tentativas.length}× · última: ${x.tentativas[x.tentativas.length-1].ok?'<b style="color:#1BAF7A">acertou</b>':'<b style="color:#E5484D">errou</b>'}</p>`:''}
-      ${meu?`<button class="refaz">▶ Resolver de novo</button><div class="ac"><button class="rv">${x.revisada?'✓ Revisada':'Marcar como revisada'}</button><button class="ed" title="Editar">✎</button><button class="dl" title="Apagar">🗑</button></div>`:''}</div>`;}).join('')}</div>`
+      ${meu?`<div class="cres"><div class="ralt"><span>Resolver de novo:</span>${(x.questao?['A','B','C','D']:['A','B','C','D','E']).map(l=>`<button data-l="${l}">${l}</button>`).join('')}</div><div class="rres"></div></div><div class="ac"><button class="rv">${x.revisada?'✓ Revisada':'Marcar como revisada'}</button><button class="ed" title="Editar">✎</button><button class="dl" title="Apagar">🗑</button></div>`:''}</div>`;}).join('')}</div>`
       :`<div class="card"><p class="pend" style="margin:0">Nenhuma questão neste filtro.</p></div>`;}
   const migalha=CADV.m?`<button class="vol" id="cdVol">← ${CADV.a!==null?esc(CADV.m):'Todas as matérias'}</button><b style="font:800 17px var(--display)">${CADV.a!==null?(CADV.a?esc(CADV.a):'Só pela foto'):esc(CADV.m)}</b>`:(cab?`<button class="vol" id="cdDash">← Dashboard do aluno</button>`:'')+`<b style="font:800 18px var(--display)">${cab?'Caderno de erros':'Meu Caderno de Erros'}</b>`;
   $('app').innerHTML=(cab||'')+`<div class="cdk"><div><span>Questões no caderno</span><b>${T.length}</b><small>${errS>T.length?`de ${errS} erros registrados nas sessões`:'anotadas com assunto ou foto'}</small></div>
@@ -680,7 +672,7 @@ async function telaCaderno(email,cab){if(!cab)abas('tabCad');const meu=!cab&&!VE
   ap.querySelectorAll('.cdi').forEach(c=>{const x=T.find(y=>String(y.id)===c.dataset.id);if(!x)return;
     const rv=c.querySelector('.rv');if(rv)rv.onclick=async()=>{rv.disabled=true;const v=!x.revisada;const {error}=await SB.from('caderno_erros').update({revisada:v,revisada_em:v?new Date().toISOString():null}).eq('id',x.id);if(error){alert(error.message);rv.disabled=false;return;}recar();};
     const ed=c.querySelector('.ed');if(ed)ed.onclick=()=>anotaErros({edit:x},recar);
-    const rf=c.querySelector('.refaz');if(rf)rf.onclick=()=>resolveCad([x],recar);
+    const cr=c.querySelector('.cres');if(cr)ligaResolver(cr,x,()=>{});
     const dl=c.querySelector('.dl');if(dl)dl.onclick=async()=>{if(!dl.dataset.ok){dl.dataset.ok=1;dl.textContent='Apagar?';return;}const {error}=await SB.from('caderno_erros').delete().eq('id',x.id);if(error){alert(error.message);return;}if(x.img&&x.img.includes('@'))SB.storage.from('caderno').remove([x.img]);recar();};});}
 
 /* resolver de novo as questões do caderno, uma por vez */
@@ -696,21 +688,22 @@ function resolveCad(L,depois){L=L.filter(Boolean);if(!L.length)return;let i=0,ac
     if(x.img){const im=d.querySelector('.rim');im.src=await cadUrl(x.img);im.onclick=()=>{const z=document.createElement('div');z.className='cdz';z.innerHTML=`<img src="${im.src}" alt="Questão">`;z.onclick=()=>z.remove();document.body.appendChild(z);};}
     d.querySelector('[data-x=f]').onclick=fecha;d.querySelector('[data-x=ant]').onclick=()=>{i--;passo();};
     d.querySelector('[data-x=prox]').onclick=()=>{if(i<L.length-1){i++;passo();}else{d.innerHTML=`<div class="box"><div class="top" style="--c:#1BAF7A"><h3>Revisão concluída</h3><p>${feitas?`Você acertou ${acertos} de ${feitas} questões refeitas.`:'Nenhuma questão respondida.'}</p></div><div class="bd"><button class="btn pri" data-x="f">Fechar</button></div></div>`;d.querySelector('[data-x=f]').onclick=fecha;}};
-    const res=d.querySelector('.rres');
-    const registra=async(l,ok)=>{feitas++;if(ok)acertos++;mudou=true;
+    ligaResolver(d,x,ok=>{feitas++;if(ok)acertos++;mudou=true;const sp=d.querySelector('.rnav span');if(sp)sp.textContent=acertos+' de '+feitas+' certas';d.querySelector('[data-x=prox]').focus();});};
+  passo();}
+function ligaResolver(box,x,cb){const res=box.querySelector('.rres');
+    const registra=async(l,ok)=>{cb(ok);
       const t=(x.tentativas||[]).concat([{em:new Date().toISOString(),escolha:l||null,ok}]);x.tentativas=t;
       const up={tentativas:t};if(ok&&!x.revisada){up.revisada=true;up.revisada_em=new Date().toISOString();x.revisada=true;}
       await SB.from('caderno_erros').update(up).eq('id',x.id);
       if(x.questao&&l)SB.from('banco_resp').insert({questao:x.questao,materia:x.materia,topico:x.assunto,escolha:l,correta:ok}).then(()=>{});
       res.innerHTML=ok?`<b style="color:#1BAF7A">Você acertou!</b> A questão foi marcada como revisada.${up.revisada?' <button class="lnk" data-x="desf">Manter a revisar</button>':''}`:`<b style="color:#E5484D">Ainda não foi desta vez.</b>${x.gabarito?' Gabarito: <b>'+x.gabarito+'</b>.':''} Ela continua no caderno para revisar.`;
       const df=res.querySelector('[data-x=desf]');if(df)df.onclick=async()=>{await SB.from('caderno_erros').update({revisada:false,revisada_em:null}).eq('id',x.id);x.revisada=false;df.replaceWith('Ela continua a revisar.');};
-      d.querySelector('[data-x=prox]').focus();};
-    d.querySelectorAll('.ralt button').forEach(b=>b.onclick=()=>{if(d.querySelector('.ralt').dataset.ok)return;d.querySelector('.ralt').dataset.ok=1;const l=b.dataset.l;
-      d.querySelectorAll('.ralt button').forEach(z=>z.disabled=true);
-      if(x.gabarito){const ok=l===x.gabarito;b.classList.add(ok?'ok':'err');if(!ok){const c=d.querySelector(`.ralt button[data-l="${x.gabarito}"]`);if(c)c.classList.add('cor');}registra(l,ok);}
+      const rv=box.querySelector&&box.closest&&box.closest('.cdi');if(rv){const b=rv.querySelector('.rv');if(b&&x.revisada){b.textContent='✓ Revisada';rv.classList.add('ok');}}};
+    box.querySelectorAll('.ralt button').forEach(b=>b.onclick=()=>{if(box.querySelector('.ralt').dataset.ok)return;box.querySelector('.ralt').dataset.ok=1;const l=b.dataset.l;
+      box.querySelectorAll('.ralt button').forEach(z=>z.disabled=true);
+      if(x.gabarito){const ok=l===x.gabarito;b.classList.add(ok?'ok':'err');if(!ok){const c=box.querySelector(`.ralt button[data-l="${x.gabarito}"]`);if(c)c.classList.add('cor');}registra(l,ok);}
       else{b.classList.add('sel');res.innerHTML='Você marcou <b>'+l+'</b>. Confira o gabarito no seu material: <button class="btn ok" data-x="ac">Acertei</button> <button class="btn" data-x="er">Errei</button>';
-        res.querySelector('[data-x=ac]').onclick=()=>registra(l,true);res.querySelector('[data-x=er]').onclick=()=>registra(l,false);}});};
-  passo();}
+        res.querySelector('[data-x=ac]').onclick=()=>registra(l,true);res.querySelector('[data-x=er]').onclick=()=>registra(l,false);}});}
 async function cardCaderno(email,cab){const {data}=await SB.from('caderno_erros').select('materia,assunto,revisada').eq('email',email);const T=data||[];
   const G={};T.forEach(x=>{const k=x.materia+'|'+(x.assunto||'');const g=G[k]=G[k]||{m:x.materia,a:x.assunto,n:0,r:0};g.n++;if(!x.revisada)g.r++;});
   const L=Object.values(G).sort((a,b)=>b.r-a.r||b.n-a.n).slice(0,7);const mx=Math.max(1,...L.map(x=>x.n));
@@ -869,7 +862,7 @@ async function telaDen(){abas('tabDen');$('app').innerHTML='<p class="pend">Carr
   $('app').querySelectorAll('[data-r]').forEach(b=>b.onclick=async()=>{await SB.rpc('admin_resolver',{p_id:+b.dataset.id,p:b.dataset.r==='1'});telaDen();});}
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795786156" defer></script>
-<script src="../js/menu.js?v=1795786156" defer></script>
+<script src="../js/presenca.js?v=1795786224" defer></script>
+<script src="../js/menu.js?v=1795786224" defer></script>
 </body>
 </html>
