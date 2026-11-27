@@ -62,7 +62,7 @@ Tabelas principais:
 | `m_plano` / `m_plano_feito` / `m_plano_remarcado` | Plano individual da mentoria. |
 | `sessoes` | sessões da Sala de Estudos (`segundos`, `tipo`, `materia`, `questoes`, `acertos`, `erros`, `detalhe jsonb` p/ simulado e Estudos Extras). |
 | `banco_resp` | respostas do Banco de Questões (`questao`, `escolha`, `correta`). |
-| `caderno_erros` | Caderno de Erros (`materia`, `assunto`, `motivo`, `fonte`, `obs`, `img`, `questao`, `gabarito` A–E, `tentativas` jsonb, `revisada`). "Resolver de novo" (`resolveCad` em estudos): refaz a questão; com gabarito corrige sozinho, sem gabarito o aluno diz se acertou; acerto marca revisada; questão do Banco também grava em `banco_resp`. `img`: caminho no bucket `caderno`, `banco:q/<id>.jpg` (foto do próprio banco) ou `/img/...`. |
+| `caderno_erros` | Caderno de Erros (`materia`, `assunto`, `motivo`, `fonte`, `obs`, `img`, `questao`, `gabarito` A–E, `tentativas` jsonb, `revisada`). "Resolver de novo" (dentro do cartão, `ligaResolver` em estudos; sem janela pop-up, a pedido do Prof. Jazz): refaz a questão; com gabarito corrige sozinho, sem gabarito o aluno diz se acertou; acerto marca revisada; questão do Banco também grava em `banco_resp`. `img`: caminho no bucket `caderno`, `banco:q/<id>.jpg` (foto do próprio banco) ou `/img/...`. |
 | `agenda_estudos` | planejamento do aluno na Agenda (`origem` manual/crono). |
 | `aulas`, `pastas`, `arquivos`, `m_pastas`, `m_arquivos`, `m_encontros`, `m_pagamentos` | Agenda/Materiais das turmas e da mentoria. |
 | `va_cursos`, `va_aulas`, `va_links`, `va_feito`, `va_aval`, `va_duvidas` | Minhas Aulas. |

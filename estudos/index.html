@@ -292,8 +292,8 @@ select,input[type=number],input[type=text]{font:500 16px var(--body);padding:11p
 <div id="exBar" hidden>Vendo como <select id="exAluno" aria-label="Escolher o aluno"><option>Aluno exemplo</option></select> — é assim que esse aluno vê. <button type="button" id="exSair">Sair do modo aluno</button></div>
 <main id="app"><p class="pend">Carregando…</p></main>
 
-<script src="../js/estatisticas.js?v=1795786224"></script>
-<script>(function(){var V='1795786224';var K='bqufu-recarga-';
+<script src="../js/estatisticas.js?v=1795786471"></script>
+<script>(function(){var V='1795786471';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -658,14 +658,13 @@ async function telaCaderno(email,cab){if(!cab)abas('tabCad');const meu=!cab&&!VE
   $('app').innerHTML=(cab||'')+`<div class="cdk"><div><span>Questões no caderno</span><b>${T.length}</b><small>${errS>T.length?`de ${errS} erros registrados nas sessões`:'anotadas com assunto ou foto'}</small></div>
     <div><span>A revisar</span><b style="color:#E5484D">${arev}</b><small>ainda não revisadas</small></div><div><span>Revisadas</span><b style="color:#1BAF7A">${rev}</b><small>${T.length?Math.round(100*rev/T.length)+'% do caderno':'—'}</small></div>
     <div><span>Motivo mais comum</span><b style="font-size:21px;margin-top:9px;color:${top?MOTV[top[0]].c:'inherit'}">${top?MOTV[top[0]].n:'—'}</b><small>${top?Math.round(100*top[1]/comMot)+'% dos erros com motivo':'anote o motivo dos erros'}</small></div></div>
-   ${T.length?`<div class="cdbar">${migalha}<span style="margin-left:auto"></span><div class="cdf">${[['rev','A revisar'],['todos','Todas'],['ok','Revisadas']].map(([k,n])=>`<button data-f="${k}"${CADV.f===k?' class="on"':''}>${n}</button>`).join('')}</div>${meu&&F.length?`<button class="btn cdres" id="cdRes">▶ Resolver ${CADV.m?'estas':'as'} questões (${(CADV.m?F.filter(x=>x.materia===CADV.m&&(CADV.a===null||(x.assunto||'')===CADV.a)):F).length})</button>`:''}${meu?'<button class="btn pri" id="cdAdd">+ Anotar erro</button>':''}</div>`:''}${corpo}`;
+   ${T.length?`<div class="cdbar">${migalha}<span style="margin-left:auto"></span><div class="cdf">${[['rev','A revisar'],['todos','Todas'],['ok','Revisadas']].map(([k,n])=>`<button data-f="${k}"${CADV.f===k?' class="on"':''}>${n}</button>`).join('')}</div>${meu?'<button class="btn pri" id="cdAdd">+ Anotar erro</button>':''}</div>`:''}${corpo}`;
   if(cab)ligaCab();
   const ap=$('app');
   ap.querySelectorAll('.cdf button').forEach(b=>b.onclick=()=>{CADV.f=b.dataset.f;recar();});
   ap.querySelectorAll('.cdc[data-m]').forEach(b=>b.onclick=()=>{CADV.m=b.dataset.m;CADV.a=null;recar();});
   ap.querySelectorAll('.cdc[data-a]').forEach(b=>b.onclick=()=>{CADV.a=b.dataset.a;recar();});
   if($('cdDash'))$('cdDash').onclick=()=>telaAlunos(email);
-  if($('cdRes'))$('cdRes').onclick=()=>resolveCad(CADV.m?F.filter(x=>x.materia===CADV.m&&(CADV.a===null||(x.assunto||'')===CADV.a)):F,recar);
   if($('cdVol'))$('cdVol').onclick=()=>{if(CADV.a!==null)CADV.a=null;else CADV.m=null;recar();};
   [$('cdAdd'),$('cdAdd2')].forEach(b=>{if(b)b.onclick=()=>anotaErros({materia:CADV.m||'',n:0},recar);});
   ap.querySelectorAll('img[data-img]').forEach(async im=>{im.src=await cadUrl(im.dataset.img);im.onclick=()=>{const z=document.createElement('div');z.className='cdz';z.innerHTML=`<img src="${im.src}" alt="Questão errada">`;z.onclick=()=>z.remove();document.body.appendChild(z);};});
@@ -862,7 +861,7 @@ async function telaDen(){abas('tabDen');$('app').innerHTML='<p class="pend">Carr
   $('app').querySelectorAll('[data-r]').forEach(b=>b.onclick=async()=>{await SB.rpc('admin_resolver',{p_id:+b.dataset.id,p:b.dataset.r==='1'});telaDen();});}
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795786224" defer></script>
-<script src="../js/menu.js?v=1795786224" defer></script>
+<script src="../js/presenca.js?v=1795786471" defer></script>
+<script src="../js/menu.js?v=1795786471" defer></script>
 </body>
 </html>
