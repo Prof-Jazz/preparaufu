@@ -73,7 +73,7 @@
 .anq .mot{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}.anq .mot button{border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--ink);font:700 12px var(--body);padding:7px 4px;cursor:pointer}
 .anq .mot button.on{background:var(--m);border-color:var(--m);color:#fff}
 .anq .ft{display:flex;align-items:center;gap:10px}.anq .ft label{display:inline-flex;align-items:center;gap:6px;border:1px dashed var(--line);border-radius:10px;padding:7px 12px;font:700 13px var(--body);cursor:pointer;background:var(--card)}
-.anq .ft input{display:none}.anq .gdica{color:var(--muted);font-size:12px}.anq select.falta{border-color:#E5484D;box-shadow:0 0 0 2px rgba(229,72,77,.35)}.anq .ft img{height:54px;max-width:120px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+.anq .ft input{display:none}.anq .ft{flex-wrap:wrap}.anq .fcam{border-style:solid!important;border-color:#3A8CCB!important}.anq .gdica{color:var(--muted);font-size:12px}.anq select.falta{border-color:#E5484D;box-shadow:0 0 0 2px rgba(229,72,77,.35)}.anq .ft img{height:54px;max-width:120px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
 .anb{display:grid;grid-template-columns:1fr 1fr;gap:8px}.anb label{display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer}.anb input{display:none}
 .cdtop{display:flex;flex-direction:column;gap:6px}.cdtop .lin{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,3fr) 46px;gap:10px;align-items:center;font-size:13.5px}
 .cdtop .lin span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.cdtop .lin i{display:block;height:10px;border-radius:9px}.cdtop .lin b{text-align:right}
@@ -292,8 +292,8 @@ select,input[type=number],input[type=text]{font:500 16px var(--body);padding:11p
 <div id="exBar" hidden>Vendo como <select id="exAluno" aria-label="Escolher o aluno"><option>Aluno exemplo</option></select> — é assim que esse aluno vê. <button type="button" id="exSair">Sair do modo aluno</button></div>
 <main id="app"><p class="pend">Carregando…</p></main>
 
-<script src="../js/estatisticas.js?v=1795786679"></script>
-<script>(function(){var V='1795786679';var K='bqufu-recarga-';
+<script src="../js/estatisticas.js?v=1795786989"></script>
+<script>(function(){var V='1795786989';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -356,7 +356,8 @@ async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!se
   else if(location.hash==='#painel'&&$('tabPainel').hidden===false)telaPainel(ALVO);
   else if(location.hash==='#caderno'&&$('tabCad').hidden===false)telaCaderno(ALVO);
   else telaSala();
-  abreDoHash(900);addEventListener('hashchange',()=>abreDoHash(0));}
+  abreDoHash(900);addEventListener('hashchange',()=>abreDoHash(0));
+  if(REAL_ADMIN)setTimeout(()=>{limpaFotos(null).catch(()=>{});},5000);}
 function abreDoHash(ms){const m=location.hash.match(/^#mensagens(?:\/([^/]+)\/?(.*))?$/);if(!m)return;history.replaceState(null,'',location.pathname+location.search+'#sala');
   setTimeout(()=>{try{if(m[1])abreChat(m[1],decodeURIComponent(m[2]||''));else abreCaixa();}catch(e){}},ms);}
 function menus(){const adm=REAL_ADMIN&&!EXMODO,stf=STAFF&&!EXMODO;$('tabPainel').hidden=!((ASSESSORIA||REC.includes('dash'))&&!stf);$('tabCad').hidden=stf;$('tabPainel').textContent='Meu Dashboard';$('tabAlunos').hidden=!stf;$('tabDen').hidden=!adm;$('tabEx').hidden=!stf;$('exBar').hidden=!EXMODO||MVER;}
@@ -587,14 +588,14 @@ async function anotaErros(o,depois){try{await carregaPlano();}catch(e){}
      <input type="text" class="qo" maxlength="140" placeholder="Qual assunto?" hidden>
      <div class="mot">${TERR.map(([k,n,dd,c])=>`<button type="button" data-k="${k}" style="--m:${c}" title="${esc(dd)}"${pre.motivo===k?' class="on"':''}>${n}</button>`).join('')}</div>
      <div class="r2"><input type="text" class="qf" maxlength="120" placeholder="Onde está a questão? ex.: Lista 3, questão 12 (opcional)" value="${esc(pre.fonte||'')}"><select class="qg" title="Gabarito da questão"><option value="">Gabarito da questão</option>${['A','B','C','D','E'].map(l=>`<option${pre.gabarito===l?' selected':''}>${l}</option>`).join('')}</select></div>
-     <div class="ft"><label>📷 ${pre.img||pre.file?'Trocar foto':'Foto da questão'}<input type="file" accept="image/*"></label><span class="pv"></span><small class="gdica">Com foto, informe o gabarito ao lado.</small></div>`;
+     <div class="ft"><label class="fcam">📷 Tirar foto<input type="file" accept="image/*" capture="environment"></label><label class="fgal">🖼 Galeria ou arquivo<input type="file" accept="image/*"></label><span class="pv"></span></div><small class="gdica">Com foto, informe o gabarito. A foto fica guardada por 2 meses.</small>`;
     L.appendChild(q);q._file=pre.file||null;q._img=pre.img||null;q._mot=pre.motivo||null;
     const qm=q.querySelector('.qm'),qa=q.querySelector('.qa'),qo=q.querySelector('.qo');
     qm.onchange=()=>{q.style.setProperty('--c',CORM[qm.value]||'#E5484D');qa.disabled=!qm.value;qa.innerHTML=qm.value?optsAss(qm.value):'<option value="">Escolha antes a matéria</option>';qo.hidden=true;};
     qa.onchange=()=>{qo.hidden=qa.value!=='__outro';if(!qo.hidden)qo.focus();};
     q.querySelectorAll('.mot button').forEach(b=>b.onclick=()=>{const on=!b.classList.contains('on');q.querySelectorAll('.mot button').forEach(x=>x.classList.remove('on'));if(on)b.classList.add('on');q._mot=on?b.dataset.k:null;});
     const pv=q.querySelector('.pv');const mostra=async()=>{if(q._file){const u=URL.createObjectURL(q._file);pv.innerHTML=`<img src="${u}" alt="Foto da questão">`;}else if(q._img){pv.innerHTML=`<img src="${await cadUrl(q._img)}" alt="Foto da questão">`;}};mostra();
-    q.querySelector('.ft input').onchange=e=>{const f=e.target.files[0];if(f){q._file=f;q.querySelector('.ft label').firstChild.textContent='📷 Trocar foto';mostra();}};
+    q.querySelectorAll('.ft input').forEach(inp=>inp.onchange=e=>{const f=e.target.files[0];if(f){q._file=f;mostra();}});
     const x=q.querySelector('.hd button');if(x)x.onclick=()=>{q.remove();[...L.children].forEach((c,i)=>c.querySelector('.hd span').textContent='Questão '+(i+1));};
     return q;};
   const mPad=o.materia&&mats.includes(o.materia)?o.materia:'';
@@ -604,7 +605,7 @@ async function anotaErros(o,depois){try{await carregaPlano();}catch(e){}
   if(!edit){d.querySelector('#aneMais').onclick=()=>{const q=novaQ({materia:mPad});q.scrollIntoView({block:'nearest'});};
     d.querySelector('#aneFotos').onchange=e=>{const fs=[...e.target.files];if(!fs.length)return;
       const vaz=[...L.children].filter(q=>!q._file&&!q._img&&!q.querySelector('.qa').value&&!q._mot);
-      fs.forEach(f=>{const q=vaz.shift();if(q){q._file=f;q.querySelector('.ft input').dispatchEvent(new Event('x'));const u=URL.createObjectURL(f);q.querySelector('.pv').innerHTML=`<img src="${u}" alt="Foto da questão">`;q.querySelector('.ft label').firstChild.textContent='📷 Trocar foto';}else novaQ({materia:mPad,file:f});});
+      fs.forEach(f=>{const q=vaz.shift();if(q){q._file=f;const u=URL.createObjectURL(f);q.querySelector('.pv').innerHTML=`<img src="${u}" alt="Foto da questão">`;}else novaQ({materia:mPad,file:f});});
       e.target.value='';};}
   const fecha=()=>{d.remove();};
   d.querySelector('#aneNao').onclick=fecha;
@@ -630,6 +631,7 @@ async function anotaErros(o,depois){try{await carregaPlano();}catch(e){}
     fecha();depois&&depois();};}
 let CADV={f:'rev',m:null,a:null};
 async function telaCaderno(email,cab){if(!cab)abas('tabCad');const meu=!cab&&!VER_REAL();
+  if(meu&&email===EMAIL){try{await limpaFotos(EMAIL);}catch(e){}}
   $('app').innerHTML=(cab||'')+'<p class="pend">Abrindo o caderno…</p>';
   const [r,s]=await Promise.all([SB.from('caderno_erros').select('*').eq('email',email).order('criado',{ascending:false}),SB.from('sessoes').select('erros').eq('email',email)]);
   if(cab)ligaCab();
@@ -706,6 +708,14 @@ function ligaResolver(box,x,cb){const res=box.querySelector('.rres');
         res.innerHTML='Você marcou <b>'+l+'</b>. Qual é o gabarito correto desta questão? <span class="gpede">'+lt.map(g=>`<button class="btn" data-g="${g}">${g}</button>`).join(' ')+'</span><br><small style="color:var(--muted)">Ele fica guardado: da próxima vez o site corrige sozinho.</small>';
         res.querySelectorAll('[data-g]').forEach(gb=>gb.onclick=async()=>{const g=gb.dataset.g;x.gabarito=g;await SB.from('caderno_erros').update({gabarito:g}).eq('id',x.id);
           const ok=l===g;b.classList.remove('sel');b.classList.add(ok?'ok':'err');if(!ok){const c=box.querySelector(`.ralt button[data-l="${g}"]`);if(c)c.classList.add('cor');}registra(l,ok);});}});}
+
+/* fotos do Caderno de Erros ficam 2 meses; depois são apagadas (a questão continua no caderno) */
+async function limpaFotos(email){const k='bqufu-limpa-'+(email||'todos');try{if(localStorage.getItem(k)===new Date().toDateString())return;}catch(e){}
+  const lim=new Date(Date.now()-60*864e5).toISOString();let q=SB.from('caderno_erros').select('id,img,obs').lt('criado',lim).like('img','%@%');if(email)q=q.eq('email',email);
+  const {data,error}=await q;if(error||!data)return;
+  for(let i=0;i<data.length;i+=50){const L=data.slice(i,i+50);const r=await SB.storage.from('caderno').remove(L.map(x=>x.img));if(r.error)return;
+    for(const x of L)await SB.from('caderno_erros').update({img:null,obs:((x.obs?x.obs+' · ':'')+'foto apagada após 2 meses').slice(0,300)}).eq('id',x.id);}
+  try{localStorage.setItem(k,new Date().toDateString());}catch(e){}}
 async function cardCaderno(email,cab){const {data}=await SB.from('caderno_erros').select('materia,assunto,revisada').eq('email',email);const T=data||[];
   const G={};T.forEach(x=>{const k=x.materia+'|'+(x.assunto||'');const g=G[k]=G[k]||{m:x.materia,a:x.assunto,n:0,r:0};g.n++;if(!x.revisada)g.r++;});
   const L=Object.values(G).sort((a,b)=>b.r-a.r||b.n-a.n).slice(0,7);const mx=Math.max(1,...L.map(x=>x.n));
@@ -864,7 +874,7 @@ async function telaDen(){abas('tabDen');$('app').innerHTML='<p class="pend">Carr
   $('app').querySelectorAll('[data-r]').forEach(b=>b.onclick=async()=>{await SB.rpc('admin_resolver',{p_id:+b.dataset.id,p:b.dataset.r==='1'});telaDen();});}
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795786679" defer></script>
-<script src="../js/menu.js?v=1795786679" defer></script>
+<script src="../js/presenca.js?v=1795786989" defer></script>
+<script src="../js/menu.js?v=1795786989" defer></script>
 </body>
 </html>

@@ -448,8 +448,8 @@ body{}@keyframes fadein{from{opacity:0}to{opacity:1}}
 <div id="exBar" hidden>Vendo como <select id="exAluno" aria-label="Escolher o aluno"><option>Aluno exemplo</option></select> — é assim que esse aluno vê. <span id="exObs"></span><button type="button" id="exSair">Sair do modo aluno</button></div>
 <main id="app"></main>
 
-<script src="../js/estatisticas.js?v=1795786679"></script>
-<script>(function(){var V='1795786679';var K='bqufu-recarga-';
+<script src="../js/estatisticas.js?v=1795786989"></script>
+<script>(function(){var V='1795786989';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,.adlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -670,7 +670,20 @@ function chBars(t,rows,base,sub,fmtV){if(!rows.length)return '';const mx=Math.ma
   return `<section class="chart"><h3><i class="hi b"></i>${esc(t)}</h3>${sub?`<p class="cs">${esc(sub)}</p>`:''}<div class="bars">${rows.map(([k,n,cor],i)=>{const col=cor||PAL[i%PAL.length];const txt=fmtV?fmtV(n):pctBR(n,base);
     return `<div class="bar"><span class="bl" title="${esc(k)}">${esc(k)}</span><span class="bt"><span class="bf" style="width:${Math.max(n/mx*100,9)}%;background:linear-gradient(90deg,${lighten(col,.35)},${col});color:${palText(col)}">${txt}</span></span><span class="bv">${fmtV?'':`${n} aluno${n>1?'s':''}`}</span></div>`;}).join('')}</div></section>`;}
 function chBarsK(k,t){const {f,base,rows}=contagem(k);return chBars(t||titulo(f),rows,base,`${base} aluno(s) responderam · cada aluno pode marcar mais de uma opção`);}
+
+/* uso do Supabase (só o administrador vê): avisa antes de chegar ao limite do plano Pro */
+async function usoSupabase(){if(!IS_ADMIN||!$('app')||$('usoSB'))return;const {data:u,error}=await SB.rpc('admin_uso');if(error||!u)return;
+  const GB=1024**3,MB=1024**2,fm=b=>b>=GB?(b/GB).toFixed(2).replace('.',',')+' GB':Math.round(b/MB)+' MB';
+  const L=[['Banco de dados',u.db,8*GB,'dados dos alunos, sessões, cronogramas, mensagens'],['Arquivos',u.arquivos,100*GB,`questões do banco ${fm((u.buckets||{}).banco||0)} · materiais ${fm((u.buckets||{}).materiais||0)} · fotos do Caderno ${fm((u.buckets||{}).caderno||0)} (${u.fotos_caderno})`],['Usuários cadastrados',u.usuarios,100000,'contas com login']];
+  const pc=([,v,m])=>Math.min(100,100*v/m),cor=p=>p>=85?'#E5484D':p>=70?'#F2C811':'#1BAF7A',maxp=Math.max(...L.map(pc));
+  const d=document.createElement('div');d.id='usoSB';d.className='card';d.style.cssText='margin-bottom:14px;padding:16px 18px';
+  d.innerHTML=`<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><b style="font:800 17px var(--display)">Uso do Supabase (plano Pro)</b><span style="margin-left:auto;font-weight:800;color:${cor(maxp)}">${maxp>=85?'Atenção: perto do limite':maxp>=70?'Fique de olho':'Tudo tranquilo'}</span></div>
+   ${maxp>=70?`<p style="margin:8px 0 0;padding:9px 12px;border-radius:10px;background:rgba(229,72,77,.12);border:1px solid #E5484D;font-weight:600">O uso passou de ${Math.round(maxp)}% de um dos limites do plano. Fale com o Claude para liberar espaço (por exemplo, fotos antigas ou materiais grandes) antes de chegar a 100%.</p>`:''}
+   <div style="display:grid;gap:10px;margin-top:12px">${L.map(x=>{const p=pc(x);return `<div><div style="display:flex;justify-content:space-between;gap:10px;font-size:14px"><b>${x[0]}</b><span>${x[0]==='Usuários cadastrados'?x[1]+' de 100.000':fm(x[1])+' de '+fm(x[2])} · <b style="color:${cor(p)}">${p<1?'menos de 1':Math.round(p)}%</b></span></div><div style="height:9px;border-radius:9px;background:var(--soft);overflow:hidden;margin-top:4px"><i style="display:block;height:100%;width:${Math.max(1,p)}%;background:${cor(p)}"></i></div><small style="color:var(--muted)">${x[3]}</small></div>`;}).join('')}</div>
+   <p style="margin:10px 0 0;font-size:13px;color:var(--muted)">O tráfego de saída (egress, limite de 250 GB por mês, sobretudo as imagens das questões) só aparece no painel do Supabase, em Usage. As fotos do Caderno de Erros são apagadas sozinhas depois de 2 meses${u.fotos_vencidas?` (${u.fotos_vencidas} aguardando limpeza)`:''}.</p>`;
+  $('app').prepend(d);}
 async function telaGeral(){abas('tabGeral');$('app').innerHTML='<p class="pend">Carregando…</p>';
+  if(IS_ADMIN){let n=0;const t=setInterval(()=>{n++;const a=$('app');if(n>40||!$('tabGeral').classList.contains('on')){clearInterval(t);return;}if(a&&!/Carregando…/.test(a.textContent.slice(0,40))){clearInterval(t);usoSupabase().catch(()=>{});}},500);}
   try{await carregar();}catch(e){$('app').innerHTML='<p class="pend">Erro: '+esc(e.message)+'</p>';return;}
   const N=RESP.length,T=LIB.length;GID=0;
   if(!N){$('app').innerHTML=`<div class="intro"><h2>Comportamento da turma</h2><p>Nenhum perfil de estudos enviado ainda (0 de ${T} alunos da Assessoria). Os gráficos do perfil aparecem aqui assim que os alunos responderem.</p></div><div id="aoVivo"></div>`;turmaAoVivo($('aoVivo'));return;}
@@ -1481,7 +1494,7 @@ async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!se
 $('sair').onclick=async()=>{try{localStorage.removeItem('bqufu-sig-v2');}catch(e){}await SB.auth.signOut();location.href='/';};
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795786679" defer></script>
-<script src="../js/menu.js?v=1795786679" defer></script>
+<script src="../js/presenca.js?v=1795786989" defer></script>
+<script src="../js/menu.js?v=1795786989" defer></script>
 </body>
 </html>

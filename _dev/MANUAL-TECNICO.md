@@ -70,6 +70,10 @@ Tabelas principais:
 
 Buckets de arquivos: `banco` (privado: `banco.json`, `q/*.jpg`, `docx/*`), `caderno` (privado, fotos do Caderno, pasta = e-mail do aluno), `capas`, `materiais`, `mentoria`.
 
+**Fotos do Caderno:** câmera (`capture`) ou galeria/arquivo; ficam 2 meses — `limpaFotos()` em estudos apaga as vencidas do próprio aluno ao abrir o caderno e todas quando o admin entra (1×/dia); a questão fica, sem a imagem.
+
+**Uso do Supabase:** `admin_uso()` alimenta o cartão "Uso do Supabase (plano Pro)" no Comportamento da turma (só admin), com aviso a partir de 70% (limites Pro: 8 GB banco, 100 GB arquivos, 100 mil usuários; egress 250 GB/mês só no painel Usage do Supabase).
+
 **Histórico do SQL aplicado:** pasta `_dev/sql/` (cada arquivo = uma mudança). **Estado exato atual** (sempre mais confiável que os arquivos), rodar no SQL Editor do Supabase:
 
 ```sql
