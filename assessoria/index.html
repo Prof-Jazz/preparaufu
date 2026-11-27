@@ -448,8 +448,8 @@ body{}@keyframes fadein{from{opacity:0}to{opacity:1}}
 <div id="exBar" hidden>Vendo como <select id="exAluno" aria-label="Escolher o aluno"><option>Aluno exemplo</option></select> — é assim que esse aluno vê. <span id="exObs"></span><button type="button" id="exSair">Sair do modo aluno</button></div>
 <main id="app"></main>
 
-<script src="../js/estatisticas.js?v=1795736568"></script>
-<script>(function(){var V='1795736568';var K='bqufu-recarga-';
+<script src="../js/estatisticas.js?v=1795741940"></script>
+<script>(function(){var V='1795741940';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,.adlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -1481,7 +1481,7 @@ async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!se
 $('sair').onclick=async()=>{try{localStorage.removeItem('bqufu-sig-v2');}catch(e){}await SB.auth.signOut();location.href='/';};
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795736568" defer></script>
-<script src="../js/menu.js?v=1795736568" defer></script>
+<script src="../js/presenca.js?v=1795741940" defer></script>
+<script src="../js/menu.js?v=1795741940" defer></script>
 </body>
 </html>

@@ -106,7 +106,7 @@ body.mn>header nav.tabs>a,.mn-esc{display:none!important}\
 @media (min-width:1001px){body.mn.mn-mini{padding-left:72px}body.mn.mn-mini>header{margin-left:-72px}body.mn-mini #mnSide{width:72px}\
  body.mn-mini #mnSide .tb{grid-template-columns:1fr!important;margin:10px 8px}body.mn-mini #mnSide .gt{display:none}body.mn-mini #mnSide .gi{display:inline-flex}body.mn-mini #mnSide .tb button{padding:8px 0}\
  body.mn-mini #mnSide .ls{padding:4px 8px}body.mn-mini #mnSide a.it{justify-content:center;padding:11px 0}body.mn-mini #mnSide a.it span{display:none}body.mn-mini #mnSide a.it svg{width:22px;height:22px}\
- body.mn-mini #mnSide .ex{margin:8px;padding:6px;font-size:0}body.mn-mini #mnSide .ex button{margin:0;font-size:15px;padding:6px 0}body.mn-mini #mnSide .mnMini{margin:8px;font-size:16px}}\
+ body.mn-mini #mnSide .ex{margin:8px;padding:6px;font-size:0}body.mn-mini #mnSide .ex button{margin:0;font-size:18px;padding:8px 0;line-height:1}body.mn-mini #mnSide .ex .st{display:none}body.mn-mini #mnSide .mnMini{margin:8px;font-size:16px}}\
 @media (max-width:1000px){#mnSide .mnMini{display:none}}\
 #mnTop{display:none}\
 @media (min-width:1001px){body.mn-topo{padding-left:0!important}body.mn-topo>header{margin-left:0!important;position:relative;z-index:65}body.mn-topo #mnSide{display:none}\
@@ -140,7 +140,7 @@ body.mn>header nav.tabs>a,.mn-esc{display:none!important}\
   function desenha(){var s=el('mnSide');var gs=[];M.L.forEach(function(x){if(gs.indexOf(x.g)<0)gs.push(x.g);});
     if(!GRP||gs.indexOf(GRP)<0){var a=M.L.filter(function(x){return !x.dup&&ativo(x);})[0];GRP=a?a.g:gs[0];}
     s.innerHTML='<div class="hd"><span>Menu</span><button type="button" aria-label="Fechar menu">✕</button></div>'+
-      (M.ex?'<div class="ex">Você está vendo a plataforma como aluno: o menu Equipe some, como para ele.<button type="button" id="mnSaiEx">← Voltar à visão do professor</button></div>':'')+
+      (M.ex?'<div class="ex">Você está vendo a plataforma como aluno: o menu Equipe some, como para ele.<button type="button" id="mnSaiEx" title="Voltar à visão do professor"><span class="sa">←</span><span class="st"> Voltar à visão do professor</span></button></div>':'')+
       (gs.length>1?'<div class="tb" style="grid-template-columns:repeat('+(gs.length>3?2:gs.length)+',minmax(0,1fr))">'+gs.map(function(g){return '<button type="button" data-g="'+g+'" title="'+g+'"'+(g===GRP?' class="on"':'')+'><span class="gi">'+svg(GI[g])+'</span><span class="gt">'+g+'</span></button>';}).join('')+'</div>':'<div style="height:10px"></div>')+
       '<nav class="ls" aria-label="Menu da plataforma">'+M.L.filter(function(x){return x.g===GRP;}).map(function(x,i){return '<a class="it'+(x.lock?' lock':'')+'" href="'+x.href+'" title="'+x.t+'" data-i="'+M.L.indexOf(x)+'">'+svg(x.lock?'lock':x.k)+'<span>'+x.t+'</span></a>';}).join('')+'</nav><button type="button" class="mnMini" id="mnMini" title="'+(mini()?'Abrir o menu':'Recolher o menu')+'">'+(mini()?'»':'« Recolher menu')+'</button>';
     s.querySelectorAll('.tb button').forEach(function(b){b.onclick=function(){GRP=b.dataset.g;GRPU=true;desenha();};});
