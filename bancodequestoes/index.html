@@ -256,7 +256,7 @@ td.h{font-weight:700}.z{color:var(--line)}
   </main>
 
 </div>
-<script>(function(){var V='1795778642';var K='bqufu-recarga-';
+<script>(function(){var V='1795786156';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -322,7 +322,7 @@ async function responde(c,o,l){const box=c.querySelector('.resp');if(box.dataset
   if(error){m.className='rmsg err';m.innerHTML='Não foi possível salvar a resposta<small>'+esc(error.message)+'</small>';delete box.dataset.feito;box.querySelectorAll('.alt').forEach(b=>{b.disabled=false;b.classList.remove('ok','err','cor');});return;}
   RESP[o.i]={...row,criado:new Date().toISOString()};atualizaStat();
   if(!ok){let cid=null;try{const {data:ja}=await SB.from('caderno_erros').select('id').eq('email',EMAIL_B).eq('questao',o.i).eq('revisada',false).limit(1);
-      if(ja&&ja.length)cid=ja[0].id;else{const r2=await SB.from('caderno_erros').insert({materia:MATB(o.d),assunto:o.t,item:null,motivo:null,fonte:label(o)+' · '+o.s,obs:'Gabarito '+o.g+' · você marcou '+l,img:'banco:q/'+o.i+'.jpg',questao:o.i}).select('id').single();cid=r2.data&&r2.data.id;}}catch(e){}
+      if(ja&&ja.length)cid=ja[0].id;else{const r2=await SB.from('caderno_erros').insert({materia:MATB(o.d),assunto:o.t,item:null,motivo:null,fonte:label(o)+' · '+o.s,obs:'Gabarito '+o.g+' · você marcou '+l,gabarito:o.g,img:'banco:q/'+o.i+'.jpg',questao:o.i}).select('id').single();cid=r2.data&&r2.data.id;}}catch(e){}
     const mt=document.createElement('div');mt.className='mot';mt.innerHTML='<b>Por que você errou?</b>'+MOTB.map(([k,n,cc])=>`<button type="button" data-k="${k}" style="--m:${cc}">${n}</button>`).join('');box.appendChild(mt);
     mt.querySelectorAll('button').forEach(b=>b.onclick=async()=>{mt.querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on');if(cid)await SB.from('caderno_erros').update({motivo:b.dataset.k}).eq('id',cid);});}}
 function atualizaStatL(L){const R=L.filter(o=>RESP[o.i]),A=R.filter(o=>RESP[o.i].correta).length;const e=$('stq');if(e)e.innerHTML=R.length?` · você já respondeu <b>${R.length}</b> · <b>${Math.round(100*A/R.length)}%</b> de acerto`:' · responda direto nas alternativas de cada questão';}
@@ -693,7 +693,7 @@ $('admList').onclick=async ev=>{const z=ev.target.dataset.z,r=ev.target.dataset.
   if(r&&confirm('Remover o acesso de '+r+'?')){await SB.rpc('admin_zerar_senha',{e:r});const {error}=await SB.from('allowed_emails').delete().eq('email',r);am(error?error.message:'Acesso removido: '+r);await admLoad();}};
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795778642" defer></script>
-<script src="../js/menu.js?v=1795778642" defer></script>
+<script src="../js/presenca.js?v=1795786156" defer></script>
+<script src="../js/menu.js?v=1795786156" defer></script>
 </body>
 </html>

@@ -62,7 +62,7 @@ Tabelas principais:
 | `m_plano` / `m_plano_feito` / `m_plano_remarcado` | Plano individual da mentoria. |
 | `sessoes` | sessões da Sala de Estudos (`segundos`, `tipo`, `materia`, `questoes`, `acertos`, `erros`, `detalhe jsonb` p/ simulado e Estudos Extras). |
 | `banco_resp` | respostas do Banco de Questões (`questao`, `escolha`, `correta`). |
-| `caderno_erros` | Caderno de Erros (`materia`, `assunto`, `motivo`, `fonte`, `obs`, `img`, `questao`, `revisada`). `img`: caminho no bucket `caderno`, `banco:q/<id>.jpg` (foto do próprio banco) ou `/img/...`. |
+| `caderno_erros` | Caderno de Erros (`materia`, `assunto`, `motivo`, `fonte`, `obs`, `img`, `questao`, `gabarito` A–E, `tentativas` jsonb, `revisada`). "Resolver de novo" (`resolveCad` em estudos): refaz a questão; com gabarito corrige sozinho, sem gabarito o aluno diz se acertou; acerto marca revisada; questão do Banco também grava em `banco_resp`. `img`: caminho no bucket `caderno`, `banco:q/<id>.jpg` (foto do próprio banco) ou `/img/...`. |
 | `agenda_estudos` | planejamento do aluno na Agenda (`origem` manual/crono). |
 | `aulas`, `pastas`, `arquivos`, `m_pastas`, `m_arquivos`, `m_encontros`, `m_pagamentos` | Agenda/Materiais das turmas e da mentoria. |
 | `va_cursos`, `va_aulas`, `va_links`, `va_feito`, `va_aval`, `va_duvidas` | Minhas Aulas. |
@@ -117,4 +117,4 @@ git add -A && git -c user.name=Prof-Jazz commit -m "..." && git push origin HEAD
 - Identidade: azul `#3A8CCB`, amarelo `#DDDD24`/`#F2C811`, verde `#1BAF7A`, laranja `#EB6834`, grafite; logos em `/bancodequestoes/logo/`.
 
 ## 8. Histórico resumido (nov./2026)
-22/11 site no ar (banco + assessoria) · 23/11 Aulas e materiais, Cronograma Semanal · 24/11 Sala de Estudos, mensagens, mentoria individual, assessores · 25/11 Minhas Aulas, Agenda com cronograma, recursos por aluno do Curso, reagendar plano, Estudos Extras, regras do gerador · 26/11 Caderno de Erros, menu híbrido, Banco com resposta direta (conta como estudo), aluno exemplo com dados fictícios, auditoria de permissões, migração de perfis antigos, resolver a Minha lista no Banco.
+22/11 site no ar (banco + assessoria) · 23/11 Aulas e materiais, Cronograma Semanal · 24/11 Sala de Estudos, mensagens, mentoria individual, assessores · 25/11 Minhas Aulas, Agenda com cronograma, recursos por aluno do Curso, reagendar plano, Estudos Extras, regras do gerador · 26/11 Caderno de Erros, menu híbrido, Banco com resposta direta (conta como estudo), aluno exemplo com dados fictícios, auditoria de permissões, migração de perfis antigos, resolver a Minha lista no Banco · 27/11 resolver de novo no Caderno de Erros (cartões compactos, 3 por linha).
