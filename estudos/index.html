@@ -73,7 +73,7 @@
 .anq .mot{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}.anq .mot button{border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--ink);font:700 12px var(--body);padding:7px 4px;cursor:pointer}
 .anq .mot button.on{background:var(--m);border-color:var(--m);color:#fff}
 .anq .ft{display:flex;align-items:center;gap:10px}.anq .ft label{display:inline-flex;align-items:center;gap:6px;border:1px dashed var(--line);border-radius:10px;padding:7px 12px;font:700 13px var(--body);cursor:pointer;background:var(--card)}
-.anq .ft input{display:none}.anq .ft img{height:54px;max-width:120px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+.anq .ft input{display:none}.anq .gdica{color:var(--muted);font-size:12px}.anq select.falta{border-color:#E5484D;box-shadow:0 0 0 2px rgba(229,72,77,.35)}.anq .ft img{height:54px;max-width:120px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
 .anb{display:grid;grid-template-columns:1fr 1fr;gap:8px}.anb label{display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer}.anb input{display:none}
 .cdtop{display:flex;flex-direction:column;gap:6px}.cdtop .lin{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,3fr) 46px;gap:10px;align-items:center;font-size:13.5px}
 .cdtop .lin span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.cdtop .lin i{display:block;height:10px;border-radius:9px}.cdtop .lin b{text-align:right}
@@ -91,7 +91,7 @@
 .ralt button{width:42px;height:42px;border-radius:50%;border:2px solid var(--line);background:var(--card);color:var(--ink);font:800 16px var(--display);cursor:pointer}
 .cres{padding:0 14px 10px;display:flex;flex-direction:column;gap:6px}.cres .ralt{gap:7px}.cres .ralt span{font-size:13.5px}.cres .ralt button{width:36px;height:36px;font-size:14px}.cres .rres{font-size:13.5px;min-height:0}
 .ralt button:hover:not(:disabled){border-color:#3A8CCB}.ralt button.ok{background:#1BAF7A;border-color:#1BAF7A;color:#fff}.ralt button.err{background:#E5484D;border-color:#E5484D;color:#fff}.ralt button.cor{border:3px solid #1BAF7A;color:#1BAF7A}.ralt button.sel{background:#3A8CCB;border-color:#3A8CCB;color:#fff}
-.rres{min-height:24px;font-size:15px}.rres .btn{padding:6px 14px}.rres .btn.ok{background:#1BAF7A;border-color:#1BAF7A;color:#fff}.rres .lnk{border:0;background:none;color:#3A8CCB;text-decoration:underline;cursor:pointer;font:inherit}
+.rres{min-height:24px;font-size:15px}.rres .btn{padding:6px 14px}.rres .gpede .btn{padding:4px 11px;margin:2px}.rres .btn.ok{background:#1BAF7A;border-color:#1BAF7A;color:#fff}.rres .lnk{border:0;background:none;color:#3A8CCB;text-decoration:underline;cursor:pointer;font:inherit}
 .rnav{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center}.rnav span{text-align:center;color:var(--muted);font-weight:700}
 </style>
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -292,8 +292,8 @@ select,input[type=number],input[type=text]{font:500 16px var(--body);padding:11p
 <div id="exBar" hidden>Vendo como <select id="exAluno" aria-label="Escolher o aluno"><option>Aluno exemplo</option></select> — é assim que esse aluno vê. <button type="button" id="exSair">Sair do modo aluno</button></div>
 <main id="app"><p class="pend">Carregando…</p></main>
 
-<script src="../js/estatisticas.js?v=1795786471"></script>
-<script>(function(){var V='1795786471';var K='bqufu-recarga-';
+<script src="../js/estatisticas.js?v=1795786679"></script>
+<script>(function(){var V='1795786679';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -586,8 +586,8 @@ async function anotaErros(o,depois){try{await carregaPlano();}catch(e){}
      <div class="r2"><select class="qm"><option value="">Matéria</option>${mats.map(m=>`<option${m===m0?' selected':''}>${esc(m)}</option>`).join('')}</select><select class="qa"${m0?'':' disabled'}>${m0?optsAss(m0,pre.assunto):'<option value="">Escolha antes a matéria</option>'}</select></div>
      <input type="text" class="qo" maxlength="140" placeholder="Qual assunto?" hidden>
      <div class="mot">${TERR.map(([k,n,dd,c])=>`<button type="button" data-k="${k}" style="--m:${c}" title="${esc(dd)}"${pre.motivo===k?' class="on"':''}>${n}</button>`).join('')}</div>
-     <div class="r2"><input type="text" class="qf" maxlength="120" placeholder="Onde está a questão? ex.: Lista 3, questão 12 (opcional)" value="${esc(pre.fonte||'')}"><select class="qg" title="Gabarito da questão"><option value="">Gabarito (se souber)</option>${['A','B','C','D','E'].map(l=>`<option${pre.gabarito===l?' selected':''}>${l}</option>`).join('')}</select></div>
-     <div class="ft"><label>📷 ${pre.img||pre.file?'Trocar foto':'Foto da questão'}<input type="file" accept="image/*"></label><span class="pv"></span></div>`;
+     <div class="r2"><input type="text" class="qf" maxlength="120" placeholder="Onde está a questão? ex.: Lista 3, questão 12 (opcional)" value="${esc(pre.fonte||'')}"><select class="qg" title="Gabarito da questão"><option value="">Gabarito da questão</option>${['A','B','C','D','E'].map(l=>`<option${pre.gabarito===l?' selected':''}>${l}</option>`).join('')}</select></div>
+     <div class="ft"><label>📷 ${pre.img||pre.file?'Trocar foto':'Foto da questão'}<input type="file" accept="image/*"></label><span class="pv"></span><small class="gdica">Com foto, informe o gabarito ao lado.</small></div>`;
     L.appendChild(q);q._file=pre.file||null;q._img=pre.img||null;q._mot=pre.motivo||null;
     const qm=q.querySelector('.qm'),qa=q.querySelector('.qa'),qo=q.querySelector('.qo');
     qm.onchange=()=>{q.style.setProperty('--c',CORM[qm.value]||'#E5484D');qa.disabled=!qm.value;qa.innerHTML=qm.value?optsAss(qm.value):'<option value="">Escolha antes a matéria</option>';qo.hidden=true;};
@@ -617,6 +617,7 @@ async function anotaErros(o,depois){try{await carregaPlano();}catch(e){}
       if(!m&&!ass&&!tem&&!q._mot)continue;
       if(!m){msg(`Questão ${i+1}: escolha a matéria.`);return;}
       if(!ass&&!tem){msg(`Questão ${i+1}: escolha o assunto ou mande a foto da questão.`);return;}
+      if(tem&&!(edit&&edit.questao)&&!q.querySelector('.qg').value){msg(`Questão ${i+1}: informe o gabarito da questão da foto, para o site corrigir quando você for revisar.`);q.querySelector('.qg').classList.add('falta');q.querySelector('.qg').focus();return;}
       linhas.push({q,row:{materia:m,assunto:ass||null,item:it?it.id:null,motivo:q._mot,fonte:q.querySelector('.qf').value.trim()||null,gabarito:q.querySelector('.qg').value||null}});}
     if(!linhas.length){if(edit){msg('Escolha o assunto ou mande a foto.');return;}fecha();return;}
     bt.disabled=true;
@@ -701,8 +702,10 @@ function ligaResolver(box,x,cb){const res=box.querySelector('.rres');
     box.querySelectorAll('.ralt button').forEach(b=>b.onclick=()=>{if(box.querySelector('.ralt').dataset.ok)return;box.querySelector('.ralt').dataset.ok=1;const l=b.dataset.l;
       box.querySelectorAll('.ralt button').forEach(z=>z.disabled=true);
       if(x.gabarito){const ok=l===x.gabarito;b.classList.add(ok?'ok':'err');if(!ok){const c=box.querySelector(`.ralt button[data-l="${x.gabarito}"]`);if(c)c.classList.add('cor');}registra(l,ok);}
-      else{b.classList.add('sel');res.innerHTML='Você marcou <b>'+l+'</b>. Confira o gabarito no seu material: <button class="btn ok" data-x="ac">Acertei</button> <button class="btn" data-x="er">Errei</button>';
-        res.querySelector('[data-x=ac]').onclick=()=>registra(l,true);res.querySelector('[data-x=er]').onclick=()=>registra(l,false);}});}
+      else{b.classList.add('sel');const lt=[...box.querySelectorAll('.ralt button')].map(z=>z.dataset.l);
+        res.innerHTML='Você marcou <b>'+l+'</b>. Qual é o gabarito correto desta questão? <span class="gpede">'+lt.map(g=>`<button class="btn" data-g="${g}">${g}</button>`).join(' ')+'</span><br><small style="color:var(--muted)">Ele fica guardado: da próxima vez o site corrige sozinho.</small>';
+        res.querySelectorAll('[data-g]').forEach(gb=>gb.onclick=async()=>{const g=gb.dataset.g;x.gabarito=g;await SB.from('caderno_erros').update({gabarito:g}).eq('id',x.id);
+          const ok=l===g;b.classList.remove('sel');b.classList.add(ok?'ok':'err');if(!ok){const c=box.querySelector(`.ralt button[data-l="${g}"]`);if(c)c.classList.add('cor');}registra(l,ok);});}});}
 async function cardCaderno(email,cab){const {data}=await SB.from('caderno_erros').select('materia,assunto,revisada').eq('email',email);const T=data||[];
   const G={};T.forEach(x=>{const k=x.materia+'|'+(x.assunto||'');const g=G[k]=G[k]||{m:x.materia,a:x.assunto,n:0,r:0};g.n++;if(!x.revisada)g.r++;});
   const L=Object.values(G).sort((a,b)=>b.r-a.r||b.n-a.n).slice(0,7);const mx=Math.max(1,...L.map(x=>x.n));
@@ -861,7 +864,7 @@ async function telaDen(){abas('tabDen');$('app').innerHTML='<p class="pend">Carr
   $('app').querySelectorAll('[data-r]').forEach(b=>b.onclick=async()=>{await SB.rpc('admin_resolver',{p_id:+b.dataset.id,p:b.dataset.r==='1'});telaDen();});}
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795786471" defer></script>
-<script src="../js/menu.js?v=1795786471" defer></script>
+<script src="../js/presenca.js?v=1795786679" defer></script>
+<script src="../js/menu.js?v=1795786679" defer></script>
 </body>
 </html>
