@@ -34,6 +34,9 @@
 .f.novo{outline:3px solid #F2C811;outline-offset:4px;border-radius:12px}.f.falta{outline:3px solid #E5484D;outline-offset:4px;border-radius:12px}
 .avnovo{margin-top:10px;padding:10px 12px;border-radius:10px;background:rgba(242,200,17,.15);border:1px solid #F2C811;font-weight:600}
 .toastfalta{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:90;max-width:min(620px,92vw);background:#E5484D;color:#fff;padding:14px 18px;border-radius:14px;box-shadow:0 12px 30px rgba(0,0,0,.35);font-size:15px;line-height:1.4}.toastfalta[hidden]{display:none}
+.mmig{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.mmig span{color:var(--muted)}
+.ptl{max-height:52vh;overflow:auto;display:flex;flex-direction:column;gap:12px;margin-top:8px}.ptg{display:flex;flex-direction:column;gap:4px}.ptg b{font-size:14px}.pti{display:flex;align-items:center;gap:7px;font-size:14px;padding:5px 8px;border:1px solid var(--line);border-radius:9px;cursor:pointer}.pti[hidden]{display:none}.pti small{color:var(--muted);margin-left:auto}
+#ptBusca{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink);font:500 14px var(--body)}
 </style>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Mentoria Individual · Prof. Jazz</title>
@@ -416,8 +419,8 @@ body{}@keyframes fadein{from{opacity:0}to{opacity:1}}
 <div id="exBar" hidden><span id="exTxt"></span> <button type="button" id="exPuro"></button> <button type="button" id="exSair">Voltar aos mentorados</button><button type="button" id="exTroca" hidden></button></div>
 <main id="app"></main>
 
-<script src="../js/estatisticas.js?v=1795786989"></script>
-<script>(function(){var V='1795786989';var K='bqufu-recarga-';
+<script src="../js/estatisticas.js?v=1795874265"></script>
+<script>(function(){var V='1795874265';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -1684,35 +1687,57 @@ const kb=n=>n>1048576?(n/1048576).toFixed(1).replace('.',',')+' MB':Math.max(1,M
 const icoArq=t=>/pdf/.test(t)?'📕':/image/.test(t)?'🖼':/sheet|excel|csv/.test(t)?'📊':/word|document/.test(t)?'📝':/video/.test(t)?'🎬':/audio/.test(t)?'🎧':/presentation|powerpoint/.test(t)?'📽':'📄';
 async function telaMat(){abas('tabMat');await listaPastas(false);}
 async function telaGerais(){abas('tabGerais');await listaPastas(true);}
-async function listaPastas(gerais){$('app').innerHTML='<p class="pend">Carregando…</p>';
-  const [p,a]=await Promise.all([SB.from('m_pastas').select('*').order('criado'),SB.from('m_arquivos').select('pasta')]);
-  const cnt={};(a.data||[]).forEach(x=>cnt[x.pasta]=(cnt[x.pasta]||0)+1);
-  const L=(p.data||[]).filter(x=>gerais?!x.email:(!x.email||x.email===ALVO)).sort((x,y)=>(x.email?0:1)-(y.email?0:1));
+let MP=[],MA=[];
+const mFilhos=id=>MP.filter(x=>(x.parent||null)===(id||null));
+function mDesc(id){const o=[id];for(let i=0;i<o.length;i++)MP.filter(x=>x.parent===o[i]).forEach(x=>o.push(x.id));return o;}
+const mCnt=id=>mDesc(id).reduce((t,d)=>t+MA.filter(f=>f.pasta===d).length,0);
+async function mCarrega(){const [p,a]=await Promise.all([SB.from('m_pastas').select('*').order('criado'),SB.from('m_arquivos').select('id,pasta')]);MP=p.data||[];MA=a.data||[];}
+const cardMP=x=>{const ns=mFilhos(x.id).length;return `<button class="mpasta" data-p="${x.id}"><span class="mpi">📁</span><b>${esc(x.nome)}</b>${x.descricao?`<small>${esc(x.descricao)}</small>`:''}<span class="mpc">${ns?ns+' subpasta(s) · ':''}${mCnt(x.id)} arquivo(s) · ${x.email?'só '+(IS_ADMIN?'deste aluno':'sua'):'para todos'}</span></button>`;};
+async function listaPastas(gerais){$('app').innerHTML='<p class="pend">Carregando…</p>';await mCarrega();
+  const L=mFilhos(null).filter(x=>gerais?!x.email:(!x.email||x.email===ALVO)).sort((x,y)=>(x.email?0:1)-(y.email?0:1));
   $('app').innerHTML=`<div class="intro"><h2>${gerais?'Materiais para todos os mentorados':'Materiais'}</h2><p>${gerais?'Pastas que aparecem para todos os alunos da mentoria individual.':IS_ADMIN?`Pastas só de ${esc(ANOME)} e as pastas para todos os mentorados.`:'Os seus materiais da mentoria: os arquivos só seus e os materiais para todos os alunos da mentoria.'}</p>${IS_ADMIN?`<button class="btn pri" id="pNova" style="margin-top:10px">+ Nova pasta ${gerais?'para todos':'só para '+esc((ANOME||'').split(' ')[0])}</button>`:''}</div>
-   <div class="mpastas">${L.map(x=>`<button class="mpasta" data-p="${x.id}"><span class="mpi">📁</span><b>${esc(x.nome)}</b>${x.descricao?`<small>${esc(x.descricao)}</small>`:''}<span class="mpc">${cnt[x.id]||0} arquivo(s) · ${x.email?'só '+(IS_ADMIN?'deste aluno':'sua'):'para todos'}</span></button>`).join('')||'<p class="pend">Nenhuma pasta ainda.</p>'}</div>`;
-  if(IS_ADMIN)$('pNova').onclick=()=>editaPasta(null,gerais);
-  $('app').querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>abrePastaM(L.find(x=>x.id===b.dataset.p),gerais));}
-function editaPasta(p,gerais){const novo=!p;
-  const [d,fecha]=mdlg(`<div class="mtop"><h3>${novo?'Nova pasta':'Alterar pasta'}</h3><p>${(p?!p.email:gerais)?'Para todos os mentorados':'Só para '+esc(ANOME)}</p></div><form class="mfm"><label>Nome da pasta<input name="nome" value="${esc(p?p.nome:'')}" required></label><label>Descrição <small>(opcional)</small><input name="descricao" value="${esc(p&&p.descricao||'')}"></label><p class="mmsg"></p><div class="mbt"><button class="btn pri" type="submit">Salvar</button><button class="btn" type="button" data-fecha>Cancelar</button></div></form>`);
-  const f=d.querySelector('form');f.onsubmit=async ev=>{ev.preventDefault();const row={nome:f.nome.value.trim(),descricao:f.descricao.value.trim()||null};if(novo)row.email=gerais?null:ALVO;
+   <div class="mpastas">${L.map(cardMP).join('')||'<p class="pend">Nenhuma pasta ainda.</p>'}</div>`;
+  if(IS_ADMIN)$('pNova').onclick=()=>editaPasta(null,gerais,null);
+  $('app').querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>abrePastaM(MP.find(x=>x.id===b.dataset.p),gerais));}
+function editaPasta(p,gerais,pai){const novo=!p;const ppai=pai?MP.find(x=>x.id===pai):null;
+  const [d,fecha]=mdlg(`<div class="mtop"><h3>${novo?(pai?'Nova subpasta':'Nova pasta'):'Alterar pasta'}</h3><p>${ppai?'dentro de '+esc(ppai.nome)+' · ':''}${(p?!p.email:(ppai?!ppai.email:gerais))?'Para todos os mentorados':'Só para '+esc(ANOME)}</p></div><form class="mfm"><label>Nome da ${pai?'subpasta':'pasta'}<input name="nome" value="${esc(p?p.nome:'')}" required></label><label>Descrição <small>(opcional)</small><input name="descricao" value="${esc(p&&p.descricao||'')}"></label><p class="mmsg"></p><div class="mbt"><button class="btn pri" type="submit">Salvar</button><button class="btn" type="button" data-fecha>Cancelar</button></div></form>`);
+  const f=d.querySelector('form');f.onsubmit=async ev=>{ev.preventDefault();const row={nome:f.nome.value.trim(),descricao:f.descricao.value.trim()||null};if(novo){row.email=ppai?ppai.email:(gerais?null:ALVO);row.parent=pai||null;}
     const r=novo?await SB.from('m_pastas').insert(row).select().single():await SB.from('m_pastas').update(row).eq('id',p.id).select().single();
-    if(r.error){d.querySelector('.mmsg').textContent=r.error.message;return;}fecha();abrePastaM(r.data,gerais);};}
-async function abrePastaM(p,gerais){$('app').innerHTML='<p class="pend">Carregando…</p>';
-  const {data}=await SB.from('m_arquivos').select('*').eq('pasta',p.id).order('criado',{ascending:false});const L=data||[];
-  $('app').innerHTML=`<div class="intro"><button class="btn" id="pVolta">‹ Voltar</button><h2 style="margin-top:10px">📁 ${esc(p.nome)}</h2>${p.descricao?`<p>${esc(p.descricao)}</p>`:''}${IS_ADMIN?`<div class="mbt" style="margin-top:10px"><label class="btn pri">⬆ Enviar arquivos<input type="file" multiple hidden id="pUp"></label><button class="btn" id="pEd">✎ Alterar pasta</button><button class="btn" id="pDel">Excluir pasta</button></div><p class="mmsg" id="pMsg"></p>`:''}</div>
-   <div class="marqs">${L.map(f=>`<div class="marq"><span class="mai">${icoArq(f.tipo||'')}</span><div><b>${esc(f.nome)}</b><small>${kb(f.tamanho||0)} · ${new Date(f.criado).toLocaleDateString('pt-BR')}</small></div><button class="btn" data-abre="${esc(f.path)}">Abrir</button>${IS_ADMIN?`<button class="btn" data-rm="${f.id}">Excluir</button>`:''}</div>`).join('')||'<p class="pend">Esta pasta ainda está vazia.</p>'}</div>`;
-  $('pVolta').onclick=()=>gerais?telaGerais():telaMat();
-  $('app').querySelectorAll('[data-abre]').forEach(b=>b.onclick=async()=>{const w=window.open('','_blank');const {data,error}=await SB.storage.from('mentoria').createSignedUrl(b.dataset.abre,3600);if(error||!data){if(w)w.close();alert('Não foi possível abrir: '+(error?error.message:''));return;}if(w)w.location=data.signedUrl;else location.href=data.signedUrl;});
+    if(r.error){d.querySelector('.mmsg').textContent=r.error.message;return;}fecha();await mCarrega();abrePastaM(r.data,gerais);};}
+async function abrePastaM(p,gerais){$('app').innerHTML='<p class="pend">Carregando…</p>';if(!MP.length)await mCarrega();
+  const {data}=await SB.from('m_arquivos').select('*').eq('pasta',p.id).order('criado',{ascending:false});const L=data||[];const S=mFilhos(p.id);
+  const cam=[];let q=p;while(q){cam.unshift(q);q=MP.find(x=>x.id===q.parent);}
+  $('app').innerHTML=`<div class="intro"><div class="mmig"><button class="btn" data-ir="">‹ ${gerais?'Materiais para todos':'Materiais'}</button>${cam.slice(0,-1).map(x=>`<span>›</span><button class="btn" data-ir="${x.id}">${esc(x.nome)}</button>`).join('')}</div><h2 style="margin-top:10px">📁 ${esc(p.nome)}</h2>${p.descricao?`<p>${esc(p.descricao)}</p>`:''}${IS_ADMIN?`<div class="mbt" style="margin-top:10px"><label class="btn pri">⬆ Enviar arquivos<input type="file" multiple hidden id="pUp"></label><button class="btn" id="pTur">📎 Usar documento das turmas</button><button class="btn" id="pSub">+ Subpasta</button><button class="btn" id="pEd">✎ Alterar pasta</button><button class="btn" id="pDel">Excluir pasta</button></div><p class="mmsg" id="pMsg"></p>`:''}</div>
+   ${S.length?`<div class="mpastas" style="margin-bottom:14px">${S.map(cardMP).join('')}</div>`:''}
+   <div class="marqs">${L.map(f=>`<div class="marq"><span class="mai">${icoArq(f.tipo||'')}</span><div><b>${esc(f.nome)}</b><small>${kb(f.tamanho||0)} · ${new Date(f.criado).toLocaleDateString('pt-BR')}${IS_ADMIN&&f.origem==='materiais'?' · do material das turmas (sem cópia)':''}</small></div><button class="btn" data-abre="${f.id}">Abrir</button>${IS_ADMIN?`<button class="btn" data-rm="${f.id}">${f.origem==='materiais'?'Tirar daqui':'Excluir'}</button>`:''}</div>`).join('')||(S.length?'':'<p class="pend">Esta pasta ainda está vazia.</p>')}</div>`;
+  $('app').querySelectorAll('[data-ir]').forEach(b=>b.onclick=()=>b.dataset.ir?abrePastaM(MP.find(x=>x.id===b.dataset.ir),gerais):(gerais?telaGerais():telaMat()));
+  $('app').querySelectorAll('.mpastas [data-p]').forEach(b=>b.onclick=()=>abrePastaM(MP.find(x=>x.id===b.dataset.p),gerais));
+  $('app').querySelectorAll('[data-abre]').forEach(b=>b.onclick=async()=>{const f=L.find(x=>x.id===b.dataset.abre);const w=window.open('','_blank');const {data,error}=await SB.storage.from(f.origem==='materiais'?'materiais':'mentoria').createSignedUrl(f.path,3600);if(error||!data){if(w)w.close();alert('Não foi possível abrir: '+(error?error.message:''));return;}if(w)w.location=data.signedUrl;else location.href=data.signedUrl;});
   if(!IS_ADMIN)return;
-  $('pEd').onclick=()=>editaPasta(p,gerais);
-  $('pDel').onclick=async()=>{if(!confirm(`Excluir a pasta “${p.nome}” e os ${L.length} arquivo(s) dela? Não dá para desfazer.`))return;if(L.length)await SB.storage.from('mentoria').remove(L.map(f=>f.path));await SB.from('m_pastas').delete().eq('id',p.id);gerais?telaGerais():telaMat();};
-  $('app').querySelectorAll('[data-rm]').forEach(b=>b.onclick=async()=>{const f=L.find(x=>x.id===b.dataset.rm);if(!confirm('Excluir “'+f.nome+'”?'))return;await SB.storage.from('mentoria').remove([f.path]);await SB.from('m_arquivos').delete().eq('id',f.id);abrePastaM(p,gerais);});
+  $('pEd').onclick=()=>editaPasta(p,gerais,null);$('pSub').onclick=()=>editaPasta(null,gerais,p.id);$('pTur').onclick=()=>puxaTurmas(p,gerais);
+  $('pDel').onclick=async()=>{const ids=mDesc(p.id);const {data:T}=await SB.from('m_arquivos').select('path,origem').in('pasta',ids);const TT=T||[];
+    if(!confirm(`Excluir a pasta “${p.nome}”${ids.length>1?`, as ${ids.length-1} subpasta(s)`:''} e os ${TT.length} arquivo(s)? Não dá para desfazer.`))return;
+    const rm=TT.filter(f=>f.origem!=='materiais').map(f=>f.path);if(rm.length)await SB.storage.from('mentoria').remove(rm);await SB.from('m_pastas').delete().eq('id',p.id);await mCarrega();
+    const pai=p.parent&&MP.find(x=>x.id===p.parent);pai?abrePastaM(pai,gerais):(gerais?telaGerais():telaMat());};
+  $('app').querySelectorAll('[data-rm]').forEach(b=>b.onclick=async()=>{const f=L.find(x=>x.id===b.dataset.rm);if(!confirm((f.origem==='materiais'?'Tirar “'+f.nome+'” desta pasta? O documento continua no material das turmas.':'Excluir “'+f.nome+'”?')))return;if(f.origem!=='materiais')await SB.storage.from('mentoria').remove([f.path]);await SB.from('m_arquivos').delete().eq('id',f.id);await mCarrega();abrePastaM(p,gerais);});
   $('pUp').onchange=async ev=>{const fs=[...ev.target.files];if(!fs.length)return;const msg=t=>$('pMsg').textContent=t;
     for(let i=0;i<fs.length;i++){const f=fs[i];if(f.size>200*1048576){msg(`“${f.name}” passa de 200 MB e ficou de fora.`);continue;}msg(`Enviando ${i+1} de ${fs.length}: ${f.name}…`);
       const limpo=f.name.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^\w.\-]+/g,'_');const path=`${p.email||'geral'}/${p.id}/${Date.now()}-${limpo}`;
       const up=await SB.storage.from('mentoria').upload(path,f,{contentType:f.type||'application/octet-stream'});if(up.error){msg('Erro ao enviar '+f.name+': '+up.error.message);return;}
       const {error}=await SB.from('m_arquivos').insert({pasta:p.id,path,nome:f.name,tipo:f.type||'',tamanho:f.size});if(error){msg('Erro: '+error.message);return;}}
-    abrePastaM(p,gerais);};}
+    await mCarrega();abrePastaM(p,gerais);};}
+/* usar um documento que já está nos Materiais das turmas, sem subir de novo */
+async function puxaTurmas(p,gerais){const [a,b,c]=await Promise.all([SB.from('pastas').select('id,nome,parent').order('ordem').order('criado_em'),SB.from('arquivos').select('id,pasta,nome,path,tipo,tamanho').not('pasta','is',null).order('nome'),SB.from('m_arquivos').select('path').eq('pasta',p.id)]);
+  const P=a.data||[],F=b.data||[],ja=new Set((c.data||[]).map(x=>x.path));
+  const cam=id=>{const L=[];let x=P.find(z=>z.id===id);while(x){L.unshift(x.nome);x=P.find(z=>z.id===x.parent);}return L.join(' › ');};
+  const G={};F.forEach(f=>{const k=cam(f.pasta);(G[k]=G[k]||[]).push(f);});
+  const [d,fecha]=mdlg(`<div class="mtop"><h3>Usar documento das turmas</h3><p>Escolha os documentos dos Materiais das turmas para aparecer em “${esc(p.nome)}”. O arquivo não é enviado de novo: é o mesmo, sem ocupar espaço a mais.</p></div>
+   <div class="mfm"><input type="search" id="ptBusca" placeholder="Buscar pelo nome do documento"><div class="ptl" id="ptL">${Object.keys(G).sort().map(k=>`<div class="ptg"><b>📁 ${esc(k)}</b>${G[k].map(f=>`<label class="pti" data-n="${esc((f.nome+' '+k).toLowerCase())}"><input type="checkbox" value="${f.id}"${ja.has(f.path)?' checked disabled':''}> ${icoArq(f.tipo||'')} ${esc(f.nome)} <small>${kb(f.tamanho||0)}${ja.has(f.path)?' · já está aqui':''}</small></label>`).join('')}</div>`).join('')||'<p class="pend">Ainda não há documentos nos Materiais das turmas.</p>'}</div>
+   <p class="mmsg"></p><div class="mbt"><button class="btn pri" id="ptOk">Adicionar à pasta</button><button class="btn" type="button" data-fecha>Cancelar</button></div></div>`);
+  d.querySelector('#ptBusca').oninput=e=>{const q=e.target.value.toLowerCase().trim();d.querySelectorAll('.pti').forEach(l=>l.hidden=q&&!l.dataset.n.includes(q));};
+  d.querySelector('#ptOk').onclick=async()=>{const ids=[...d.querySelectorAll('.pti input:checked:not(:disabled)')].map(x=>x.value);if(!ids.length){d.querySelector('.mmsg').textContent='Marque pelo menos um documento.';return;}
+    const rows=ids.map(id=>{const f=F.find(x=>x.id===id);return {pasta:p.id,path:f.path,nome:f.nome,tipo:f.tipo||'',tamanho:f.tamanho||0,origem:'materiais'};});
+    const {error}=await SB.from('m_arquivos').insert(rows);if(error){d.querySelector('.mmsg').textContent=error.message;return;}fecha();await mCarrega();abrePastaM(p,gerais);};}
 
 /* ---------- entrada ---------- */
 async function entrar(){const {data:{session}}=await SB.auth.getSession();if(!session){location.replace('/?volta='+encodeURIComponent(location.pathname+location.hash));return;}
@@ -1908,7 +1933,7 @@ label.btn{display:inline-flex;align-items:center;cursor:pointer}
 .mvenc b{font:800 18px var(--display)}.mvenc p{margin:4px 0 0;line-height:1.5}
 </style>
 
-<script src="../js/presenca.js?v=1795786989" defer></script>
-<script src="../js/menu.js?v=1795786989" defer></script>
+<script src="../js/presenca.js?v=1795874265" defer></script>
+<script src="../js/menu.js?v=1795874265" defer></script>
 </body>
 </html>

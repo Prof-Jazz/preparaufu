@@ -34,6 +34,9 @@
 .blk.sugst:hover{background:color-mix(in srgb,var(--c) 45%,transparent)}
 .blk:not(.sugst):not(.aula){background:var(--c);color:#fff}.blk:not(.sugst):not(.aula) small{color:rgba(255,255,255,.85)}.blk:not(.sugst):not(.aula) b::before{content:'✓ '}
 .ment .leg,.ment .evm{display:none}
+.lib{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;margin-top:4px;font-size:12.5px!important;color:var(--muted)}.lib label{display:inline-flex;gap:4px;align-items:center;cursor:pointer;color:var(--ink)}.lib em{color:#E5484D;font-style:normal;font-weight:700}
+.libup{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:14px 0 8px;font-size:14px}.libup label{display:inline-flex;gap:5px;align-items:center;cursor:pointer}
+.migalha{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:10px}.migalha .voltar{margin:0}.migalha span{color:var(--muted)}
 </style>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Aulas e materiais · PREPARA UFU</title>
@@ -208,7 +211,7 @@ textarea{min-height:70px;resize:vertical}
 <div id="exBar" hidden>Modo aluno exemplo — é assim que o aluno da turma <select id="exTurma"><option value="assessoria">Assessoria PREPARA UFU</option><option value="matematica">Curso de Matemática</option></select> vê esta página. <button type="button" id="exSair">Sair do modo exemplo</button></div>
 <main id="app"></main>
 
-<script>(function(){var V='1795786989';var K='bqufu-recarga-';
+<script>(function(){var V='1795874265';var K='bqufu-recarga-';
 function aberto(){return !!document.querySelector('.cdlg,.dlg,#printArea')||document.body.classList.contains('imprimindo');}
 function confere(forcar){fetch('/versao.txt?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null}).then(function(t){t=t&&t.trim();if(!t||t===V)return;
   try{if(sessionStorage.getItem(K+t))return;}catch(e){}
@@ -294,7 +297,12 @@ async function carregar(){
   const [a,b,c]=await Promise.all([SB.from('aulas').select('*').order('data').order('ini',{nullsFirst:true}),SB.from('arquivos').select('*').order('criado_em'),SB.from('pastas').select('*').order('ordem').order('criado_em')]);
   const err=a.error||b.error||c.error;if(err)throw err;AULAS=a.data||[];ARQ=b.data||[];PASTAS=c.data||[];
   if(!IS_ADMIN){const r=await SB.from('agenda_estudos').select('*').eq('email',verReal()?verEmail():EMAIL).order('data').order('ini');MEUS=r.data||[];}
-  if(EXT){AULAS=AULAS.filter(x=>(x.turmas||[]).includes(EXT));PASTAS=PASTAS.filter(x=>(x.turmas||[]).includes(EXT));ARQ=ARQ.filter(f=>f.pasta?PASTAS.some(x=>x.id===f.pasta):AULAS.some(x=>x.id===f.aula));}}
+  if(EXT){AULAS=AULAS.filter(x=>(x.turmas||[]).includes(EXT));ARQ=ARQ.filter(f=>f.pasta?(f.turmas||[]).includes(EXT):AULAS.some(x=>x.id===f.aula));PASTAS=PASTAS.filter(p=>desc(p.id).some(id=>ARQ.some(f=>f.pasta===id)));}}
+const filhos=id=>PASTAS.filter(p=>(p.parent||null)===(id||null));
+function desc(id){const o=[id];for(let i=0;i<o.length;i++)PASTAS.filter(p=>p.parent===o[i]).forEach(p=>o.push(p.id));return o;}
+const nArq=id=>desc(id).reduce((t,d)=>t+ARQ.filter(f=>f.pasta===d).length,0);
+function caminho(id){const L=[];let p=PASTAS.find(x=>x.id===id);while(p){L.unshift(p);p=PASTAS.find(x=>x.id===p.parent);}return L;}
+let LIB_UP=['assessoria','matematica'];
 async function abrirArq(f,btn){const w=window.open('','_blank');if(btn)btn.disabled=true;
   const {data,error}=await SB.storage.from('materiais').createSignedUrl(f.path,3600);if(btn)btn.disabled=false;
   if(error||!data){if(w)w.close();alert('Não foi possível abrir o arquivo: '+(error?error.message:''));return;}
@@ -306,12 +314,15 @@ async function enviar(files,dono,id,prog){for(const [i,f] of [...files].entries(
     const path=`${dono}/${id}/${Date.now()}-${nomeSeguro(f.name)}`;
     const up=await SB.storage.from('materiais').upload(path,f,{contentType:f.type||undefined,upsert:false});
     if(up.error){alert('Erro ao enviar '+f.name+': '+up.error.message);continue;}
-    const row={nome:f.name,path,tipo:f.type||null,tamanho:f.size};row[dono]=id;
+    const row={nome:f.name,path,tipo:f.type||null,tamanho:f.size};row[dono]=id;if(dono==='pasta')row.turmas=LIB_UP.slice();
     const ins=await SB.from('arquivos').insert(row);if(ins.error){alert('Erro ao registrar '+f.name+': '+ins.error.message);await SB.storage.from('materiais').remove([path]);}}
   if(prog)prog('');}
-async function apagarArq(f){await SB.storage.from('materiais').remove([f.path]);const {error}=await SB.from('arquivos').delete().eq('id',f.id);if(error)alert(error.message);}
-function linhaArq(f,adm){return `<div class="arq">${fic(f.nome)}<div class="tx"><b>${esc(f.nome)}</b><span>${tamanho(f.tamanho)}${f.criado_em?' · enviado em '+new Date(f.criado_em).toLocaleDateString('pt-BR'):''}</span></div><div class="bt"><button class="btn" data-abre="${f.id}">Abrir</button>${adm?`<button class="btn del" data-apaga="${f.id}">Excluir</button>`:''}</div></div>`;}
-function ligaArqs(root,depois){root.querySelectorAll('[data-abre]').forEach(b=>b.onclick=()=>abrirArq(ARQ.find(f=>f.id===b.dataset.abre),b));
+async function usadoMentoria(paths){if(!paths.length)return new Set();const {data}=await SB.from('m_arquivos').select('path').eq('origem','materiais').in('path',paths);return new Set((data||[]).map(x=>x.path));}
+async function apagarArq(f){const usa=await usadoMentoria([f.path]);if(!usa.has(f.path))await SB.storage.from('materiais').remove([f.path]);const {error}=await SB.from('arquivos').delete().eq('id',f.id);if(error)alert(error.message);}
+function linhaArq(f,adm){return `<div class="arq">${fic(f.nome)}<div class="tx"><b>${esc(f.nome)}</b><span>${tamanho(f.tamanho)}${f.criado_em?' · enviado em '+new Date(f.criado_em).toLocaleDateString('pt-BR'):''}</span>${adm&&f.pasta?`<span class="lib">Liberado para: ${TURMAS.map(([k,n])=>`<label><input type="checkbox" data-lib="${f.id}" value="${k}"${(f.turmas||[]).includes(k)?' checked':''}> ${k==='assessoria'?'Assessoria':'Curso de Matemática'}</label>`).join('')}${(f.turmas||[]).length?'':'<em> · ninguém vê ainda</em>'}</span>`:''}</div><div class="bt"><button class="btn" data-abre="${f.id}">Abrir</button>${adm?`<button class="btn del" data-apaga="${f.id}">Excluir</button>`:''}</div></div>`;}
+function ligaArqs(root,depois){root.querySelectorAll('[data-lib]').forEach(c=>c.onchange=async()=>{const f=ARQ.find(x=>x.id===c.dataset.lib);const t=[...root.querySelectorAll(`[data-lib="${f.id}"]:checked`)].map(x=>x.value);
+    const {error}=await SB.from('arquivos').update({turmas:t}).eq('id',f.id);if(error){alert(error.message);c.checked=!c.checked;return;}f.turmas=t;const em=c.closest('.lib').querySelector('em');if(!t.length&&!em)c.closest('.lib').insertAdjacentHTML('beforeend','<em> · ninguém vê ainda</em>');if(t.length&&em)em.remove();});
+  root.querySelectorAll('[data-abre]').forEach(b=>b.onclick=()=>abrirArq(ARQ.find(f=>f.id===b.dataset.abre),b));
   root.querySelectorAll('[data-apaga]').forEach(b=>b.onclick=async()=>{const f=ARQ.find(x=>x.id===b.dataset.apaga);if(!confirm('Excluir o arquivo “'+f.nome+'”?'))return;b.disabled=true;await apagarArq(f);await carregar();depois();});}
 function zonaUpload(el,dono,id,depois){el.innerHTML=`<div class="drop" tabindex="0"><b>+ Enviar arquivos</b><br><span style="font-size:13px">Clique ou arraste aqui PDFs, imagens, planilhas… (até 200 MB cada)</span><input type="file" multiple hidden></div><p class="pend up" style="margin:6px 0 0"></p>`;
   const d=el.querySelector('.drop'),inp=el.querySelector('input'),pr=t=>el.querySelector('.up').textContent=t;
@@ -464,38 +475,42 @@ function editarEvento(a,dia){const novoEv=!a;a=a||{data:dia,ini:'19:00',fim:'20:
 async function telaMat(pasta){abas('tabMat');$('app').innerHTML='<p class="pend">Carregando os materiais…</p>';
   try{await carregar();}catch(e){$('app').innerHTML=`<div class="card"><p class="pend">${esc(e.message)}</p></div>`;return;}
   if(pasta)abrePasta(pasta);else desenhaPastas();}
+function cardPasta(p){const n=nArq(p.id),ns=filhos(p.id).length;return `<button class="pasta" data-p="${p.id}" title="${esc(p.nome)}">${p.capa?`<div class="capa" role="img" aria-label="${esc(p.nome)}" style="background-image:url('${esc(capaURL(p.capa))}')"></div>`:`<div class="capa ph"><i></i></div><div class="ov"><b>${esc(p.nome)}</b>${p.descricao?`<span>${esc(p.descricao)}</span>`:''}<span>${ns?ns+' subpasta'+(ns===1?'':'s')+' · ':''}${n} arquivo${n===1?'':'s'}</span></div>`}</button>`;}
 function desenhaPastas(){
-  const comAula=AULAS.filter(a=>ARQ.some(f=>f.aula===a.id));
-  $('app').innerHTML=`<div class="card mhead"><div style="flex:1;min-width:220px"><h2 class="t">Materiais</h2><p class="pend" style="margin:2px 0 0">${IS_ADMIN?'Crie pastas e escolha para quais turmas cada uma fica liberada. Os alunos só veem as pastas da turma deles.':'PDFs, imagens, planejamentos e tudo o que o Prof. Jazz disponibilizar para você.'}</p></div>${IS_ADMIN?'<button class="btn pri" id="novaPasta">+ Nova pasta</button>':''}</div>
-   <div class="pastas">${PASTAS.map(p=>{const n=ARQ.filter(f=>f.pasta===p.id).length;return `<button class="pasta" data-p="${p.id}" title="${esc(p.nome)}">${p.capa?`<div class="capa" role="img" aria-label="${esc(p.nome)}" style="background-image:url('${esc(capaURL(p.capa))}')"></div>`:`<div class="capa ph"><i></i></div><div class="ov"><b>${esc(p.nome)}</b>${p.descricao?`<span>${esc(p.descricao)}</span>`:''}<span>${n} arquivo${n===1?'':'s'}</span>${IS_ADMIN?`<div>${tags(p.turmas)}</div>`:''}</div>`}</button>`;}).join('')}
+  const comAula=AULAS.filter(a=>ARQ.some(f=>f.aula===a.id));const T=filhos(null);
+  $('app').innerHTML=`<div class="card mhead"><div style="flex:1;min-width:220px"><h2 class="t">Materiais</h2><p class="pend" style="margin:2px 0 0">${IS_ADMIN?'Crie pastas e subpastas. Em cada documento você escolhe para quem ele fica liberado (Assessoria, Curso de Matemática ou os dois). A pasta só aparece para o aluno se tiver algum documento liberado para a turma dele.':'PDFs, imagens, planejamentos e tudo o que o Prof. Jazz disponibilizar para você.'}</p></div>${IS_ADMIN?'<button class="btn pri" id="novaPasta">+ Nova pasta</button>':''}</div>
+   <div class="pastas">${T.map(cardPasta).join('')}
    ${comAula.length?`<button class="pasta aulas" data-p="__aulas"><div class="capa ph"><i></i></div><div class="ov"><b>Materiais das aulas</b><span>Os anexos de cada aula da agenda</span><span>${comAula.length} aula${comAula.length===1?'':'s'} com material</span></div></button>`:''}</div>
-   ${!PASTAS.length&&!comAula.length?`<div class="card"><p class="pend" style="margin:0">${IS_ADMIN?'Nenhuma pasta ainda. Clique em “+ Nova pasta” para começar.':'Ainda não há materiais disponíveis para a sua turma.'}</p></div>`:''}`;
+   ${!T.length&&!comAula.length?`<div class="card"><p class="pend" style="margin:0">${IS_ADMIN?'Nenhuma pasta ainda. Clique em “+ Nova pasta” para começar.':'Ainda não há materiais disponíveis para a sua turma.'}</p></div>`:''}`;
   $('app').querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>abrePasta(b.dataset.p));
-  if(IS_ADMIN)$('novaPasta').onclick=()=>editarPasta(null);}
+  if(IS_ADMIN)$('novaPasta').onclick=()=>editarPasta(null,null);}
 function abrePasta(id){
   if(id==='__aulas'){const L=AULAS.filter(a=>ARQ.some(f=>f.aula===a.id));
     $('app').innerHTML=`<button class="voltar" id="volta">‹ Todas as pastas</button><div class="card"><h2 class="t">Materiais das aulas</h2><p class="pend" style="margin:2px 0 14px">Os arquivos anexados às aulas da agenda.</p>${L.map(a=>{const d=parse(a.data);return `<h4 style="margin:14px 0 8px;font:700 16px var(--display)">${d.getDate()}/${String(d.getMonth()+1).padStart(2,'0')} · ${esc(titulo(a))}</h4><div class="arqs">${ARQ.filter(f=>f.aula===a.id).map(f=>linhaArq(f,IS_ADMIN)).join('')}</div>`;}).join('')}</div>`;
     $('volta').onclick=desenhaPastas;ligaArqs($('app'),()=>abrePasta('__aulas'));return;}
-  const p=PASTAS.find(x=>x.id===id);if(!p){desenhaPastas();return;}const L=ARQ.filter(f=>f.pasta===id);
-  $('app').innerHTML=`<button class="voltar" id="volta">‹ Todas as pastas</button>
-   <div class="card"><div class="mhead"><div class="phd" style="flex:1;min-width:220px">${p.capa?`<img src="${esc(capaURL(p.capa))}" alt="">`:''}<div><h2 class="t">${esc(p.nome)}</h2>${p.descricao?`<p class="pend" style="margin:2px 0 0">${esc(p.descricao)}</p>`:''}${IS_ADMIN?`<div style="margin-top:6px">${tags(p.turmas)}</div>`:''}</div></div>${IS_ADMIN?'<button class="btn" id="edPasta">Editar pasta</button>':''}</div>
-   ${IS_ADMIN?'<div id="upP" style="margin-top:14px"></div>':''}
-   <div class="arqs" style="margin-top:14px">${L.length?L.map(f=>linhaArq(f,IS_ADMIN)).join(''):'<p class="pend" style="margin:0">Esta pasta ainda está vazia.</p>'}</div></div>`;
-  $('volta').onclick=desenhaPastas;ligaArqs($('app'),()=>abrePasta(id));
-  if(IS_ADMIN){zonaUpload($('upP'),'pasta',id,()=>abrePasta(id));$('edPasta').onclick=()=>editarPasta(p);}}
-function editarPasta(p){const nova=!p;p=p||{nome:'',descricao:'',turmas:['assessoria','matematica']};
-  const [dl,fecha]=dialogo(`<div class="top"><div><h3>${nova?'Nova pasta':'Editar pasta'}</h3></div><button class="x" data-fecha aria-label="Fechar">×</button></div>
-   <form class="bd"><label class="f">Nome da pasta<input name="nome" type="text" value="${esc(p.nome)}" placeholder="ex.: Listas de exercícios" required></label>
+  const p=PASTAS.find(x=>x.id===id);if(!p){desenhaPastas();return;}const L=ARQ.filter(f=>f.pasta===id),S=filhos(id),cam=caminho(id);
+  $('app').innerHTML=`<div class="migalha"><button class="voltar" data-ir="">Materiais</button>${cam.map((x,i)=>i<cam.length-1?`<span>›</span><button class="voltar" data-ir="${x.id}">${esc(x.nome)}</button>`:`<span>›</span><b>${esc(x.nome)}</b>`).join('')}</div>
+   <div class="card"><div class="mhead"><div class="phd" style="flex:1;min-width:220px">${p.capa?`<img src="${esc(capaURL(p.capa))}" alt="">`:''}<div><h2 class="t">${esc(p.nome)}</h2>${p.descricao?`<p class="pend" style="margin:2px 0 0">${esc(p.descricao)}</p>`:''}</div></div>${IS_ADMIN?'<button class="btn" id="novaSub">+ Subpasta</button><button class="btn" id="edPasta">Editar pasta</button>':''}</div>
+   ${S.length?`<div class="pastas sub" style="margin-top:14px">${S.map(cardPasta).join('')}</div>`:''}
+   ${IS_ADMIN?`<div class="libup"><b>Liberar os próximos envios para:</b>${TURMAS.map(([k])=>`<label><input type="checkbox" name="libup" value="${k}"${LIB_UP.includes(k)?' checked':''}> ${k==='assessoria'?'Assessoria':'Curso de Matemática'}</label>`).join('')}</div><div id="upP"></div>`:''}
+   <div class="arqs" style="margin-top:14px">${L.length?L.map(f=>linhaArq(f,IS_ADMIN)).join(''):(S.length?'':'<p class="pend" style="margin:0">Esta pasta ainda está vazia.</p>')}</div></div>`;
+  $('app').querySelectorAll('[data-ir]').forEach(b=>b.onclick=()=>b.dataset.ir?abrePasta(b.dataset.ir):desenhaPastas());
+  $('app').querySelectorAll('.pastas [data-p]').forEach(b=>b.onclick=()=>abrePasta(b.dataset.p));
+  ligaArqs($('app'),()=>abrePasta(id));
+  if(IS_ADMIN){$('app').querySelectorAll('[name=libup]').forEach(c=>c.onchange=()=>{LIB_UP=[...$('app').querySelectorAll('[name=libup]:checked')].map(x=>x.value);});
+    zonaUpload($('upP'),'pasta',id,()=>abrePasta(id));$('edPasta').onclick=()=>editarPasta(p,p.parent||null);$('novaSub').onclick=()=>editarPasta(null,id);}}
+function editarPasta(p,pai){const nova=!p;p=p||{nome:'',descricao:''};const nomePai=pai?(PASTAS.find(x=>x.id===pai)||{}).nome:'';
+  const [dl,fecha]=dialogo(`<div class="top"><div><h3>${nova?(pai?'Nova subpasta':'Nova pasta'):'Editar pasta'}</h3>${pai?`<p style="margin:2px 0 0;opacity:.9">dentro de ${esc(nomePai)}</p>`:''}</div><button class="x" data-fecha aria-label="Fechar">×</button></div>
+   <form class="bd"><label class="f">Nome da ${pai?'subpasta':'pasta'}<input name="nome" type="text" value="${esc(p.nome)}" placeholder="ex.: Listas de exercícios" required></label>
    <label class="f">Descrição (opcional)<input name="descricao" type="text" value="${esc(p.descricao||'')}" placeholder="ex.: listas semanais de Matemática"></label>
-   <div class="f"><b style="font-size:14px">Capa da pasta (formato story do Instagram, 1080 × 1920)</b><div class="capaed"><div class="pv" id="cpPv"${p.capa?` style="background-image:url('${esc(capaURL(p.capa))}')"`:''}>${p.capa?'':'sem capa'}</div><div class="bx"><input type="file" name="capa" accept="image/*"><span class="pend" style="margin:0">Se a imagem tiver outro formato, o site enquadra pelo centro.</span>${p.capa?'<label style="display:inline-flex;gap:6px;align-items:center;font-size:14px"><input type="checkbox" name="semcapa"> Remover a capa</label>':''}</div></div></div>
-   <div class="f"><b style="font-size:14px">Quem pode ver esta pasta</b><div class="chk">${TURMAS.map(([k,n])=>`<label><input type="checkbox" name="t_${k}"${p.turmas.includes(k)?' checked':''}> ${n}</label>`).join('')}</div></div>
-   <p class="msg"></p><div class="btns"><button class="btn pri" type="submit">${nova?'Criar pasta':'Salvar'}</button><button class="btn" type="button" data-fecha>Cancelar</button>${nova?'':'<button class="btn del" type="button" data-x="del" style="margin-left:auto">Excluir pasta</button>'}</div></form>`);
+   <div class="f"><b style="font-size:14px">Capa (formato story do Instagram, 1080 × 1920, opcional)</b><div class="capaed"><div class="pv" id="cpPv"${p.capa?` style="background-image:url('${esc(capaURL(p.capa))}')"`:''}>${p.capa?'':'sem capa'}</div><div class="bx"><input type="file" name="capa" accept="image/*"><span class="pend" style="margin:0">Se a imagem tiver outro formato, o site enquadra pelo centro.</span>${p.capa?'<label style="display:inline-flex;gap:6px;align-items:center;font-size:14px"><input type="checkbox" name="semcapa"> Remover a capa</label>':''}</div></div></div>
+   <p class="pend" style="margin:0">Para quem aparece é definido em cada documento: a pasta só aparece para a turma que tiver algum documento liberado dentro dela.</p>
+   <p class="msg"></p><div class="btns"><button class="btn pri" type="submit">${nova?'Criar':'Salvar'}</button><button class="btn" type="button" data-fecha>Cancelar</button>${nova?'':'<button class="btn del" type="button" data-x="del" style="margin-left:auto">Excluir pasta</button>'}</div></form>`);
   const f=dl.querySelector('form'),msg=t=>dl.querySelector('.msg').textContent=t;let blob=null;
   f.capa.onchange=async()=>{const fl=f.capa.files[0];if(!fl)return;try{blob=await prepCapa(fl);const pv=dl.querySelector('#cpPv');pv.style.backgroundImage=`url('${URL.createObjectURL(blob)}')`;pv.textContent='';}catch(e){blob=null;msg('Não consegui ler essa imagem. Use JPG, PNG ou WEBP.');}};
-  f.onsubmit=async ev=>{ev.preventDefault();const turmas=TURMAS.map(t=>t[0]).filter(k=>f['t_'+k].checked);if(!turmas.length){msg('Marque pelo menos uma turma.');return;}
-    const bt=f.querySelector('[type=submit]');bt.disabled=true;msg('');
-    const row={nome:f.nome.value.trim(),descricao:f.descricao.value.trim()||null,turmas};
-    const r=nova?await SB.from('pastas').insert({...row,ordem:PASTAS.length}).select().single():await SB.from('pastas').update(row).eq('id',p.id);
+  f.onsubmit=async ev=>{ev.preventDefault();const bt=f.querySelector('[type=submit]');bt.disabled=true;msg('');
+    const row={nome:f.nome.value.trim(),descricao:f.descricao.value.trim()||null};
+    const r=nova?await SB.from('pastas').insert({...row,parent:pai||null,turmas:['assessoria','matematica'],ordem:filhos(pai).length}).select().single():await SB.from('pastas').update(row).eq('id',p.id);
     if(r.error){msg(r.error.message);bt.disabled=false;return;}
     const id=nova?r.data.id:p.id;
     if(blob||(f.semcapa&&f.semcapa.checked)){let novaCapa=null;
@@ -503,11 +518,14 @@ function editarPasta(p){const nova=!p;p=p||{nome:'',descricao:'',turmas:['assess
       if(p.capa)await SB.storage.from('capas').remove([p.capa]);
       await SB.from('pastas').update({capa:novaCapa}).eq('id',id);}
     fecha();await carregar();abrePasta(id);};
-  const del=dl.querySelector('[data-x=del]');if(del)del.onclick=async()=>{const L=ARQ.filter(x=>x.pasta===p.id);if(!confirm(`Excluir a pasta “${p.nome}”${L.length?' e os '+L.length+' arquivo(s) dentro dela':''}? Não dá para desfazer.`))return;
-    if(L.length)await SB.storage.from('materiais').remove(L.map(x=>x.path));if(p.capa)await SB.storage.from('capas').remove([p.capa]);const {error}=await SB.from('pastas').delete().eq('id',p.id);if(error){msg(error.message);return;}fecha();await carregar();desenhaPastas();};}
+  const del=dl.querySelector('[data-x=del]');if(del)del.onclick=async()=>{const ids=desc(p.id);const L=ARQ.filter(x=>ids.includes(x.pasta));const ns=ids.length-1;
+    if(!confirm(`Excluir a pasta “${p.nome}”${ns?`, as ${ns} subpasta(s)`:''}${L.length?' e os '+L.length+' arquivo(s) dentro dela':''}? Não dá para desfazer.`))return;
+    const usa=await usadoMentoria(L.map(x=>x.path));const rm=L.map(x=>x.path).filter(x=>!usa.has(x));if(rm.length)await SB.storage.from('materiais').remove(rm);
+    const caps=PASTAS.filter(x=>ids.includes(x.id)&&x.capa).map(x=>x.capa);if(caps.length)await SB.storage.from('capas').remove(caps);
+    const {error}=await SB.from('pastas').delete().eq('id',p.id);if(error){msg(error.message);return;}fecha();await carregar();p.parent?abrePasta(p.parent):desenhaPastas();};}
 entrar();
 </script>
-<script src="../js/presenca.js?v=1795786989" defer></script>
-<script src="../js/menu.js?v=1795786989" defer></script>
+<script src="../js/presenca.js?v=1795874265" defer></script>
+<script src="../js/menu.js?v=1795874265" defer></script>
 </body>
 </html>

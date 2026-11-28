@@ -29,7 +29,7 @@ Plataforma do Prof. Jazz (preparação para o vestibular da UFU). Este manual ex
 | `/bancodequestoes/` | **Banco de Questões UFU** 2015–2026: filtros, responder A–D (corrige na hora, grava em `banco_resp`, erro vai ao Caderno), "Minha lista" com questões de várias matérias (salva no navegador, `localStorage bqufu-lista-<email>`) para baixar em PDF/Word ou **resolver ali** ("Resolver a lista aqui", com Embaralhar), Análise de Incidência. Menu da plataforma fica no cabeçalho só aqui. |
 | `/assessoria/` | Área das turmas: **Perfil de estudos**, **Cronograma Semanal** (gerador automático + edição), **Plano de Estudos** (reagendar), Dúvidas; para a equipe: Comportamento da turma, Alunos, Cadastro (liberar alunos, recursos, assessores, zerar senha), Plano da turma. |
 | `/mentoria/` | Mentoria individual: o mentorado tem Início, Dashboard, Plano individual (`m_plano`), Cronograma, Encontros, Materiais próprios, Perfil, Dúvidas; o admin gerencia mentorados, cobranças, raio-x. |
-| `/aulas/` | **Agenda** (aulas ao vivo da turma + planejamento do aluno, `agenda_estudos`) e **Materiais** (pastas com capa 1080×1920). |
+| `/aulas/` | **Agenda** (aulas ao vivo da turma + planejamento do aluno, `agenda_estudos`) e **Materiais** (pastas e subpastas com capa 1080×1920; a liberação é por documento: `arquivos.turmas`; a pasta só aparece para a turma que tem documento liberado nela ou nas subpastas — `ve_pasta`). |
 | `/minhasaulas/` | **Minhas Aulas**: videoaulas do YouTube com player próprio (sem marca), seções com capa 1280×720, grupos renomeáveis, links "Conteúdo da aula", estrelas, fórum "Dúvidas e comentários". |
 | `/img/exemplo/` | Questões fictícias usadas no aluno exemplo. |
 
@@ -48,7 +48,7 @@ Regras fixas do Prof. Jazz: toda melhoria para as turmas vale também para a men
 
 ## 3. Banco de dados (Supabase)
 
-Funções-chave (SQL, `security definer`): `is_admin`, `is_assessor`, `is_staff` (admin ou assessor), `is_assessoria`, `is_mentorado`, `is_allowed`, `eu_email()`, `staff_ve(email)` (equipe pode ver aquele aluno), `meu_papel`, `minhas_areas`, `meus_recursos`, `tem_recurso(r)`, `minha_turma`, `nome_curto`, `admin_lista`, `m_lista`, `turma_ao_vivo`, `quem_online`, `ping`, mensagens (`enviar_msg`, `conversa`, `minhas_conversas`, `nao_lidas`, `bloqueio`, `denunciar`), Minhas Aulas (`va_ve`, `va_forum`, `va_alertas`, `va_duvidas_prof`, `va_medias`, `va_vi_respostas`), materiais (`ve_arquivo`, `ve_turmas`, `m_ve_pasta`, `m_ve_arquivo`), `m_copiar_plano`, `uid_aluno`.
+Funções-chave (SQL, `security definer`): `is_admin`, `is_assessor`, `is_staff` (admin ou assessor), `is_assessoria`, `is_mentorado`, `is_allowed`, `eu_email()`, `staff_ve(email)` (equipe pode ver aquele aluno), `meu_papel`, `minhas_areas`, `meus_recursos`, `tem_recurso(r)`, `minha_turma`, `nome_curto`, `admin_lista`, `m_lista`, `turma_ao_vivo`, `quem_online`, `ping`, mensagens (`enviar_msg`, `conversa`, `minhas_conversas`, `nao_lidas`, `bloqueio`, `denunciar`), Minhas Aulas (`va_ve`, `va_forum`, `va_alertas`, `va_duvidas_prof`, `va_medias`, `va_vi_respostas`), materiais (`ve_arquivo`, `ve_pasta`, `ve_turmas`, `m_ve_pasta`, `m_ve_arquivo`), `m_copiar_plano`, `uid_aluno`.
 
 Tabelas principais:
 
@@ -64,7 +64,7 @@ Tabelas principais:
 | `banco_resp` | respostas do Banco de Questões (`questao`, `escolha`, `correta`). |
 | `caderno_erros` | Caderno de Erros (`materia`, `assunto`, `motivo`, `fonte`, `obs`, `img`, `questao`, `gabarito` A–E, `tentativas` jsonb, `revisada`). "Resolver de novo" (dentro do cartão, `ligaResolver` em estudos; sem janela pop-up, a pedido do Prof. Jazz): refaz a questão; foto exige gabarito ao anotar; registro antigo sem gabarito pede o gabarito na 1ª revisão e guarda; acerto marca revisada; questão do Banco também grava em `banco_resp`. `img`: caminho no bucket `caderno`, `banco:q/<id>.jpg` (foto do próprio banco) ou `/img/...`. |
 | `agenda_estudos` | planejamento do aluno na Agenda (`origem` manual/crono). |
-| `aulas`, `pastas`, `arquivos`, `m_pastas`, `m_arquivos`, `m_encontros`, `m_pagamentos` | Agenda/Materiais das turmas e da mentoria. |
+| `aulas`, `pastas`, `arquivos`, `m_pastas`, `m_arquivos`, `m_encontros`, `m_pagamentos` | Agenda/Materiais das turmas e da mentoria. `pastas.parent` e `m_pastas.parent` = subpastas. `arquivos.turmas` = para quem o documento está liberado. `m_arquivos.origem` = `'mentoria'` (arquivo no bucket `mentoria`) ou `'materiais'` (documento das turmas usado na mentoria sem cópia: mesmo `path` do bucket `materiais`; tirar da pasta ou excluir a pasta nunca apaga o arquivo; excluir o documento nas turmas mantém o arquivo se a mentoria ainda usa). |
 | `va_cursos`, `va_aulas`, `va_links`, `va_feito`, `va_aval`, `va_duvidas` | Minhas Aulas. |
 | `presenca`, `acessos`, `mensagens`, `bloqueios`, `denuncias` | online/estudando, acessos diários, chat entre alunos. |
 
@@ -121,4 +121,5 @@ git add -A && git -c user.name=Prof-Jazz commit -m "..." && git push origin HEAD
 - Identidade: azul `#3A8CCB`, amarelo `#DDDD24`/`#F2C811`, verde `#1BAF7A`, laranja `#EB6834`, grafite; logos em `/bancodequestoes/logo/`.
 
 ## 8. Histórico resumido (nov./2026)
+- 28/11: Materiais com subpastas (turmas e mentoria); liberação por documento (Assessoria / Curso de Matemática); mentoria pode "Usar documento das turmas" sem subir de novo (`_dev/sql/materiais_subpastas.sql`).
 22/11 site no ar (banco + assessoria) · 23/11 Aulas e materiais, Cronograma Semanal · 24/11 Sala de Estudos, mensagens, mentoria individual, assessores · 25/11 Minhas Aulas, Agenda com cronograma, recursos por aluno do Curso, reagendar plano, Estudos Extras, regras do gerador · 26/11 Caderno de Erros, menu híbrido, Banco com resposta direta (conta como estudo), aluno exemplo com dados fictícios, auditoria de permissões, migração de perfis antigos, resolver a Minha lista no Banco · 27/11 resolver de novo no Caderno de Erros (cartões compactos, 3 por linha).
